@@ -1,0 +1,243 @@
+// GENERAL SECTION:
+
+enum customerStatus(Mevcut,Potansiyel,Riskli,Kara Liste)
+
+enum shippingMethod(Fabricadan, Depodan, Limana, EXW, FCA, CPT, CIP, DAT, DAP, DDP, FAS, FOB, CFR, CIF)
+
+enum city(ALL STATES IN TURKEY)
+
+table taxOffice(
+    id int primary auto increment
+    name string
+    city city[]
+)
+
+table bank(
+    id int primary auto increment
+    name string
+)
+
+table currency(
+    id int primary auto increment
+    name string
+    code string (3 letters)
+    rate float
+    exchange_percent float
+)
+----------------------------------------------------
+// SALES SECTION:
+
+table customer(
+    id int primary auto increment
+    name string
+    foregin bool
+    relatedPerson string
+    title string
+    email string
+    phoneNumber string
+    firstOffer date
+    salesPersonId int (relation personnel.id if column handleSales is true)
+    firstRegisterDate date
+    status customerStatus[] 
+    returnDate date
+    salesOpinion string 
+    creditNote string
+    shippingMethod shippingMethod[]
+    meterLimit float
+    address string
+    city String
+    taxOfficeId int (relation taxOffice.id)
+    taxNumber string
+    paymentKind paymentKind[]
+    Note string
+    bankID (relation bank.id)
+    currency (relation currency.id)
+    iban string
+    swift string
+)
+
+table customerMeetPlan(
+    id int primary auto increment
+    customer (reltaion customer.id)
+    country string
+    visitReason string
+    plannedDate date
+    realDate date
+    visitingPersonnel (relation personnel.id)
+    result string
+    accuracyRate float
+    note string
+    travelExpense float
+    accomodationExpense float
+    foodExpense float
+    giftExpense float
+    officeExpense float
+)
+
+table customerMeetReport(
+    id int primary auto increment
+    revisionDate date
+    meetDate date
+    personnelId (relation personnel.id)
+    visitReason enum("Pazarlama Faalieyti", "Rutin Ziyaret", "Şikâyet", "Diğer")
+    customerId (relation customer.id)
+    city city[]
+    district string
+    peopleMet json[]
+    wayOfMeeting enum(Telefon, E-mail, Face to face)
+    contentsOfMeeting text
+    customerNote text
+    reponseToCustomer text
+    )
+
+table competitorReport(
+    id int primary auto increment
+    competitorName string
+    date date
+)
+
+table competitionReportSubject(
+    id int primary auto increment
+    name string
+)
+
+table competitorReportContent(
+    id int primary auto increment
+    competitorReportId (relation competitorReport.id)
+    competitionReportSubjectId (relation competitionReportSubject.id)
+    exists bool
+    status string
+    gap string
+    strategy string
+    action string
+)
+
+table customerPrice(
+    id int primary auto increment
+    date date
+    customerId (relation customer.id)
+    productId (relation product.id)
+    currencyId (relation currency.id)
+    price float
+    unit enum(m, kg)
+    )
+
+table offer(
+    id int primary auto increment
+    offerNo int
+    saleNo int
+    offerDate date
+    proformaNo int
+    date date
+    customerId (relation customer.id)
+    requestNo int
+    requestDate date
+    requestDeadline date
+    requestBudget float
+    productId (relation product.id) 
+    specification text
+    detail text
+    quantity float
+    unit enum(m, kg)
+    price float
+    currency (relation currency.id)
+    vat float
+    total float
+    maturity int
+    daysDue int
+    deadlineDate date
+    specialRequirment string
+    deliveryAddress string
+    shippingMethod shippingMethod[]
+    proformaDetails string
+    packingListNo int
+    additionalTerms text
+    validPeriod int
+    validPeriodType enum(ay, hafta, gün)
+    conditions json[]
+    lastValidityDate date
+    acceptanceDate date
+    rejectionDate date
+    status enum(Verilecek, Red, onaylandi, beklemede)
+    meetNote text
+    lastMeetDate date
+    meetStatement text
+    totalKDV float
+)
+
+table order(
+    id int primary auto increment
+    orderNo string
+    customerId (relation customer.id)
+    index int
+    productId (relation product.id)
+    quantity float
+    unit enum(m, kg)
+    deliveryAddress text
+    acceptanceDate date
+    specifications text
+    details text
+)
+
+table customerComplaint(
+    id int primary auto increment
+    date date
+    subject string
+    productId (relation product.id)
+    packagingDate date
+    complaintDetails
+    dealingPersonnelId (relation personnel.id)
+    dealingDate date
+    evaluatingPersonnel (relation.id)
+    actionTaken text
+    dofNo int
+    result string
+)
+
+table productFeasabilityForm(
+    id int primary auto increment
+    date date
+    attendees json[]
+    productName string
+    customerId (relation customer.id)
+    yearlyProductionCount int
+    startDateGoal date
+    productPriceGoal float
+    marketReady bool
+    demandReady bool
+    legalReady bool
+    testReady bool
+    productionReady bool
+    measurmentReady bool
+    rawMaterialCost float
+    productionCost float
+    process json([{
+        name, duration, machineLaborCost, totalCost
+    }])
+    material json([{
+        name, unitPrice, amount, totalCost
+    }])
+    auxEquipment json([{
+        name, unitPrice, productionSupplyCost, totalCost  
+    }])
+    machine json([{
+        name, freeCapacity, requiredCapacity, capacityStatus
+    }])
+    costs json([{
+        name, cost, evaluation, description
+    }])
+    
+    cost float
+    customerBudget float
+    priceDifferencePercent float
+    suitable bool
+    costsCovered bool
+)
+
+table product(
+    id int primary auto increment
+    code string
+    name string
+)
+
+----------------------------------------------------

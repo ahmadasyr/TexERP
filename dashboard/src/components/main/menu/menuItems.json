@@ -1,0 +1,39 @@
+[
+  {
+    "title": "Home",
+    "link": "/dashboard",
+    "desc": "Home page"
+  },
+  {
+    "title": "Sales",
+    "desc": "View sales actions",
+    "icon": "money",
+    "subItems": [
+      {
+        "title": "Customer",
+        "link": "/customer",
+        "desc": "View/Edit customers",
+        "icon": "user"
+      },
+      {
+        "title": "Bank",
+        "link": "/bank",
+        "desc": "View/Edit banks",
+        "icon": "bank"
+      }
+    ]
+  },
+  {
+    "title": "Males",
+    "desc": "View sales actions",
+    "icon": "money",
+    "subItems": [
+      {
+        "title": "Customer",
+        "link": "/customere",
+        "desc": "View/Edit customers",
+        "icon": "user"
+      }
+    ]
+  }
+]
