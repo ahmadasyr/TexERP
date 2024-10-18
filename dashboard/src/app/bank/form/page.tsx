@@ -80,16 +80,10 @@ const CustomerForm: React.FC = () => {
     boxShadow: 28,
     p: 4,
   };
-  let modal = (
-    <FormModal alertValue={alertValue} setAlertValue={setAlertValue} />
-  );
-  useEffect(() => {
-    modal = <FormModal alertValue={alertValue} setAlertValue={setAlertValue} />;
-  }, [alertValue]);
 
   return (
     <>
-      {modal}
+      <FormModal alertValue={alertValue} setAlertValue={setAlertValue} />
       <form onSubmit={handleSubmit}>
         <Typography variant="h4" gutterBottom>
           Bank

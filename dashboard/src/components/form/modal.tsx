@@ -13,11 +13,15 @@ const style = {
   boxShadow: 24,
   p: 4,
 };
+interface FormModalProps {
+  alertValue: number;
 
-export const FormModal = (
-  alertValue: number,
-  setAlertValue: React.Dispatch<React.SetStateAction<number>>
-) => {
+  setAlertValue: React.Dispatch<React.SetStateAction<number>>;
+}
+export const FormModal: React.FC<FormModalProps> = ({
+  alertValue,
+  setAlertValue,
+}) => {
   useEffect(() => {
     console.log("change");
   }, [alertValue]);
