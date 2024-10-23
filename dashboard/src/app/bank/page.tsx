@@ -4,29 +4,23 @@ import React from "react";
 import { Button } from "@mui/material";
 import { useRouter } from "next/navigation";
 import EnhancedTable from "@/components/table/tableMain";
-import { fetchData, headCells, Data, tableName } from "./bank";
+import { fetchData, headCells, tableName } from "./bank";
+import { Data } from "./bank";
 
-const Customer: React.FC = () => {
+const Page: React.FC = () => {
   const router = useRouter();
   return (
     <div>
-      {/* Chenge */}
-      <h1>Banks</h1>
-      <Button
-        variant="contained"
-        color="primary"
-        onClick={() => router.push("/bank/form")}
-      >
-        Create New
-      </Button>
       <EnhancedTable
+        title="Banks"
         fetchData={fetchData}
         headCells={headCells}
         data={Data}
         tableName={tableName}
+        viewable={true}
       />
     </div>
   );
 };
 
-export default Customer;
+export default Page;

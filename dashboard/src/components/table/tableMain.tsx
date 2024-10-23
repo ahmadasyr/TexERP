@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { use, useEffect } from "react";
 import Box from "@mui/material/Box";
 import Paper from "@mui/material/Paper";
 import TableContainer from "@mui/material/TableContainer";
@@ -10,38 +10,48 @@ import TablePagination from "@mui/material/TablePagination";
 import EnhancedTableHead from "../../components/table/tableHead";
 import EnhancedTableToolbar from "../../components/table/tableToolBar";
 import { getComparator, stableSort } from "../../components/table/utils";
-import { TableCell } from "@mui/material";
+import { Button, IconButton, Link, TableCell } from "@mui/material";
 import Checkbox from "@mui/material/Checkbox";
-
+import "./table.scss";
+import { styled } from "@mui/material/styles";
+import { Visibility } from "@mui/icons-material";
+import { useRouter } from "next/navigation";
 type Data = {
   id: number;
 };
 
 type EnhancedTableProps = {
+  title: string;
   fetchData: (setRows: React.Dispatch<React.SetStateAction<Data[]>>) => void;
   headCells: any[];
   data: Data[];
   tableName: string;
+  viewable?: boolean;
 };
 
 export default function EnhancedTable({
+  title,
   fetchData,
   headCells,
   tableName,
-  data,
+  viewable,
 }: EnhancedTableProps): JSX.Element {
+  const router = useRouter();
   const [rows, setRows] = React.useState<Data[]>([]);
   const [order, setOrder] = React.useState<"asc" | "desc">("asc");
   const [orderBy, setOrderBy] = React.useState<keyof Data>("id");
-  const [selected, setSelected] = React.useState<readonly number[]>([]);
+  const [selected, setSelected] = React.useState<number[]>([]);
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
   const [refresh, setRefresh] = React.useState(false);
-
+  const [searchTerm, setSearchTerm] = React.useState("");
   React.useEffect(() => {
     fetchData(setRows);
   }, [refresh]);
 
+  useEffect(() => {
+    console.log(rows);
+  }, [rows]);
   const handleRequestSort = (
     event: React.MouseEvent<unknown>,
     property: keyof Data
@@ -62,7 +72,7 @@ export default function EnhancedTable({
 
   const handleClick = (id: number) => {
     const selectedIndex = selected.indexOf(id);
-    let newSelected: readonly number[] = [];
+    let newSelected: number[] = [];
 
     if (selectedIndex === -1) {
       newSelected = newSelected.concat(selected, id);
@@ -90,45 +100,83 @@ export default function EnhancedTable({
     setPage(0);
   };
 
+  // const emptyRows =
+  //   page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
+  const StyledTableRow = styled(TableRow)(({ theme }) => ({
+    "&:nth-of-type(even)": {
+      backgroundColor: theme.palette.action.hover,
+    },
+    "&:nth-of-type(even):hover": {
+      backgroundColor: theme.palette.action.selected,
+    },
+    "&:nth-of-type(odd):hover": {
+      backgroundColor: theme.palette.action.selected,
+    },
+    "&:last-child td, &:last-child th": {
+      border: 0,
+    },
+  }));
+
+  React.useEffect(() => {
+    fetchData(setRows);
+  }, [refresh]);
+
+  // Filter rows based on search term
+  const filteredRows = rows.filter((row) =>
+    Object.values(row).some((value) =>
+      String(value).toLowerCase().includes(searchTerm.toLowerCase())
+    )
+  );
+
   const emptyRows =
-    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
+    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - filteredRows.length) : 0;
+  const [visibleColumns, setVisibleColumns] = React.useState(
+    headCells.map((column) => ({ ...column, visible: true }))
+  );
 
   return (
-    <Box sx={{ width: "100%" }}>
-      <Paper sx={{ width: "100%", mb: 2 }}>
+    <Box className="enhanced-table">
+      <Paper className="table-paper">
         <EnhancedTableToolbar
+          title={title}
           tableName={tableName}
           selected={selected}
           setSelected={setSelected}
           numSelected={selected.length}
           refresh={refresh}
           setRefresh={setRefresh}
+          searchTerm={searchTerm} // Pass search term state
+          setSearchTerm={setSearchTerm} // Pass setSearchTerm function
+          visibleColumns={visibleColumns} // Pass headCells
+          setVisibleColumns={setVisibleColumns} // Pass setRows function
+          headCells={headCells} // Pass headCells
         />
         <TableContainer>
-          <Table stickyHeader sx={{ minWidth: 750 }}>
+          <Table stickyHeader>
             <EnhancedTableHead
-              headCells={headCells}
+              headCells={visibleColumns}
               numSelected={selected.length}
               order={order}
               orderBy={orderBy as string}
-              onSelectAllClick={handleSelectAllClick}
+              onSelectAllClick={(e) => handleSelectAllClick(e)}
               onRequestSort={handleRequestSort}
-              rowCount={rows.length}
+              rowCount={filteredRows.length}
             />
             <TableBody>
-              {stableSort(rows, getComparator(order, orderBy))
+              {stableSort(filteredRows, getComparator(order, orderBy)) // Use filteredRows
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 .map((row) => {
                   const isItemSelected = selected.indexOf(row.id) !== -1;
                   return (
-                    <TableRow
+                    <StyledTableRow
                       hover
-                      onClick={() => handleClick(row.id)}
-                      role="checkbox"
                       aria-checked={isItemSelected}
                       tabIndex={-1}
                       key={row.id}
                       selected={isItemSelected}
+                      className={`table-row ${
+                        isItemSelected ? "selected" : ""
+                      }`}
                     >
                       <TableCell padding="checkbox">
                         <Checkbox
@@ -137,24 +185,65 @@ export default function EnhancedTable({
                           onClick={() => handleClick(row.id)}
                         />
                       </TableCell>
-                      {headCells.map((headCell) => (
-                        <TableCell key={headCell.id}>
-                          {row[headCell.id as keyof Data]}
+                      {visibleColumns.map((headCell) =>
+                        headCell?.visible ? (
+                          <TableCell key={headCell.id}>
+                            {typeof row[headCell.id as keyof Data] ===
+                            "boolean" ? (
+                              row[headCell.id as keyof Data] ? (
+                                "Evet"
+                              ) : (
+                                "Hayır"
+                              )
+                            ) : typeof row[headCell.id as keyof Data] ===
+                              "object" ? (
+                              <Link
+                                href={`/${headCell.id}/view/?id=${
+                                  (row[headCell.id as keyof Data] as any)?.id
+                                }`}
+                              >
+                                {headCell.displayValue.map(
+                                  (value: keyof Data) =>
+                                    (row[headCell.id as keyof Data] as any)[
+                                      value
+                                    ] + " "
+                                )}
+                              </Link>
+                            ) : (
+                              row[headCell.id as keyof Data]
+                            )}
+                          </TableCell>
+                        ) : null
+                      )}
+                      {viewable ? (
+                        <TableCell key="view" style={{ width: 100 }}>
+                          <IconButton
+                            onClick={() =>
+                              router.push(`/${tableName}/view/?id=${row.id}`)
+                            }
+                          >
+                            <Visibility />
+                          </IconButton>
                         </TableCell>
-                      ))}
-                    </TableRow>
+                      ) : null}
+                    </StyledTableRow>
                   );
                 })}
+              {emptyRows > 0 && (
+                <TableRow style={{ height: 53 * emptyRows }}>
+                  <TableCell colSpan={6} />
+                </TableRow>
+              )}
             </TableBody>
           </Table>
         </TableContainer>
         <TablePagination
           rowsPerPageOptions={[5, 10, 25]}
           component="div"
-          count={rows.length}
+          count={filteredRows.length} // Use filteredRows length
           rowsPerPage={rowsPerPage}
           page={page}
-          onPageChange={(_, newPage) => handleChangePage(newPage)}
+          onPageChange={(_, newPage) => setPage(newPage)}
           onRowsPerPageChange={handleChangeRowsPerPage}
         />
       </Paper>

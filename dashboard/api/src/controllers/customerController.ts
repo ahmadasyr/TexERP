@@ -3,12 +3,19 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-export const getCustomers = async (
+export const getAllCustomers = async (
   req: Request,
   res: Response
 ): Promise<void> => {
   try {
-    const customers = await prisma.customer.findMany();
+    const customers = await prisma.customer.findMany({
+      include: {
+        taxOffice: true,
+        bank: true,
+        currency: true,
+        personnel: true,
+      },
+    });
     res.status(200).json(customers);
   } catch (error) {
     res.status(500).json({ error: "Failed to fetch customers" });
@@ -46,7 +53,7 @@ export const createCustomer = async (
     email,
     phoneNumber,
     firstOffer,
-    salesPersonId,
+    personnelId,
     firstRegisterDate,
     status,
     returnDate,
@@ -75,7 +82,7 @@ export const createCustomer = async (
         email,
         phoneNumber,
         firstOffer: new Date(firstOffer),
-        salesPersonId,
+        personnelId,
         firstRegisterDate: new Date(firstRegisterDate),
         status,
         returnDate: new Date(returnDate),
@@ -85,14 +92,23 @@ export const createCustomer = async (
         meterLimit,
         address,
         city,
-        taxOfficeId,
         taxNumber,
         paymentKind,
         note,
-        bankId,
-        currencyId,
         iban,
         swift,
+        taxOffice: {
+          connect: { id: taxOfficeId },
+        },
+        bank: {
+          connect: { id: bankId },
+        },
+        currency: {
+          connect: { id: currencyId },
+        },
+        personnel: {
+          connect: { id: personnelId },
+        },
       },
     });
     res.status(201).json(newCustomer);
@@ -112,7 +128,7 @@ export const updateCustomer = async (req: Request, res: Response) => {
     email,
     phoneNumber,
     firstOffer,
-    salesPersonId,
+    personnelId,
     firstRegisterDate,
     status,
     returnDate,
@@ -143,7 +159,7 @@ export const updateCustomer = async (req: Request, res: Response) => {
         email,
         phoneNumber,
         firstOffer: new Date(firstOffer),
-        salesPersonId,
+        personnelId,
         firstRegisterDate: new Date(firstRegisterDate),
         status,
         returnDate: new Date(returnDate),

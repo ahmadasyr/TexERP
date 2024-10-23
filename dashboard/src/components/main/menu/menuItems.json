@@ -5,6 +5,10 @@
     "desc": "Home page"
   },
   {
+    "title": "Admin",
+    "desc": "View admin actions"
+  },
+  {
     "title": "Sales",
     "desc": "View sales actions",
     "icon": "money",

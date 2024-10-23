@@ -4,7 +4,7 @@ import * as personnelController from "../controllers/personnelController";
 const router = express.Router();
 
 router.post("/", personnelController.createPersonnel);
-router.get("/", personnelController.getPersonnels);
+router.get("/", personnelController.getAllPersonnels);
 router.get("/sales", personnelController.getSalesPersonnel);
 router.get("/:id", personnelController.getPersonnelById);
 router.put("/:id", personnelController.updatePersonnel);

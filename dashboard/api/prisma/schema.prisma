@@ -15,8 +15,8 @@ datasource db {
 
 model personnel {
   id               Int       @id @default(autoincrement())
-  firstName        String    @db.VarChar(50)
-  lastName         String    @db.VarChar(50)
+  firstName        String?   @db.VarChar(50)
+  lastName         String?   @db.VarChar(50)
   position         String?   @db.VarChar(50)
   department       String?   @db.VarChar(50)
   dateOfHire       DateTime?
@@ -29,6 +29,7 @@ model personnel {
   customerMeetReport  customerMeetReport[]
   complaintsDealt     customerComplaint[]  @relation("ref_dealingPersonnel")
   complaintsEvaluated customerComplaint[]  @relation("ref_evaluatingPersonnel")
+  customer            customer[]
 }
 
 // GENERAL SECTION
@@ -64,15 +65,8 @@ enum offerStatus {
 //   Diğer
 // }
 
-enum customerStatus {
-  Mevcut
-  Potansiyel
-  Riskli
-  Kara_Liste
-}
-
 enum shippingMethod {
-  Fabricadan
+  Fabrikadan
   Depodan
   Limana
   EXW
@@ -129,9 +123,9 @@ model customer {
   email             String
   phoneNumber       String
   firstOffer        DateTime
-  salesPersonId     Int?
+  personnelId       Int
   firstRegisterDate DateTime
-  status            customerStatus
+  status            String
   returnDate        DateTime
   salesOpinion      String
   creditNote        String
@@ -152,6 +146,7 @@ model customer {
   taxOffice              taxOffice                @relation(fields: [taxOfficeId], references: [id])
   bank                   bank                     @relation(fields: [bankId], references: [id])
   currency               currency                 @relation(fields: [currencyId], references: [id])
+  personnel              personnel                @relation(fields: [personnelId], references: [id])
   customerMeetPlan       customerMeetPlan[]
   customerMeetReport     customerMeetReport[]
   customerPrice          customerPrice[]

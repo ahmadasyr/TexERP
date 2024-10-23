@@ -4,7 +4,10 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 // Get all banks
-export const getBanks = async (req: Request, res: Response): Promise<void> => {
+export const getAllBanks = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
   try {
     const banks = await prisma.bank.findMany();
     res.json(banks);

@@ -1,74 +1,120 @@
 "use client";
-import React from "react";
-import { Button, Grid, Typography } from "@mui/material";
-import {
-  NewTextField,
-  NewSelect,
-  NewCheckBox,
-  NewRelation,
-  NewDate,
-} from "../../../components/form/FormFields";
-import { useFormData } from "./useFormData";
-import { formFields } from "../customer";
+import { Data, formFields, tableName, title } from "../customer";
+import FormComponent from "@/components/form/FormComponent";
 
-const CustomerForm: React.FC = () => {
-  const { formData, handleChange, handleSubmit, tableData } = useFormData();
+const render = [
+  {
+    field: "name",
+    type: "text",
+  },
+  {
+    field: "foreign",
+    type: "checkbox",
+  },
+  {
+    field: "relatedPerson",
+    type: "text",
+  },
+  {
+    field: "title",
+    type: "text",
+  },
+  {
+    field: "email",
+    type: "email",
+  },
+  {
+    field: "phoneNumber",
+    type: "phone",
+  },
+  {
+    field: "firstOffer",
+    type: "date",
+  },
+  {
+    field: "personnelId",
+    type: "relation",
+  },
+  {
+    field: "firstRegisterDate",
+    type: "date",
+  },
+  {
+    field: "status",
+    type: "select",
+  },
+  {
+    field: "returnDate",
+    type: "date",
+  },
+  {
+    field: "salesOpinion",
+    type: "text",
+  },
+  {
+    field: "creditNote",
+    type: "text",
+  },
+  {
+    field: "shippingMethod",
+    type: "select",
+  },
+  {
+    field: "meterLimit",
+    type: "number",
+  },
+  {
+    field: "address",
+    type: "text",
+  },
+  {
+    field: "city",
+    type: "text",
+  },
+  {
+    field: "taxOfficeId",
+    type: "relation",
+  },
+  {
+    field: "taxNumber",
+    type: "text",
+  },
+  {
+    field: "paymentKind",
+    type: "text",
+  },
+  {
+    field: "note",
+    type: "text",
+  },
+  {
+    field: "bankId",
+    type: "relation",
+  },
+  {
+    field: "currencyId",
+    type: "relation",
+  },
+  {
+    field: "iban",
+    type: "text",
+  },
+  {
+    field: "swift",
+    type: "text",
+  },
+];
 
-  interface FieldProps {
-    type: string;
-    field: string;
-  }
-
-  const renderField = ({ type, field }: FieldProps) => {
-    let allProps = {
-      keyProp: field,
-      formFields,
-      formData,
-      handleChange,
-      tableData,
-    };
-    switch (type) {
-      case "text":
-        return <NewTextField {...allProps} />;
-      case "select":
-        return <NewSelect {...allProps} />;
-      case "checkbox":
-        return <NewCheckBox {...allProps} />;
-      case "relation":
-        return <NewRelation {...allProps} />;
-      case "date":
-        return <NewDate {...allProps} />;
-      default:
-        return null;
-    }
-  };
-
+const Page = () => {
   return (
-    <form onSubmit={handleSubmit}>
-      <Typography variant="h4" gutterBottom>
-        Customer Form
-      </Typography>
-      <Grid container spacing={2}>
-        <Grid item xs={12}>
-          {renderField({
-            type: "text",
-            field: "name",
-          })}
-          {renderField({ type: "select", field: "status" })}
-          {renderField({ type: "select", field: "test" })}
-          {renderField({ type: "checkbox", field: "foreign" })}
-          {renderField({ type: "relation", field: "relatedPerson" })}
-          {renderField({ type: "date", field: "firstRegisterDate" })}
-          {renderField({ type: "relation", field: "bankId" })}
-        </Grid>
-        <Grid item xs={12}>
-          <Button type="submit" variant="contained" color="primary">
-            Submit
-          </Button>
-        </Grid>
-      </Grid>
-    </form>
+    <FormComponent
+      Data={Data}
+      formFields={formFields}
+      tableName={tableName}
+      title={title}
+      render={render}
+    />
   );
 };
 
-export default CustomerForm;
+export default Page;

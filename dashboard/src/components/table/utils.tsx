@@ -29,6 +29,7 @@ export interface HeadCell {
   numeric: boolean;
   disablePadding: boolean;
   label: string;
+  displayValue?: string[];
 }
 
 export const handleDelete = async (tableName: string, selected: number[]) => {

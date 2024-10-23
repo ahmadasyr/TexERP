@@ -9,7 +9,7 @@ const style = {
   transform: "translate(-50%, -50%)",
   width: 400,
   bgcolor: "background.paper",
-  border: "2px solid #000",
+  borderRadius: 2,
   boxShadow: 24,
   p: 4,
 };
@@ -41,7 +41,7 @@ export const FormModal: React.FC<FormModalProps> = ({
             maxWidth: 400,
           }}
         >
-          <Typography id="alert-modal-title" variant="h6" component="h2">
+          <Typography id="alert-modal-title" variant="h4" component="h2">
             {alertValue === 200 ? "Success" : "Error"}
           </Typography>
           <Typography id="alert-modal-description" sx={{ mt: 2 }}>
@@ -90,7 +90,26 @@ export const FormModal: React.FC<FormModalProps> = ({
         aria-describedby="alert-modal-description"
       >
         <Box sx={style}>
-          <Typography id="alert-modal-title" variant="h6" component="h2">
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              mb: 2,
+            }}
+          >
+            <img
+              src="https://example.com/animated-icon.gif"
+              alt="Animated Icon"
+              style={{ width: 50, height: 50 }}
+            />
+          </Box>
+          <Typography
+            id="alert-modal-title"
+            variant="h4"
+            component="h2"
+            align="center"
+          >
             {alertValue === 200 ? "Success" : "Error"}
           </Typography>
           <Typography id="alert-modal-description" sx={{ mt: 2 }}>

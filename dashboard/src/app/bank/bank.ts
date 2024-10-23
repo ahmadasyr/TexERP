@@ -1,41 +1,23 @@
 import { HeadCell } from "../../components/table/utils";
-
+import { createField } from "../../components/form/utils";
 export const tableName = "bank";
 
-export default interface Data {
+export interface Data {
   id: number;
   name: string;
 }
-const createField = ({
-  name = "",
-  label = "",
-  type = "",
-  required = false,
-  relation = false,
-  table = "",
-  value = "",
-  displayValue = null as string[] | string | null,
-  options = [] as string[],
-  dependant = false,
-  dependency = "",
-  multiOptions = [] as { value: string; options: string[] }[],
-}) => ({
-  name,
-  label,
-  type,
-  required,
-  relation,
-  table,
-  value,
-  displayValue,
-  options,
-  dependant,
-  dependency,
-  multiOptions,
-});
 
 export const formFields = [
   createField({ name: "name", label: "Name", type: "text" }),
+  createField({
+    name: "bankId",
+    label: "bank",
+    type: "number",
+    relation: true,
+    table: "bank",
+    value: "id",
+    displayValue: ["name"],
+  }),
 ];
 
 export const headCells: HeadCell[] = [
@@ -53,3 +35,5 @@ export const fetchData = async (setRows: any) => {
     console.error("Fetch error: ", error);
   }
 };
+
+export const title = "Bank";

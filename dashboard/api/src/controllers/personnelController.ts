@@ -4,7 +4,7 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 // Get all personnel
-export const getPersonnels = async (
+export const getAllPersonnels = async (
   req: Request,
   res: Response
 ): Promise<void> => {
@@ -60,11 +60,11 @@ export const createPersonnel = async (
   res: Response
 ): Promise<void> => {
   const {
-    firstname,
-    lastname,
+    firstName,
+    lastName,
     position,
     department,
-    dateofhire,
+    dateOfHire,
     email,
     phone,
     handleComplaints,
@@ -73,11 +73,11 @@ export const createPersonnel = async (
   try {
     const newPersonnel = await prisma.personnel.create({
       data: {
-        firstname,
-        lastname,
+        firstName,
+        lastName,
         position,
         department,
-        dateofhire,
+        dateOfHire,
         email,
         phone,
         handleComplaints,
@@ -97,11 +97,11 @@ export const updatePersonnel = async (
 ): Promise<void> => {
   const { id } = req.params;
   const {
-    firstname,
-    lastname,
+    firstName,
+    lastName,
     position,
     department,
-    dateofhire,
+    dateOfHire,
     email,
     phone,
     handleComplaints,
@@ -111,11 +111,11 @@ export const updatePersonnel = async (
     const updatedPersonnel = await prisma.personnel.update({
       where: { id: parseInt(id) },
       data: {
-        firstname,
-        lastname,
+        firstName,
+        lastName,
         position,
         department,
-        dateofhire,
+        dateOfHire,
         email,
         phone,
         handleComplaints,
