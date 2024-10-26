@@ -122,7 +122,7 @@ model customer {
   title             String
   email             String
   phoneNumber       String
-  firstOffer        DateTime
+  firstOfferDate    DateTime
   personnelId       Int
   firstRegisterDate DateTime
   status            String
@@ -153,6 +153,14 @@ model customer {
   offer                  offer[]
   order                  order[]
   productFeasibilityForm productFeasibilityForm[]
+
+  customerComplaint customerComplaint[]
+}
+
+model competitor {
+  id               Int                @id @default(autoincrement())
+  name             String
+  competitorReport competitorReport[]
 }
 
 model customerMeetPlan {
@@ -199,9 +207,12 @@ model customerMeetReport {
 
 model competitorReport {
   id                      Int                       @id @default(autoincrement())
-  competitorName          String
+  competitorId            Int
   date                    DateTime
   competitorReportContent competitorReportContent[]
+
+  // Relations
+  competitor competitor @relation(fields: [competitorId], references: [id])
 }
 
 model competitionReportSubject {
@@ -310,6 +321,7 @@ model customerComplaint {
   id                    Int      @id @default(autoincrement())
   date                  DateTime
   subject               String
+  customerId            Int
   productId             Int
   packagingDate         DateTime
   complaintDetails      String
@@ -321,6 +333,7 @@ model customerComplaint {
   result                String
 
   // Relations
+  customer            customer  @relation(fields: [customerId], references: [id])
   product             product   @relation(fields: [productId], references: [id])
   dealingPersonnel    personnel @relation("ref_dealingPersonnel", fields: [dealingPersonnelId], references: [id])
   evaluatingPersonnel personnel @relation("ref_evaluatingPersonnel", fields: [evaluatingPersonnelId], references: [id])

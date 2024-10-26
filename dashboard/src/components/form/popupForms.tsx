@@ -1,6 +1,7 @@
 import React from "react";
 // import Customer from "../../app/customer/form/page";
 import Bank from "../../app/bank/form/page";
+import Customer from "@/app/customer/form/page";
 
 interface PopupFormsProps {
   parsedString: string;
@@ -18,10 +19,12 @@ const PopupForms: React.FC<PopupFormsProps> = ({
     switch (content) {
       case "bank":
         return <Bank popupSetter={popupSetter} popupHandler={popupHandler} />;
-      case "form2":
-        return <div>Form 2 Content</div>;
+      case "customer":
+        return (
+          <Customer popupSetter={popupSetter} popupHandler={popupHandler} />
+        );
       default:
-        return null;
+        return <>EMPTY</>;
     }
   };
 

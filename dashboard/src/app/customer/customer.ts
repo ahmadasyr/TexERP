@@ -8,7 +8,7 @@ export interface Data {
   title: string;
   email: string;
   phoneNumber: string;
-  firstOffer: Date;
+  firstOfferDate: Date;
   personnelId?: number;
   firstRegisterDate: Date;
   status: string;
@@ -34,24 +34,24 @@ export interface Data {
 }
 
 export const formFields = [
-  createField({ name: "name", label: "Name", type: "text" }),
-  createField({ name: "foreign", label: "Foreign", type: "checkbox" }),
+  createField({ name: "name", label: "Müşteri Adı", type: "text" }),
+  createField({ name: "foreign", label: "Yurtdışı", type: "checkbox" }),
   createField({
     name: "relatedPerson",
-    label: "Related Person",
+    label: "İlgili Kişi",
     type: "text",
   }),
-  createField({ name: "title", label: "Title", type: "text" }),
-  createField({ name: "email", label: "Email", type: "email" }),
-  createField({ name: "phoneNumber", label: "Phone Number", type: "tel" }),
+  createField({ name: "title", label: "Unvan", type: "text" }),
+  createField({ name: "email", label: "E-Posta", type: "email" }),
+  createField({ name: "phoneNumber", label: "Telefon", type: "tel" }),
   createField({
-    name: "firstOffer",
-    label: "First Offer",
-    type: "datetime-local",
+    name: "firstOfferDate",
+    label: "İlk Teklif Tarihi",
+    type: "date",
   }),
   createField({
     name: "personnelId",
-    label: "Sales Person ID",
+    label: "Satış Personeli",
     type: "relation",
     relation: true,
     table: "personnel/sales",
@@ -60,21 +60,29 @@ export const formFields = [
   }),
   createField({
     name: "firstRegisterDate",
-    label: "First Register Date",
+    label: "İlk Kayıt Tarihi",
     type: "date",
   }),
   createField({
     name: "status",
-    label: "Status",
+    label: "Durum",
     type: "select",
     options: ["Mevcut", "Potansiyel", "Riskli", "Kara Liste"],
   }),
-  createField({ name: "returnDate", label: "Return Date", type: "date" }),
-  createField({ name: "salesOpinion", label: "Sales Opinion", type: "text" }),
-  createField({ name: "creditNote", label: "Credit Note", type: "text" }),
+  createField({
+    name: "returnDate",
+    label: "Müşteri Dönme Tarihi",
+    type: "date",
+  }),
+  createField({
+    name: "salesOpinion",
+    label: "Satış Birimi Görüşü",
+    type: "text",
+  }),
+  createField({ name: "creditNote", label: "Kredi Notu", type: "text" }),
   createField({
     name: "shippingMethod",
-    label: "Shipping Method",
+    label: "Nakliye Şekli",
     type: "select",
     options: [
       "Fabrikadan",
@@ -93,24 +101,24 @@ export const formFields = [
       "CIF",
     ],
   }),
-  createField({ name: "meterLimit", label: "Meter Limit", type: "float" }),
-  createField({ name: "address", label: "Address", type: "text" }),
-  createField({ name: "city", label: "City", type: "text" }),
+  createField({ name: "meterLimit", label: "Limit Metraj", type: "float" }),
+  createField({ name: "address", label: "Adres", type: "text" }),
+  createField({ name: "city", label: "Şehir", type: "text" }),
   createField({
     name: "taxOfficeId",
-    label: "Tax Office ID",
+    label: "Vergi Dairesi",
     type: "relation",
     relation: true,
     table: "tax-office",
     value: "id",
     displayValue: "name",
   }),
-  createField({ name: "taxNumber", label: "Tax Number", type: "text" }),
-  createField({ name: "paymentKind", label: "Payment Kind", type: "text" }),
-  createField({ name: "note", label: "Note", type: "text" }),
+  createField({ name: "taxNumber", label: "Vergi No", type: "text" }),
+  createField({ name: "paymentKind", label: "Ödeme Şekli", type: "text" }),
+  createField({ name: "note", label: "Notlar", type: "text" }),
   createField({
     name: "bankId",
-    label: "Bank ID",
+    label: "Çalışılan Banka",
     type: "number",
     relation: true,
     table: "bank",
@@ -119,7 +127,7 @@ export const formFields = [
   }),
   createField({
     name: "currencyId",
-    label: "Currency ID",
+    label: "Çalışılan Para Birimi",
     type: "relation",
     relation: true,
     table: "currency",
@@ -127,84 +135,124 @@ export const formFields = [
     displayValue: "name",
   }),
   createField({ name: "iban", label: "IBAN", type: "text" }),
-  createField({ name: "swift", label: "Swift", type: "text" }),
+  createField({ name: "swift", label: "SWIFT", type: "text" }),
 ];
 
 export const headCells: HeadCell[] = [
-  { id: "id", numeric: true, disablePadding: true, label: "ID" },
-  { id: "name", numeric: false, disablePadding: false, label: "Name" },
+  { id: "id", numeric: true, disablePadding: true, label: "NO" },
+  { id: "name", numeric: false, disablePadding: false, label: "MÜŞTERİ ADI" },
   {
-    id: "meterLimit",
-    numeric: true,
+    id: "foreign",
+    numeric: false,
     disablePadding: false,
-    label: "Meter Limit",
+    label: "YUR DİŞİ",
   },
-  { id: "foreign", numeric: false, disablePadding: false, label: "Foreign" },
   {
     id: "relatedPerson",
     numeric: false,
     disablePadding: false,
-    label: "Related Person",
+    label: "İLGİLİ KİŞİ",
   },
-  { id: "title", numeric: false, disablePadding: false, label: "Title" },
-  { id: "email", numeric: false, disablePadding: false, label: "Email" },
+  { id: "title", numeric: false, disablePadding: false, label: "Unvan" },
+  { id: "email", numeric: false, disablePadding: false, label: "E-MAİL" },
   {
     id: "phoneNumber",
     numeric: false,
     disablePadding: false,
-    label: "Phone Number",
+    label: "TELEFON",
   },
   {
-    id: "firstOffer",
+    id: "firstOfferDate",
     numeric: false,
     disablePadding: false,
-    label: "First Offer",
+    label: "İLK TEKLİF TARİHİ",
+    date: true,
   },
   {
     id: "personnel",
     numeric: false,
     disablePadding: false,
-    label: "Sales Person",
+    label: "Satış Sorumlusu",
     displayValue: ["firstName", "lastName"],
-  },
-  {
-    id: "bank",
-    numeric: false,
-    disablePadding: false,
-    label: "Bank",
-    displayValue: ["name"],
   },
   {
     id: "firstRegisterDate",
     numeric: false,
     disablePadding: false,
-    label: "First Register Date",
+    label: "İLK KAYIT TARİHİ",
+    date: true,
   },
-  { id: "status", numeric: false, disablePadding: false, label: "Status" },
+  {
+    id: "status",
+    numeric: false,
+    disablePadding: false,
+    label: "DURUM (M/P/R/K)",
+  },
   {
     id: "returnDate",
     numeric: false,
     disablePadding: false,
-    label: "Return Date",
+    label: "M. DÖNME TARİHİ",
+    date: true,
   },
   {
     id: "salesOpinion",
     numeric: false,
     disablePadding: false,
-    label: "Sales Opinion",
+    label: "SATIŞ BİRİMİ GÖRÜŞÜ",
   },
-  { id: "swift", numeric: false, disablePadding: false, label: "Swift" },
+  {
+    id: "creditNote",
+    numeric: false,
+    disablePadding: false,
+    label: "KREDİ NOTU",
+  },
+  {
+    id: "shippingMethod",
+    numeric: false,
+    disablePadding: false,
+    label: "NAKLİYE ŞEKLİ",
+  },
+  {
+    id: "meterLimit",
+    numeric: true,
+    disablePadding: false,
+    label: "LİMİT METRAJ",
+  },
+  { id: "address", numeric: false, disablePadding: false, label: "ADRES" },
+  { id: "city", numeric: false, disablePadding: false, label: "ŞEHİR" },
+  {
+    id: "taxOffice",
+    numeric: false,
+    disablePadding: false,
+    label: "Vergi Dairesi",
+    displayValue: ["name"],
+  },
+  { id: "taxNumber", numeric: false, disablePadding: false, label: "Vergi No" },
+  {
+    id: "paymentKind",
+    numeric: false,
+    disablePadding: false,
+    label: "ÖDEME ŞEKLİ",
+  },
+  { id: "note", numeric: false, disablePadding: false, label: "NOTLAR" },
+  {
+    id: "bank",
+    numeric: false,
+    disablePadding: false,
+    label: "ÇALIŞILAN BANKA",
+    displayValue: ["name"],
+  },
+  {
+    id: "currency",
+    numeric: false,
+    disablePadding: false,
+    label: "ÇALIŞILAN PARA BİRİMİ",
+    displayValue: ["name"],
+  },
+  { id: "iban", numeric: false, disablePadding: false, label: "IBAN" },
+  { id: "swift", numeric: false, disablePadding: false, label: "SWIFT" },
 ];
-
-export const fetchData = async (setRows: any) => {
-  try {
-    const response = await fetch("http://localhost:3001/api/customer");
-    const data = await response.json();
-    setRows(data);
-  } catch (error) {
-    console.error("Fetch error: ", error);
-  }
-};
 
 export const fetchOrders = async (setRows: any) => {
   try {
@@ -218,4 +266,4 @@ export const fetchOrders = async (setRows: any) => {
 
 export const tableName = "customer";
 export const idField = "id";
-export const title = "Customer";
+export const title = "Müşteri";

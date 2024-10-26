@@ -37,12 +37,32 @@ export const getOrderById = async (req: Request, res: Response) => {
   }
 };
 
-export const getOrderByCustId = async (req: Request, res: Response) => {
+export const getOrderByCustomerId = async (req: Request, res: Response) => {
   const { id } = req.params;
   try {
     const order = await prisma.order.findMany({
       where: { customerId: Number(id) },
       include: {
+        product: true,
+      },
+    });
+    if (order) {
+      res.status(200).json(order);
+    } else {
+      res.status(404).json({ error: "Order not found" });
+    }
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch order" });
+  }
+};
+
+export const getOrderByProductId = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  try {
+    const order = await prisma.order.findMany({
+      where: { productId: Number(id) },
+      include: {
+        customer: true,
         product: true,
       },
     });

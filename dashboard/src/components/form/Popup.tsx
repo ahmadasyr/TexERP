@@ -5,7 +5,7 @@ import { Clear } from "@mui/icons-material";
 interface PopupProps {
   open: boolean;
   table: string;
-  togglePopup: (data: any) => void;
+  togglePopup: (table: string, column: string) => void;
   popupHandler?: (data: any) => void;
   popupSetter?: (data: any) => void;
 }
@@ -29,7 +29,7 @@ const Popup: React.FC<PopupProps> = ({
           top: "50%",
           left: "50%",
           transform: "translate(-50%, -50%)",
-          width: 400,
+          width: "80%",
           bgcolor: "background.paper",
           boxShadow: 24,
           p: 4,

@@ -39,32 +39,38 @@ export const fetchData = async (
           `http://localhost:3001/api/${field.table}`
         );
         const data = await response.json();
-        return { name: field.table, values: data };
+        return { name: field.table, values: Array.isArray(data) ? data : [] };
       });
     const results = await Promise.all(promises);
     console.log("Results:", results);
     setTableData(results);
   } catch (error) {
+    setTableData([]);
     console.error("Error fetching table data:", error);
   }
 };
 
-export const useFormData = <Data,>(formFields: any[]) => {
-  const initializeFormData = <T extends {}>(): T => {
+export const useFormData = <Data extends {}>(formFields: any[]) => {
+  const initializeFormData = <T extends {}>(fields: any[]): T => {
     const formData: Partial<Record<keyof T, null>> = {};
-    Object.keys(formData).forEach((key) => {
-      formData[key as keyof T] = null;
+    fields.forEach((field) => {
+      formData[field.name as keyof T] = null;
     });
     return formData as T;
   };
 
-  const [formData, setFormData] = useState<Data>(initializeFormData());
+  const [formData, setFormData] = useState<Data>(
+    initializeFormData<Data>(formFields)
+  );
   const [tableData, setTableData] = useState<any[]>([]);
 
-  // Only fetch data once on mount
-  useEffect(() => {
+  const runFetchData = async () => {
     fetchData(formFields, setTableData);
-  }, [formFields]);
+  };
+
+  useEffect(() => {
+    runFetchData();
+  }, []);
 
   const handleChange = (
     event: React.ChangeEvent<
@@ -72,6 +78,13 @@ export const useFormData = <Data,>(formFields: any[]) => {
     >
   ) => {
     const { name, value } = event.target;
+    if (value === "") {
+      setFormData((prev: any) => ({
+        ...prev,
+        [name as string]: null,
+      }));
+      return;
+    }
     setFormData((prev: any) => ({
       ...prev,
       [name as string]: value,
@@ -82,5 +95,6 @@ export const useFormData = <Data,>(formFields: any[]) => {
     formData,
     handleChange,
     tableData,
+    runFetchData,
   };
 };

@@ -36,6 +36,25 @@ export const getProductFeasibilityFormById = async (
   }
 };
 
+export const getProductFeasibilityFormByCustomer = async (
+  req: Request,
+  res: Response
+) => {
+  const { id } = req.params;
+  try {
+    const form = await prisma.productFeasibilityForm.findMany({
+      where: { customerId: Number(id) },
+    });
+    if (form) {
+      res.status(200).json(form);
+    } else {
+      res.status(404).json({ error: "Product feasibility form not found" });
+    }
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch product feasibility form" });
+  }
+};
+
 export const createProductFeasibilityForm = async (
   req: Request,
   res: Response

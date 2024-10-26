@@ -8,7 +8,9 @@ export const getAllCustomerMeetReports = async (
   res: Response
 ) => {
   try {
-    const reports = await prisma.customerMeetReport.findMany();
+    const reports = await prisma.customerMeetReport.findMany({
+      include: { customer: true },
+    });
     res.status(200).json(reports);
   } catch (error) {
     res.status(500).json({ error: "Failed to fetch customer meet reports" });
@@ -23,6 +25,26 @@ export const getCustomerMeetReportById = async (
   try {
     const report = await prisma.customerMeetReport.findUnique({
       where: { id: Number(id) },
+    });
+    if (report) {
+      res.status(200).json(report);
+    } else {
+      res.status(404).json({ error: "Customer meet report not found" });
+    }
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch customer meet report" });
+  }
+};
+
+export const getCustomerMeetReportByCustomer = async (
+  req: Request,
+  res: Response
+) => {
+  const { id } = req.params;
+  try {
+    const report = await prisma.customerMeetReport.findMany({
+      where: { customerId: Number(id) },
+      include: { customer: true },
     });
     if (report) {
       res.status(200).json(report);

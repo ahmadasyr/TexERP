@@ -104,7 +104,7 @@ const FormComponent: React.FC<FormComponentProps> = ({
           const data = await response.json();
           console.log("Success:", data);
           if (popupHandler) {
-            console.log("YES", data);
+            console.log("YES");
             popupHandler(data);
             if (popupSetter) {
               popupSetter({ on: false, table: "" });
@@ -166,8 +166,7 @@ const FormComponent: React.FC<FormComponentProps> = ({
     }
   };
 
-  function togglePopup(data: any) {
-    const { table, column } = data;
+  function togglePopup(table: string, column: string) {
     setPopup({
       on: !popup.on,
       table: table,

@@ -35,7 +35,7 @@ table customer(
     title string
     email string
     phoneNumber string
-    firstOffer date
+    firstOfferDate date
     personnelId int (relation personnel.id if column handleSales is true)
     firstRegisterDate date
     status customerStatus[] 

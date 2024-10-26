@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
-import NavBar from "@/components/navbar";
 import Layout from "@/components/layout";
 
 const geistSans = localFont({
@@ -16,8 +15,8 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "Dokumas Fabric",
-  description: "Dokumas Fabric",
+  title: "Dashboard - Dokumaş Fabric",
+  description: "Dokumaş Fabric",
 };
 
 export default function RootLayout({

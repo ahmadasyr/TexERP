@@ -68,7 +68,8 @@ const EnhancedTableHead = <
                 direction={orderBy === headCell.id ? order : "asc"}
                 onClick={createSortHandler(headCell.id)}
               >
-                {headCell.label}
+                {headCell.label.charAt(0).toUpperCase() +
+                  headCell.label.slice(1).toLowerCase()}
                 {orderBy === headCell.id ? (
                   <span style={visuallyHidden}>
                     {order === "desc"

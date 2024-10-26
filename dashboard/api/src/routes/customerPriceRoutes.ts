@@ -6,6 +6,7 @@ const router = express.Router();
 router.post("/", customerPriceController.createCustomerPrice);
 router.get("/", customerPriceController.getAllCustomerPrices);
 router.get("/:id", customerPriceController.getCustomerPriceById);
+router.get("/customer/:id", customerPriceController.getCustomerPriceByCustomer);
 router.put("/:id", customerPriceController.updateCustomerPrice);
 router.delete("/:id", customerPriceController.deleteCustomerPrice);
 

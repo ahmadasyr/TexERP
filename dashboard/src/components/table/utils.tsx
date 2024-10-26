@@ -30,6 +30,8 @@ export interface HeadCell {
   disablePadding: boolean;
   label: string;
   displayValue?: string[];
+  date?: boolean;
+  splitTime?: boolean;
 }
 
 export const handleDelete = async (tableName: string, selected: number[]) => {

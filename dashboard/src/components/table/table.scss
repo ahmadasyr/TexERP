@@ -5,6 +5,13 @@
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     border-radius: 12px;
   }
+  // if phone no margin fr table-paper
+  @media (max-width: 600px) {
+    .table-paper {
+      margin: 0;
+      margin-top: 1rem;
+    }
+  }
 
   .table-row {
     td,

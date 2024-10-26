@@ -28,6 +28,25 @@ export const getCustomerPriceById = async (req: Request, res: Response) => {
   }
 };
 
+export const getCustomerPriceByCustomer = async (
+  req: Request,
+  res: Response
+) => {
+  const { id } = req.params;
+  try {
+    const customerPrice = await prisma.customerPrice.findMany({
+      where: { customerId: Number(id) },
+    });
+    if (customerPrice) {
+      res.status(200).json(customerPrice);
+    } else {
+      res.status(404).json({ error: "Customer price not found" });
+    }
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch customer price" });
+  }
+};
+
 export const createCustomerPrice = async (req: Request, res: Response) => {
   const { date, customerId, productId, currencyId, price, unit } = req.body;
   try {

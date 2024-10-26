@@ -22,6 +22,7 @@ interface FormFieldProps {
 }
 
 const gridSize = 12;
+
 export const NewTextField = ({
   keyProp,
   formFields,
@@ -41,6 +42,7 @@ export const NewTextField = ({
           handleChange({ target: { name: keyProp, value: e.target.value } })
         }
         required={field?.required}
+        InputLabelProps={{ shrink: !!formData[keyProp] }}
       />
     </Grid>
   );
@@ -306,9 +308,13 @@ export const NewRelation = ({
 
   const [searchTerm, setSearchTerm] = useState("");
 
-  const selectedValue = tableData
-    .find((table) => table.name === field.table)
-    ?.values.find((value: any) => value[field.value] === formData[keyProp]);
+  const selectedTable = tableData.find((table) => table.name === field.table);
+  const selectedValue = selectedTable
+    ? selectedTable.values.find(
+        (value: any) => value[field.value] === formData[keyProp]
+      )
+    : null;
+  console.log("selectedValue", selectedValue);
 
   const filteredOptions = tableData
     .find((table) => table.name === field.table)
@@ -364,8 +370,100 @@ export const NewRelation = ({
           togglePopup && togglePopup(field.table, keyProp);
         }}
       >
+        Yeni {field.label} Ekle
         <AddIcon />
       </IconButton>
     </>
+  );
+};
+
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+} from "@mui/material";
+import { Delete } from "@mui/icons-material";
+
+export const NewMultiEntryField = ({
+  keyProp,
+  formFields,
+  formData,
+  handleChange,
+}: FormFieldProps) => {
+  const field = formFields.find((f) => f.name === keyProp);
+  const [inputValue, setInputValue] = useState("");
+
+  const handleAddEntry = () => {
+    if (inputValue.trim() !== "") {
+      const updatedArray = [...(formData[keyProp] || []), inputValue.trim()];
+      handleChange({ target: { name: keyProp, value: updatedArray } });
+      setInputValue("");
+    }
+  };
+
+  const handleRemoveEntry = (index: number) => {
+    const updatedArray = formData[keyProp].filter(
+      (_: any, i: number) => i !== index
+    );
+    handleChange({ target: { name: keyProp, value: updatedArray } });
+  };
+
+  return (
+    <Grid item xs={12}>
+      <FormControl fullWidth>
+        {/* MUI Table */}
+        <TableContainer component={Paper} style={{ marginTop: "16px" }}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>{field?.label}</TableCell>
+                <TableCell>Action</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              <TableRow>
+                <TableCell>
+                  <TextField
+                    fullWidth
+                    name={keyProp as string}
+                    type="text"
+                    value={inputValue}
+                    onChange={(e) => setInputValue(e.target.value)}
+                    onKeyPress={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        handleAddEntry();
+                      }
+                    }}
+                  />
+                </TableCell>
+                <TableCell width={"1rem"}>
+                  <IconButton color="primary" onClick={handleAddEntry}>
+                    <AddIcon />
+                  </IconButton>
+                </TableCell>
+              </TableRow>
+              {formData[keyProp]?.map((entry: string, index: number) => (
+                <TableRow key={index}>
+                  <TableCell>{entry}</TableCell>
+                  <TableCell width={"1rem"}>
+                    <IconButton
+                      color="default"
+                      onClick={() => handleRemoveEntry(index)}
+                    >
+                      <Delete />
+                    </IconButton>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </FormControl>
+    </Grid>
   );
 };

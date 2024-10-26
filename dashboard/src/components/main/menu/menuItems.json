@@ -2,41 +2,104 @@
   {
     "title": "Home",
     "link": "/dashboard",
-    "desc": "Home page"
+    "desc": "Home page",
+    "icon": "dashboard"
   },
   {
-    "title": "Admin",
-    "desc": "View admin actions"
-  },
-  {
-    "title": "Sales",
-    "desc": "View sales actions",
+    "title": "Satış İşlemleri",
+    "desc": "Satış işlemleri menüsü",
     "icon": "money",
     "subItems": [
       {
-        "title": "Customer",
+        "title": "Müşteriler",
         "link": "/customer",
-        "desc": "View/Edit customers",
-        "icon": "user"
+        "desc": "Müşteri listesi",
+        "icon": "group"
       },
       {
-        "title": "Bank",
+        "title": "Bankalar",
         "link": "/bank",
-        "desc": "View/Edit banks",
-        "icon": "bank"
-      }
-    ]
-  },
-  {
-    "title": "Males",
-    "desc": "View sales actions",
-    "icon": "money",
-    "subItems": [
+        "desc": "Banka listesi",
+        "icon": "account_balance"
+      },
       {
-        "title": "Customer",
-        "link": "/customere",
-        "desc": "View/Edit customers",
-        "icon": "user"
+        "title": "Vergi Daireleri",
+        "link": "/tax-office",
+        "desc": "Vergi daireleri listesi",
+        "icon": "domain"
+      },
+      {
+        "title": "Müşteri Görüşme Planı",
+        "link": "/customer-meet-plan",
+        "desc": "Müşteri görüşme planı listesi",
+        "icon": "airplane_ticket"
+      },
+      {
+        "title": "Müşteri Görüşme Raporu",
+        "link": "/customer-meet-report",
+        "desc": "Müşteri görüşme raporu listesi",
+        "icon": "description"
+      },
+      {
+        "title": "Ürünler",
+        "link": "/product",
+        "desc": "Ürün listesi",
+        "icon": "category"
+      },
+      {
+        "title": "Müşteri Fiyatları",
+        "link": "/customer-price",
+        "desc": "Müşteri fiyatları listesi",
+        "icon": "tag"
+      },
+      {
+        "title": "Teklifler",
+        "link": "/offer",
+        "desc": "Teklif listesi",
+        "icon": "request_quote"
+      },
+      {
+        "title": "Siparişler",
+        "link": "/order",
+        "desc": "Sipariş listesi",
+        "icon": "shopping_cart_checkout"
+      },
+      {
+        "title": "Müşteri Şikayetleri",
+        "link": "/customer-complaint",
+        "desc": "Müşteri şikayetleri listesi",
+        "icon": "record_voice_over"
+      },
+      {
+        "title": "Ürün Fizibilite Formu",
+        "link": "/product-feasibility-form",
+        "desc": "Ürün fizibilite formu listesi",
+        "icon": "checklist"
+      },
+      {
+        "title": "Rakip işlemleri",
+        "desc": "Rakip işlemleri menüsü",
+        "icon": "supervisor_account",
+        "subItems": [
+          {
+            "title": "Rakip Analiz Raporları",
+            "link": "/competitor-report",
+            "desc": "Rakip raporları listesi",
+            "icon": "table_chart_view"
+          },
+          {
+            "title": "Rakip Analiz Rapor Konuları",
+            "link": "/competitor-report-subject",
+            "desc": "Rakip rapor konuları listesi",
+            "icon": "schema"
+          },
+          {
+            "title": "Rakip listesi",
+            "link": "/competitor",
+            "desc": "Rakip listesi",
+            "icon": "supervisor_account"
+          }
+        ]
       }
     ]
   }

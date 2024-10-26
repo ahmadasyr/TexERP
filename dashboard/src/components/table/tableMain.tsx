@@ -16,25 +16,26 @@ import "./table.scss";
 import { styled } from "@mui/material/styles";
 import { Visibility } from "@mui/icons-material";
 import { useRouter } from "next/navigation";
+import { fetchData } from "../../components/utils";
 type Data = {
   id: number;
 };
 
 type EnhancedTableProps = {
   title: string;
-  fetchData: (setRows: React.Dispatch<React.SetStateAction<Data[]>>) => void;
   headCells: any[];
   data: Data[];
   tableName: string;
   viewable?: boolean;
+  URI: string;
 };
 
 export default function EnhancedTable({
   title,
-  fetchData,
   headCells,
   tableName,
   viewable,
+  URI,
 }: EnhancedTableProps): JSX.Element {
   const router = useRouter();
   const [rows, setRows] = React.useState<Data[]>([]);
@@ -46,8 +47,9 @@ export default function EnhancedTable({
   const [refresh, setRefresh] = React.useState(false);
   const [searchTerm, setSearchTerm] = React.useState("");
   React.useEffect(() => {
-    fetchData(setRows);
-  }, [refresh]);
+    console.log(URI);
+    fetchData(setRows, URI);
+  }, [refresh, URI]);
 
   useEffect(() => {
     console.log(rows);
@@ -117,10 +119,6 @@ export default function EnhancedTable({
     },
   }));
 
-  React.useEffect(() => {
-    fetchData(setRows);
-  }, [refresh]);
-
   // Filter rows based on search term
   const filteredRows = rows.filter((row) =>
     Object.values(row).some((value) =>
@@ -135,9 +133,13 @@ export default function EnhancedTable({
   );
 
   return (
-    <Box className="enhanced-table">
+    <Box
+      style={{ maxWidth: "100vw", minWidth: "90vw" }}
+      className="enhanced-table"
+    >
       <Paper className="table-paper">
         <EnhancedTableToolbar
+          URI={URI}
           title={title}
           tableName={tableName}
           selected={selected}
@@ -209,6 +211,10 @@ export default function EnhancedTable({
                                     ] + " "
                                 )}
                               </Link>
+                            ) : headCell.type === "date" ? (
+                              new Date(
+                                row[headCell.id as keyof Data]
+                              ).toLocaleDateString()
                             ) : (
                               row[headCell.id as keyof Data]
                             )}
@@ -216,7 +222,12 @@ export default function EnhancedTable({
                         ) : null
                       )}
                       {viewable ? (
-                        <TableCell key="view" style={{ width: 100 }}>
+                        <TableCell
+                          width={"1rem"}
+                          key="view"
+                          padding="none"
+                          size="small"
+                        >
                           <IconButton
                             onClick={() =>
                               router.push(`/${tableName}/view/?id=${row.id}`)

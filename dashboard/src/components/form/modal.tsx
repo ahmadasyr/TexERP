@@ -1,158 +1,120 @@
-import { Box, Button, Grid, Modal, Typography } from "@mui/material";
-import exp from "constants";
+import { Clear } from "@mui/icons-material";
+import {
+  Box,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  Grid,
+  IconButton,
+  Typography,
+} from "@mui/material";
 import { useEffect } from "react";
 
-const style = {
-  position: "absolute" as const,
-  top: "50%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
-  width: 400,
-  bgcolor: "background.paper",
-  borderRadius: 2,
-  boxShadow: 24,
-  p: 4,
-};
 interface FormModalProps {
   alertValue: number;
-
   setAlertValue: React.Dispatch<React.SetStateAction<number>>;
+  isPopup?: boolean;
 }
+
 export const FormModal: React.FC<FormModalProps> = ({
   alertValue,
   setAlertValue,
+  isPopup,
 }) => {
   useEffect(() => {
     console.log("change");
   }, [alertValue]);
+
+  const handleClose = () => setAlertValue(0);
+
   return (
     <>
-      <Modal
+      <Dialog
         open={alertValue === 200}
-        onClose={() => setAlertValue(0)}
-        aria-labelledby="alert-modal-title"
-        aria-describedby="alert-modal-description"
+        onClose={handleClose}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
       >
-        <div
-          style={{
-            padding: 20,
-            backgroundColor: "white",
-            margin: "auto",
-            maxWidth: 400,
-          }}
-        >
-          <Typography id="alert-modal-title" variant="h4" component="h2">
-            {alertValue === 200 ? "Success" : "Error"}
-          </Typography>
-          <Typography id="alert-modal-description" sx={{ mt: 2 }}>
+        <DialogTitle id="alert-dialog-title">{"Success"}</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
             Form submitted successfully!
-          </Typography>
-          <Grid container spacing={2} sx={{ mt: 2 }}>
-            <Grid item xs={4}>
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={() => {
-                  setAlertValue(0);
-                  window.location.reload();
-                }}
-              >
-                Create New
-              </Button>
-            </Grid>
-            <Grid item xs={4}>
-              <Button
-                variant="contained"
-                color="secondary"
-                onClick={() => setAlertValue(0)}
-              >
-                Continue
-              </Button>
-            </Grid>
-            <Grid item xs={4}>
-              <Button
-                variant="contained"
-                onClick={() => {
-                  setAlertValue(0);
-                  window.history.back();
-                }}
-              >
-                Go Back
-              </Button>
-            </Grid>
-          </Grid>
-        </div>
-      </Modal>
-      <Modal
-        open={alertValue === 500}
-        onClose={() => setAlertValue(0)}
-        aria-labelledby="alert-modal-title"
-        aria-describedby="alert-modal-description"
-      >
-        <Box sx={style}>
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              mb: 2,
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => {
+              setAlertValue(0);
+              window.location.reload();
             }}
           >
-            <img
-              src="https://example.com/animated-icon.gif"
-              alt="Animated Icon"
-              style={{ width: 50, height: 50 }}
-            />
-          </Box>
-          <Typography
-            id="alert-modal-title"
-            variant="h4"
-            component="h2"
-            align="center"
+            Create New
+          </Button>
+          <Button variant="contained" color="secondary" onClick={handleClose}>
+            Continue
+          </Button>
+          <Button
+            variant="contained"
+            onClick={() => {
+              setAlertValue(0);
+              window.history.back();
+            }}
           >
-            {alertValue === 200 ? "Success" : "Error"}
-          </Typography>
-          <Typography id="alert-modal-description" sx={{ mt: 2 }}>
-            {alertValue === 200
-              ? "Form submitted successfully!"
-              : "There was an error submitting the form."}
-          </Typography>
-          <Grid container spacing={2} sx={{ mt: 2 }}>
-            <Grid item xs={4}>
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={() => {
-                  setAlertValue(0);
-                  window.location.reload();
-                }}
-              >
-                Create New
-              </Button>
-            </Grid>
-            <Grid item xs={4}>
-              <Button
-                variant="contained"
-                color="secondary"
-                onClick={() => setAlertValue(0)}
-              >
-                Continue
-              </Button>
-            </Grid>
-            <Grid item xs={4}>
-              <Button
-                variant="contained"
-                onClick={() => {
-                  setAlertValue(0);
-                  window.history.back();
-                }}
-              >
-                Go Back
-              </Button>
-            </Grid>
-          </Grid>
-        </Box>
-      </Modal>
+            Go Back
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog
+        open={alertValue === 500}
+        onClose={handleClose}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">
+          {"Error"}
+          <IconButton
+            onClick={handleClose}
+            style={{ position: "absolute", right: 8, top: 8 }}
+          >
+            <Clear />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            There was an error submitting the form.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            variant="outlined"
+            color="primary"
+            onClick={() => {
+              setAlertValue(0);
+            }}
+          >
+            Edit
+          </Button>
+          {!isPopup ? (
+            <Button
+              variant="outlined"
+              color="error"
+              onClick={() => {
+                setAlertValue(0);
+
+                window.history.back();
+              }}
+            >
+              Go Back
+            </Button>
+          ) : null}
+        </DialogActions>
+      </Dialog>
     </>
   );
 };

@@ -9,6 +9,10 @@ router.get(
   "/:id",
   productFeasibilityFormController.getProductFeasibilityFormById
 );
+router.get(
+  "/customer/:id",
+  productFeasibilityFormController.getProductFeasibilityFormByCustomer
+);
 router.put(
   "/:id",
   productFeasibilityFormController.updateProductFeasibilityForm

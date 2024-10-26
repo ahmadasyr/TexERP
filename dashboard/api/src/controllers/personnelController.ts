@@ -47,7 +47,7 @@ export const getSalesPersonnel = async (
     if (personnel.length > 0) {
       res.json(personnel);
     } else {
-      res.status(404).json({ error: "No sales personnel exist" });
+      res.status(500).json({ error: "No sales personnel exist" });
     }
   } catch (error) {
     res.status(500).json({ error: "Error retrieving personnel" });

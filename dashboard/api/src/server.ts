@@ -12,6 +12,9 @@ import offerRoutes from "./routes/offerRoutes";
 import orderRoutes from "./routes/orderRoutes";
 import customerComplaintRoutes from "./routes/customerComplaintRoutes";
 import productFeasibilityFormRoutes from "./routes/productFeasibilityFormRoutes";
+import competitorReportRoutes from "./routes/competitorReportRoutes";
+import competitorReportSubjectRoutes from "./routes/competitorReportSubjectRoutes";
+import competitorRoutes from "./routes/competitorRoutes";
 const cors = require("cors");
 
 const app = express();
@@ -44,5 +47,11 @@ app.use("/api/order", orderRoutes);
 app.use("/api/customer-complaint", customerComplaintRoutes);
 // Use productFeasibilityForm routes
 app.use("/api/product-feasibility-form", productFeasibilityFormRoutes);
+// Use competitorReport routes
+app.use("/api/competitor-report", competitorReportRoutes);
+// Use competitorReportSubject routes
+app.use("/api/competitor-report-subject", competitorReportSubjectRoutes);
+// Use competitor routes
+app.use("/api/competitor", competitorRoutes);
 
 export default app;

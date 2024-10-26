@@ -28,6 +28,7 @@ import {
 import { Add, Edit } from "@mui/icons-material";
 
 interface TableToolbarProps {
+  URI: string;
   title: string;
   numSelected: number;
   setSelected: React.Dispatch<React.SetStateAction<any[]>>;
@@ -52,6 +53,7 @@ const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
 });
 
 const TableToolbar: React.FC<TableToolbarProps> = ({
+  URI,
   title,
   numSelected,
   tableName,
@@ -185,7 +187,7 @@ const TableToolbar: React.FC<TableToolbarProps> = ({
               {title}
             </Typography>
             <Button
-              onClick={() => router.push(`/${tableName}/form`)}
+              onClick={() => router.push(`${URI}/form`)}
               variant="outlined"
               style={{
                 whiteSpace: "nowrap",
@@ -215,9 +217,7 @@ const TableToolbar: React.FC<TableToolbarProps> = ({
             </Tooltip>
             <Tooltip title="Edit">
               <IconButton
-                onClick={() =>
-                  router.push(`${tableName}/form/?id=${selected[0]}`)
-                }
+                onClick={() => router.push(`${URI}/form/?id=${selected[0]}`)}
               >
                 <Edit />
               </IconButton>

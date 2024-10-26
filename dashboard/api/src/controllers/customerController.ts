@@ -30,6 +30,12 @@ export const getCustomerById = async (
   try {
     const customer = await prisma.customer.findUnique({
       where: { id: parseInt(id) },
+      include: {
+        taxOffice: true,
+        bank: true,
+        currency: true,
+        personnel: true,
+      },
     });
     if (customer) {
       res.status(200).json(customer);
@@ -52,7 +58,7 @@ export const createCustomer = async (
     title,
     email,
     phoneNumber,
-    firstOffer,
+    firstOfferDate,
     personnelId,
     firstRegisterDate,
     status,
@@ -81,8 +87,7 @@ export const createCustomer = async (
         title,
         email,
         phoneNumber,
-        firstOffer: new Date(firstOffer),
-        personnelId,
+        firstOfferDate: new Date(firstOfferDate),
         firstRegisterDate: new Date(firstRegisterDate),
         status,
         returnDate: new Date(returnDate),
@@ -127,7 +132,7 @@ export const updateCustomer = async (req: Request, res: Response) => {
     title,
     email,
     phoneNumber,
-    firstOffer,
+    firstOfferDate,
     personnelId,
     firstRegisterDate,
     status,
@@ -158,7 +163,7 @@ export const updateCustomer = async (req: Request, res: Response) => {
         title,
         email,
         phoneNumber,
-        firstOffer: new Date(firstOffer),
+        firstOfferDate: new Date(firstOfferDate),
         personnelId,
         firstRegisterDate: new Date(firstRegisterDate),
         status,

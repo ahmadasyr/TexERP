@@ -21,8 +21,32 @@ export const getAllCustomerComplaints = async (req: Request, res: Response) => {
 export const getCustomerComplaintById = async (req: Request, res: Response) => {
   const { id } = req.params;
   try {
-    const complaint = await prisma.customerComplaint.findUnique({
-      where: { id: Number(id) },
+    const complaint = await prisma.customerComplaint.findMany({
+      where: { customerId: Number(id) },
+      include: {
+        product: true,
+        dealingPersonnel: true,
+        evaluatingPersonnel: true,
+      },
+    });
+    if (complaint) {
+      res.status(200).json(complaint);
+    } else {
+      res.status(404).json({ error: "Customer complaint not found" });
+    }
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch customer complaint" });
+  }
+};
+
+export const getCustomerComplaintByCustomer = async (
+  req: Request,
+  res: Response
+) => {
+  const { id } = req.params;
+  try {
+    const complaint = await prisma.customerComplaint.findMany({
+      where: { customerId: Number(id) },
       include: {
         product: true,
         dealingPersonnel: true,
@@ -44,6 +68,7 @@ export const createCustomerComplaint = async (req: Request, res: Response) => {
     date,
     subject,
     productId,
+    customerId,
     packagingDate,
     complaintDetails,
     dealingPersonnelId,
@@ -60,6 +85,7 @@ export const createCustomerComplaint = async (req: Request, res: Response) => {
         date: new Date(date),
         subject,
         productId,
+        customerId,
         packagingDate: new Date(packagingDate),
         complaintDetails,
         dealingPersonnelId,

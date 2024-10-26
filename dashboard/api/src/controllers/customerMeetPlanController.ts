@@ -5,7 +5,9 @@ const prisma = new PrismaClient();
 
 export const getAllCustomerMeetPlans = async (req: Request, res: Response) => {
   try {
-    const customerMeetPlans = await prisma.customerMeetPlan.findMany();
+    const customerMeetPlans = await prisma.customerMeetPlan.findMany({
+      include: { customer: true },
+    });
     res.status(200).json(customerMeetPlans);
   } catch (error) {
     res.status(500).json({ error: "Failed to fetch customer meet plans" });
@@ -17,6 +19,26 @@ export const getCustomerMeetPlanById = async (req: Request, res: Response) => {
   try {
     const customerMeetPlan = await prisma.customerMeetPlan.findUnique({
       where: { id: Number(id) },
+    });
+    if (customerMeetPlan) {
+      res.status(200).json(customerMeetPlan);
+    } else {
+      res.status(404).json({ error: "Customer meet plan not found" });
+    }
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch customer meet plan" });
+  }
+};
+
+export const getCustomerMeetPlanByCustomer = async (
+  req: Request,
+  res: Response
+) => {
+  const { id } = req.params;
+  try {
+    const customerMeetPlan = await prisma.customerMeetPlan.findMany({
+      where: { customerId: Number(id) },
+      include: { customer: true },
     });
     if (customerMeetPlan) {
       res.status(200).json(customerMeetPlan);

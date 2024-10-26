@@ -6,6 +6,10 @@ const router = express.Router();
 router.post("/", customerMeetPlanController.createCustomerMeetPlan);
 router.get("/", customerMeetPlanController.getAllCustomerMeetPlans);
 router.get("/:id", customerMeetPlanController.getCustomerMeetPlanById);
+router.get(
+  "/customer/:id",
+  customerMeetPlanController.getCustomerMeetPlanByCustomer
+);
 router.put("/:id", customerMeetPlanController.updateCustomerMeetPlan);
 router.delete("/:id", customerMeetPlanController.deleteCustomerMeetPlan);
 
