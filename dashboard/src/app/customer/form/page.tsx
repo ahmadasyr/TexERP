@@ -47,7 +47,6 @@ const customer: React.FC<customerProps> = ({ popupHandler, popupSetter }) => {
       fetch(`http://localhost:3001/api/${tableName}/${id}`)
         .then((response) => response.json())
         .then((data) => {
-          console.log(data);
           Object.keys(data).forEach((key) => {
             handleChange({
               target: { name: key, value: data[key] },
@@ -77,7 +76,7 @@ const customer: React.FC<customerProps> = ({ popupHandler, popupSetter }) => {
           setAlertValue(response.status);
         } else {
           const data = await response.json();
-          console.log("Success:", data);
+
           setAlertValue(200); // Set success status
         }
       } catch (error) {
@@ -100,9 +99,8 @@ const customer: React.FC<customerProps> = ({ popupHandler, popupSetter }) => {
           setAlertValue(response.status);
         } else {
           const data = await response.json();
-          console.log("Success:", data);
+
           if (popupHandler) {
-            console.log("YES");
             popupHandler(data);
             if (popupSetter) {
               popupSetter({ on: false, table: "" });
@@ -144,21 +142,6 @@ const customer: React.FC<customerProps> = ({ popupHandler, popupSetter }) => {
     });
   }
 
-  const [oldFormData, setOldFormData] = React.useState<any>({});
-
-  useEffect(() => {
-    formFields.forEach((field) => {
-      if (
-        field.relation &&
-        oldFormData[field.name as keyof Data] !==
-          formData[field.name as keyof Data]
-      ) {
-        runFetchData();
-      }
-    });
-    setOldFormData(formData);
-  }, [formData]);
-
   return (
     <>
       <Popup
@@ -175,22 +158,27 @@ const customer: React.FC<customerProps> = ({ popupHandler, popupSetter }) => {
       />
       <form
         onSubmit={handleSubmit}
-        style={{
-          marginTop: "5%",
-          width: "90% !important",
-          display: "flex",
-          padding: "5%",
-          justifyContent: "center",
-          boxShadow: "0 0 20px rgba(0,0,0,0.15)",
-          borderRadius: ".5rem",
-        }}
+        style={
+          popupHandler
+            ? {}
+            : {
+                marginTop: "5%",
+                margin: "5% auto 5% auto",
+                width: "90% !important",
+                display: "flex",
+                padding: "5%",
+                justifyContent: "center",
+                boxShadow: "0 0 20px rgba(0,0,0,0.15)",
+                borderRadius: ".5rem",
+              }
+        }
       >
         <Box width="100%">
           <Typography variant="h4" gutterBottom>
             {title}
           </Typography>
           <Box display="flex" justifyContent="center">
-            <Grid item xs={12}>
+            <Grid item xs={12} md={12}>
               <NewCheckBox {...allProps} keyProp="foreign" />
             </Grid>
           </Box>
@@ -201,64 +189,64 @@ const customer: React.FC<customerProps> = ({ popupHandler, popupSetter }) => {
             }}
           />
           <Grid container spacing={1}>
-            <Grid item xs={4}>
+            <Grid item xs={12} md={4}>
               <NewTextField {...allProps} keyProp="name" />
             </Grid>
-            <Grid item xs={4}>
+            <Grid item xs={12} md={4}>
               <NewTextField {...allProps} keyProp="relatedPerson" />
             </Grid>
-            <Grid item xs={4}>
+            <Grid item xs={12} md={4}>
               <NewTextField {...allProps} keyProp="title" />
             </Grid>
-            <Grid item xs={4}>
+            <Grid item xs={12} md={4}>
               <NewEmail {...allProps} keyProp="email" />
             </Grid>
-            <Grid item xs={4}>
+            <Grid item xs={12} md={4}>
               <NewPhone {...allProps} keyProp="phoneNumber" />
             </Grid>
-            <Grid item xs={4}>
+            <Grid item xs={12} md={4}>
               <NewDate {...allProps} keyProp="firstOfferDate" />
             </Grid>
-            <Grid item xs={4}>
+            <Grid item xs={12} md={4}>
               <NewDate {...allProps} keyProp="firstRegisterDate" />
             </Grid>
-            <Grid item xs={4}>
+            <Grid item xs={12} md={4}>
               <NewSelect {...allProps} keyProp="status" />
             </Grid>
-            <Grid item xs={4}>
+            <Grid item xs={12} md={4}>
               <NewDate {...allProps} keyProp="returnDate" />
             </Grid>
-            <Grid item xs={4}>
+            <Grid item xs={12} md={4}>
               <NewTextField {...allProps} keyProp="salesOpinion" />
             </Grid>
-            <Grid item xs={4}>
+            <Grid item xs={12} md={4}>
               <NewTextField {...allProps} keyProp="creditNote" />
             </Grid>
-            <Grid item xs={4}>
+            <Grid item xs={12} md={4}>
               <NewSelect {...allProps} keyProp="shippingMethod" />
             </Grid>
-            <Grid item xs={4}>
+            <Grid item xs={12} md={4}>
               <NewNumber {...allProps} keyProp="meterLimit" />
             </Grid>
-            <Grid item xs={4}>
+            <Grid item xs={12} md={4}>
               <NewTextField {...allProps} keyProp="address" />
             </Grid>
-            <Grid item xs={4}>
+            <Grid item xs={12} md={4}>
               <NewTextField {...allProps} keyProp="city" />
             </Grid>
-            <Grid item xs={4}>
+            <Grid item xs={12} md={4}>
               <NewTextField {...allProps} keyProp="taxNumber" />
             </Grid>
-            <Grid item xs={4}>
+            <Grid item xs={12} md={4}>
               <NewTextField {...allProps} keyProp="paymentKind" />
             </Grid>
-            <Grid item xs={4}>
+            <Grid item xs={12} md={4}>
               <NewTextField {...allProps} keyProp="note" />
             </Grid>
-            <Grid item xs={4}>
+            <Grid item xs={12} md={4}>
               <NewTextField {...allProps} keyProp="iban" />{" "}
             </Grid>
-            <Grid item xs={4}>
+            <Grid item xs={12} md={4}>
               <NewTextField {...allProps} keyProp="swift" />
             </Grid>
           </Grid>
@@ -269,21 +257,27 @@ const customer: React.FC<customerProps> = ({ popupHandler, popupSetter }) => {
             }}
           />
           <Grid container spacing={1}>
-            <Grid item xs={4}>
+            <Grid item xs={12} md={4}>
               <NewRelation {...allProps} keyProp="personnelId" />
             </Grid>
-            <Grid item xs={4}>
+            <Grid item xs={12} md={4}>
               <NewRelation {...allProps} keyProp="taxOfficeId" />
             </Grid>
-            <Grid item xs={4}>
+            <Grid item xs={12} md={4}>
               <NewRelation {...allProps} keyProp="bankId" />
             </Grid>
-            <Grid item xs={4}>
+            <Grid item xs={12} md={4}>
               <NewRelation {...allProps} keyProp="currencyId" />
             </Grid>
           </Grid>
+          <Divider
+            style={{
+              marginBottom: "1rem",
+              marginTop: "1rem",
+            }}
+          />
           <Button type="submit" variant="contained" color="primary">
-            Submit
+            Kaydet
           </Button>
         </Box>
       </form>

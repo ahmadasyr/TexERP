@@ -7,6 +7,7 @@ export const getAllCustomerComplaints = async (req: Request, res: Response) => {
   try {
     const complaints = await prisma.customerComplaint.findMany({
       include: {
+        customer: true,
         product: true,
         dealingPersonnel: true,
         evaluatingPersonnel: true,
@@ -48,6 +49,7 @@ export const getCustomerComplaintByCustomer = async (
     const complaint = await prisma.customerComplaint.findMany({
       where: { customerId: Number(id) },
       include: {
+        customer: true,
         product: true,
         dealingPersonnel: true,
         evaluatingPersonnel: true,

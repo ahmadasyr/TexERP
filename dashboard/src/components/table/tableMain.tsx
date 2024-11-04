@@ -47,13 +47,9 @@ export default function EnhancedTable({
   const [refresh, setRefresh] = React.useState(false);
   const [searchTerm, setSearchTerm] = React.useState("");
   React.useEffect(() => {
-    console.log(URI);
     fetchData(setRows, URI);
-  }, [refresh, URI]);
+  }, [URI]);
 
-  useEffect(() => {
-    console.log(rows);
-  }, [rows]);
   const handleRequestSort = (
     event: React.MouseEvent<unknown>,
     property: keyof Data
@@ -131,10 +127,20 @@ export default function EnhancedTable({
   const [visibleColumns, setVisibleColumns] = React.useState(
     headCells.map((column) => ({ ...column, visible: true }))
   );
-
+  useEffect(() => {
+    setVisibleColumns(
+      headCells.map((column) => ({
+        ...column,
+        visible: true,
+      }))
+    );
+  }, [headCells]);
   return (
     <Box
-      style={{ maxWidth: "100vw", minWidth: "90vw" }}
+      style={{
+        maxWidth: "100vw",
+        minWidth: "90%",
+      }}
       className="enhanced-table"
     >
       <Paper className="table-paper">
@@ -198,7 +204,8 @@ export default function EnhancedTable({
                                 "Hayır"
                               )
                             ) : typeof row[headCell.id as keyof Data] ===
-                              "object" ? (
+                                "object" &&
+                              (row[headCell.id as keyof Data] as any).id ? (
                               <Link
                                 href={`/${headCell.id}/view/?id=${
                                   (row[headCell.id as keyof Data] as any)?.id
@@ -211,7 +218,10 @@ export default function EnhancedTable({
                                     ] + " "
                                 )}
                               </Link>
-                            ) : headCell.type === "date" ? (
+                            ) : typeof row[headCell.id as keyof Data] ===
+                              "object" ? (
+                              row[headCell.id as keyof Data].toString()
+                            ) : headCell.date ? (
                               new Date(
                                 row[headCell.id as keyof Data]
                               ).toLocaleDateString()

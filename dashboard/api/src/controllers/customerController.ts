@@ -119,7 +119,7 @@ export const createCustomer = async (
     res.status(201).json(newCustomer);
   } catch (error) {
     console.log(error);
-    res.status(500).json({ error: "Failed to create customer" });
+    res.status(500).json({ error: "Failed to create" });
   }
 };
 

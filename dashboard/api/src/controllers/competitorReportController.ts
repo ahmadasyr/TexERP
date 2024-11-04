@@ -67,8 +67,11 @@ export const createCompetitorReport = async (req: Request, res: Response) => {
       data: {
         competitorId,
         date: new Date(date),
+
         competitorReportContent: {
-          create: competitorReportContent,
+          createMany: {
+            data: competitorReportContent,
+          },
         },
       },
     });
@@ -102,6 +105,9 @@ export const updateCompetitorReport = async (req: Request, res: Response) => {
 export const deleteCompetitorReport = async (req: Request, res: Response) => {
   const { id } = req.params;
   try {
+    await prisma.competitorReportContent.deleteMany({
+      where: { competitorReportId: Number(id) },
+    });
     await prisma.competitorReport.delete({
       where: { id: Number(id) },
     });

@@ -19,11 +19,16 @@ export interface Data {
 }
 
 export const formFields = [
-  createField({ name: "date", label: "Şikayet Tarihi", type: "date" }),
+  createField({
+    name: "date",
+    label: "Şikayet Tarihi",
+    type: "date",
+  }),
   createField({
     name: "subject",
     label: "Şikayetin Konusu/İçeriği",
     type: "text",
+    required: true,
   }),
   createField({
     name: "customerId",
@@ -33,6 +38,7 @@ export const formFields = [
     table: "customer",
     value: "id",
     displayValue: "name",
+    required: true,
   }),
   createField({
     name: "productId",
@@ -52,6 +58,7 @@ export const formFields = [
     name: "complaintDetails",
     label: "Müşteri Talebi",
     type: "text",
+    required: true,
   }),
   createField({
     name: "dealingPersonnelId",
@@ -60,12 +67,15 @@ export const formFields = [
     relation: true,
     table: "personnel",
     value: "id",
-    displayValue: "name",
+    displayValue: ["firstName", "lastName"],
+    required: true,
+    creatable: false,
   }),
   createField({
     name: "dealingDate",
     label: "Müşteri Temas Tarihi",
     type: "date",
+    required: true,
   }),
   createField({
     name: "evaluatingPersonnelId",
@@ -74,7 +84,8 @@ export const formFields = [
     relation: true,
     table: "personnel",
     value: "id",
-    displayValue: "name",
+    displayValue: ["firstName", "lastName"],
+    creatable: false,
   }),
   createField({
     name: "actionTaken",
@@ -86,12 +97,13 @@ export const formFields = [
 ];
 
 export const headCells: HeadCell[] = [
-  { id: "id", numeric: true, disablePadding: true, label: "ID" },
+  { id: "id", numeric: true, disablePadding: true, label: "No" },
   {
     id: "date",
     numeric: false,
     disablePadding: false,
     label: "Şikayet Tarihi",
+    date: true,
   },
   {
     id: "subject",
@@ -100,17 +112,25 @@ export const headCells: HeadCell[] = [
     label: "Şikayetin Konusu/İçeriği",
   },
   {
-    id: "customerId",
+    id: "customer",
     numeric: true,
     disablePadding: false,
     label: "Müşteri Adı",
+    displayValue: ["name"],
   },
-  { id: "productId", numeric: true, disablePadding: false, label: "Ürün ID" },
+  {
+    id: "product",
+    numeric: true,
+    disablePadding: false,
+    label: "Ürün ID",
+    displayValue: ["name"],
+  },
   {
     id: "packagingDate",
     numeric: false,
     disablePadding: false,
     label: "Şikayet Edilen Ürünün Ambalaj Tarihi",
+    date: true,
   },
   {
     id: "complaintDetails",
@@ -119,22 +139,25 @@ export const headCells: HeadCell[] = [
     label: "Müşteri Talebi",
   },
   {
-    id: "dealingPersonnelId",
+    id: "dealingPersonnel",
     numeric: true,
     disablePadding: false,
     label: "Müşteri ile Temas Kuran Kişi",
+    displayValue: ["firstName", "lastName"],
   },
   {
     id: "dealingDate",
     numeric: false,
     disablePadding: false,
     label: "Müşteri Temas Tarihi",
+    date: true,
   },
   {
-    id: "evaluatingPersonnelId",
+    id: "evaluatingPersonnel",
     numeric: true,
     disablePadding: false,
     label: "Şikayeti Değerlendiren Kişi",
+    displayValue: ["firstName", "lastName"],
   },
   {
     id: "actionTaken",

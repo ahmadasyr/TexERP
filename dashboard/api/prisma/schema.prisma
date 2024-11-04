@@ -106,7 +106,7 @@ model currency {
   name            String
   code            String          @db.Char(3)
   rate            Float
-  exchangePercent Float
+  exchangePercent Float?
   customer        customer[]
   customerPrice   customerPrice[]
   offer           offer[]
@@ -115,37 +115,37 @@ model currency {
 // SALES SECTION
 
 model customer {
-  id                Int            @id @default(autoincrement())
+  id                Int             @id @default(autoincrement())
   name              String
   foreign           Boolean
-  relatedPerson     String
-  title             String
-  email             String
-  phoneNumber       String
-  firstOfferDate    DateTime
+  relatedPerson     String?
+  title             String?
+  email             String?
+  phoneNumber       String?
+  firstOfferDate    DateTime?
   personnelId       Int
-  firstRegisterDate DateTime
+  firstRegisterDate DateTime?       @default(now())
   status            String
-  returnDate        DateTime
-  salesOpinion      String
-  creditNote        String
-  shippingMethod    shippingMethod
-  meterLimit        Float
-  address           String
+  returnDate        DateTime?
+  salesOpinion      String?
+  creditNote        String?
+  shippingMethod    shippingMethod?
+  meterLimit        Float?
+  address           String?
   city              String
-  taxOfficeId       Int
-  taxNumber         String
-  paymentKind       String
-  note              String
-  bankId            Int
-  currencyId        Int
-  iban              String
-  swift             String
+  taxOfficeId       Int?
+  taxNumber         String?
+  paymentKind       String?
+  note              String?
+  bankId            Int?
+  currencyId        Int?
+  iban              String?
+  swift             String?
 
   // Relations
-  taxOffice              taxOffice                @relation(fields: [taxOfficeId], references: [id])
-  bank                   bank                     @relation(fields: [bankId], references: [id])
-  currency               currency                 @relation(fields: [currencyId], references: [id])
+  taxOffice              taxOffice?               @relation(fields: [taxOfficeId], references: [id])
+  bank                   bank?                    @relation(fields: [bankId], references: [id])
+  currency               currency?                @relation(fields: [currencyId], references: [id])
   personnel              personnel                @relation(fields: [personnelId], references: [id])
   customerMeetPlan       customerMeetPlan[]
   customerMeetReport     customerMeetReport[]
@@ -164,25 +164,25 @@ model competitor {
 }
 
 model customerMeetPlan {
-  id                   Int      @id @default(autoincrement())
+  id                   Int       @id @default(autoincrement())
   customerId           Int
   country              String
   visitReason          String
   plannedDate          DateTime
-  realDate             DateTime
-  visitingPersonnelId  Int
-  result               String
-  accuracyRate         Float
-  note                 String
-  travelExpense        Float
-  accommodationExpense Float
-  foodExpense          Float
-  giftExpense          Float
-  officeExpense        Float
+  realDate             DateTime?
+  visitingPersonnelId  Int?
+  result               String?
+  accuracyRate         Float?
+  note                 String?
+  travelExpense        Float?
+  accommodationExpense Float?
+  foodExpense          Float?
+  giftExpense          Float?
+  officeExpense        Float?
 
   // Relations
-  customer          customer  @relation(fields: [customerId], references: [id])
-  visitingPersonnel personnel @relation(fields: [visitingPersonnelId], references: [id])
+  customer          customer   @relation(fields: [customerId], references: [id])
+  visitingPersonnel personnel? @relation(fields: [visitingPersonnelId], references: [id])
 }
 
 model customerMeetReport {
@@ -197,8 +197,8 @@ model customerMeetReport {
   peopleMet          Json
   wayOfMeeting       String
   contentsOfMeeting  String
-  customerNote       String
-  responseToCustomer String
+  customerNote       String?
+  responseToCustomer String?
 
   // Relations
   customer  customer  @relation(fields: [customerId], references: [id])
@@ -237,8 +237,8 @@ model competitorReportContent {
 }
 
 model customerPrice {
-  id         Int      @id @default(autoincrement())
-  date       DateTime
+  id         Int       @id @default(autoincrement())
+  date       DateTime? @default(now())
   customerId Int
   productId  Int
   currencyId Int
@@ -318,25 +318,25 @@ model order {
 }
 
 model customerComplaint {
-  id                    Int      @id @default(autoincrement())
-  date                  DateTime
+  id                    Int       @id @default(autoincrement())
+  date                  DateTime? @default(now())
   subject               String
   customerId            Int
-  productId             Int
-  packagingDate         DateTime
+  productId             Int?
+  packagingDate         DateTime?
   complaintDetails      String
   dealingPersonnelId    Int
   dealingDate           DateTime
-  evaluatingPersonnelId Int
-  actionTaken           String
-  dofNo                 Int
-  result                String
+  evaluatingPersonnelId Int?
+  actionTaken           String?
+  dofNo                 Int?
+  result                String?
 
   // Relations
-  customer            customer  @relation(fields: [customerId], references: [id])
-  product             product   @relation(fields: [productId], references: [id])
-  dealingPersonnel    personnel @relation("ref_dealingPersonnel", fields: [dealingPersonnelId], references: [id])
-  evaluatingPersonnel personnel @relation("ref_evaluatingPersonnel", fields: [evaluatingPersonnelId], references: [id])
+  customer            customer   @relation(fields: [customerId], references: [id])
+  product             product?   @relation(fields: [productId], references: [id])
+  dealingPersonnel    personnel  @relation("ref_dealingPersonnel", fields: [dealingPersonnelId], references: [id])
+  evaluatingPersonnel personnel? @relation("ref_evaluatingPersonnel", fields: [evaluatingPersonnelId], references: [id])
 }
 
 model productFeasibilityForm {

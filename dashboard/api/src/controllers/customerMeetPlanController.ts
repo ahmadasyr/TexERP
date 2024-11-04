@@ -6,7 +6,7 @@ const prisma = new PrismaClient();
 export const getAllCustomerMeetPlans = async (req: Request, res: Response) => {
   try {
     const customerMeetPlans = await prisma.customerMeetPlan.findMany({
-      include: { customer: true },
+      include: { customer: true, visitingPersonnel: true },
     });
     res.status(200).json(customerMeetPlans);
   } catch (error) {

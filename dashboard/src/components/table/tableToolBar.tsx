@@ -187,7 +187,7 @@ const TableToolbar: React.FC<TableToolbarProps> = ({
               {title}
             </Typography>
             <Button
-              onClick={() => router.push(`${URI}/form`)}
+              onClick={() => router.push(`${tableName}/form`)}
               variant="outlined"
               style={{
                 whiteSpace: "nowrap",
@@ -195,13 +195,13 @@ const TableToolbar: React.FC<TableToolbarProps> = ({
               }}
               startIcon={<Add />}
             >
-              Create New
+              Yeni Ekle
             </Button>
 
             <TextField
               value={searchTerm} // Bind searchTerm
               onChange={handleSearchChange} // Handle input change
-              label="Search"
+              label="Ara"
               variant="outlined"
               size="small"
               sx={{ ml: 2 }}
@@ -248,7 +248,7 @@ const TableToolbar: React.FC<TableToolbarProps> = ({
         onClose={() => setDrawerOpen(false)}
       >
         <div style={{ width: 250, padding: 20 }}>
-          <Typography variant="h6">Filter Options</Typography>
+          <Typography variant="h6">Filtre Seçenekleri</Typography>
           <Divider sx={{ my: 2 }} />
 
           {/* Date range filters */}
@@ -278,7 +278,7 @@ const TableToolbar: React.FC<TableToolbarProps> = ({
           /> */}
 
           {/* Column visibility toggles */}
-          <Typography variant="subtitle1">Toggle Columns</Typography>
+          <Typography variant="subtitle1">Sütunları Değiştir</Typography>
           <List>
             {headCells.map((column, index) => (
               <ListItem key={index}>
@@ -308,18 +308,20 @@ const TableToolbar: React.FC<TableToolbarProps> = ({
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
       >
-        <DialogTitle id="alert-dialog-title">{"Confirm Deletion"}</DialogTitle>
+        <DialogTitle id="alert-dialog-title">
+          {"Seçili öğeleri silme"}
+        </DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
-            Are you sure you want to delete the selected items?
+            Seçili öğeleri silmek istediğinizden emin misiniz?
           </DialogContentText>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseConfirmDialog} color="primary">
-            Cancel
+            İptal
           </Button>
           <Button onClick={handleConfirmDelete} color="primary" autoFocus>
-            Confirm
+            Sil
           </Button>
         </DialogActions>
       </Dialog>

@@ -5,7 +5,13 @@ const prisma = new PrismaClient();
 
 export const getAllCustomerPrices = async (req: Request, res: Response) => {
   try {
-    const customerPrices = await prisma.customerPrice.findMany();
+    const customerPrices = await prisma.customerPrice.findMany({
+      include: {
+        product: true,
+        currency: true,
+        customer: true,
+      },
+    });
     res.status(200).json(customerPrices);
   } catch (error) {
     res.status(500).json({ error: "Failed to fetch customer prices" });
@@ -36,6 +42,11 @@ export const getCustomerPriceByCustomer = async (
   try {
     const customerPrice = await prisma.customerPrice.findMany({
       where: { customerId: Number(id) },
+      include: {
+        product: true,
+        currency: true,
+        customer: true,
+      },
     });
     if (customerPrice) {
       res.status(200).json(customerPrice);

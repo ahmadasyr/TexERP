@@ -39,7 +39,6 @@ const Page: React.FC<PageProps> = ({ popupHandler, popupSetter }) => {
       fetch(`http://localhost:3001/api/${tableName}/${id}`)
         .then((response) => response.json())
         .then((data) => {
-          console.log(data);
           Object.keys(data).forEach((key) => {
             handleChange({
               target: { name: key, value: data[key] },
@@ -69,7 +68,7 @@ const Page: React.FC<PageProps> = ({ popupHandler, popupSetter }) => {
           setAlertValue(response.status);
         } else {
           const data = await response.json();
-          console.log("Success:", data);
+
           setAlertValue(200); // Set success status
         }
       } catch (error) {
@@ -92,9 +91,8 @@ const Page: React.FC<PageProps> = ({ popupHandler, popupSetter }) => {
           setAlertValue(response.status);
         } else {
           const data = await response.json();
-          console.log("Success:", data);
+
           if (popupHandler) {
-            console.log("YES");
             popupHandler(data);
             if (popupSetter) {
               popupSetter({ on: false, table: "" });
@@ -172,19 +170,24 @@ const Page: React.FC<PageProps> = ({ popupHandler, popupSetter }) => {
         <Grid
           container
           spacing={1}
-          sx={{
-            padding: 2,
-            backgroundColor: "background.paper",
-            margin: "auto",
-            maxWidth: "80%",
-            boxShadow: 1,
-            borderRadius: 1,
-          }}
+          style={
+            popupHandler
+              ? {}
+              : {
+                  marginTop: "5%",
+                  width: "90% !important",
+                  display: "flex",
+                  padding: "5%",
+                  justifyContent: "center",
+                  boxShadow: "0 0 20px rgba(0,0,0,0.15)",
+                  borderRadius: ".5rem",
+                }
+          }
         >
-          <Grid item xs={12}>
+          <Grid item xs={6}>
             <NewTextField {...allProps} keyProp="name" />
           </Grid>
-          <Grid item xs={12}>
+          <Grid item xs={6}>
             <NewTextField {...allProps} keyProp="city" />
           </Grid>
           <Button
@@ -195,7 +198,7 @@ const Page: React.FC<PageProps> = ({ popupHandler, popupSetter }) => {
             variant="contained"
             color="primary"
           >
-            Submit
+            Kaydet
           </Button>
         </Grid>
       </form>

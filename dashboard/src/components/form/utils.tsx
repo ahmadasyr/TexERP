@@ -8,10 +8,11 @@ export const createField = ({
   table = "",
   value = "",
   displayValue = null as string[] | string | null,
-  options = [] as string[],
+  options = [] as any[],
   dependant = false,
   dependency = "",
   multiOptions = [] as { value: string; options: string[] }[],
+  creatable = true,
 }) => ({
   name,
   label,
@@ -25,6 +26,7 @@ export const createField = ({
   dependant,
   dependency,
   multiOptions,
+  creatable,
 });
 
 export const fetchData = async (
@@ -42,7 +44,6 @@ export const fetchData = async (
         return { name: field.table, values: Array.isArray(data) ? data : [] };
       });
     const results = await Promise.all(promises);
-    console.log("Results:", results);
     setTableData(results);
   } catch (error) {
     setTableData([]);

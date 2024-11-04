@@ -25,7 +25,6 @@ import { lightPalette, darkPalette } from "./theme";
 import PrimarySearchAppBar from "./navbar";
 const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [open, setOpen] = useState(false);
-  const [darkMode, setDarkMode] = useState(false);
 
   const toggleDrawer = () => {
     setOpen(!open);
@@ -34,6 +33,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const toggleTheme = () => {
     setDarkMode(!darkMode);
   };
+  const [darkMode, setDarkMode] = useState(false);
 
   const theme = createTheme({
     palette: {
@@ -46,7 +46,6 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return (
     <EmotionThemeProvider theme={theme}>
       <ThemeProvider theme={theme}>
-        <CssBaseline />
         <PrimarySearchAppBar toggleDrawer={toggleDrawer} />
         {/* <AppBar position="static">
           <Toolbar>

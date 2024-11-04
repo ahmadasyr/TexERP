@@ -36,7 +36,7 @@ const FormComponent: React.FC<FormComponentProps> = ({
 }) => {
   const searchParams = useSearchParams();
   const id = searchParams.get("id");
-  const { formData, handleChange, tableData } = useFormData<Data>(formFields);
+  const { formData, handleChange, tableData } = useFormData(formFields);
   const [alertValue, setAlertValue] = React.useState<number>(0);
   const [popup, setPopup] = React.useState<any>({
     on: false,
@@ -49,7 +49,6 @@ const FormComponent: React.FC<FormComponentProps> = ({
       fetch(`http://localhost:3001/api/customer/${id}`)
         .then((response) => response.json())
         .then((data) => {
-          console.log(data);
           Object.keys(data).forEach((key) => {
             handleChange({
               target: { name: key, value: data[key] },
@@ -79,7 +78,7 @@ const FormComponent: React.FC<FormComponentProps> = ({
           setAlertValue(response.status);
         } else {
           const data = await response.json();
-          console.log("Success:", data);
+
           setAlertValue(200); // Set success status
         }
       } catch (error) {
@@ -102,9 +101,8 @@ const FormComponent: React.FC<FormComponentProps> = ({
           setAlertValue(response.status);
         } else {
           const data = await response.json();
-          console.log("Success:", data);
+
           if (popupHandler) {
-            console.log("YES");
             popupHandler(data);
             if (popupSetter) {
               popupSetter({ on: false, table: "" });
@@ -119,10 +117,6 @@ const FormComponent: React.FC<FormComponentProps> = ({
       }
     }
   };
-
-  useEffect(() => {
-    console.log(formData);
-  }, [formData]);
 
   const popUpDataParser = (data: any) => {
     handleChange({
@@ -191,23 +185,24 @@ const FormComponent: React.FC<FormComponentProps> = ({
         <Grid
           container
           spacing={1}
-          sx={{
-            padding: 2,
-            backgroundColor: "background.paper",
-            margin: "auto",
-            maxWidth: "80%",
-            boxShadow: 1,
-            borderRadius: 1,
+          style={{
+            marginTop: "5%",
+            width: "90% !important",
+            display: "flex",
+            padding: "5%",
+            justifyContent: "center",
+            boxShadow: "0 0 20px rgba(0,0,0,0.15)",
+            borderRadius: ".5rem",
           }}
         >
           {render.map((field: any) => (
-            <Grid item xs={12} sm={6} md={4} key={field.field}>
+            <Grid item xs={12} md={4} sm={6} key={field.field}>
               {renderField(field)}
             </Grid>
           ))}
-          <Grid item xs={12}></Grid>
+          <Grid item xs={12} md={4}></Grid>
           <Button type="submit" variant="contained" color="primary">
-            Submit
+            Kaydet
           </Button>
         </Grid>
       </form>

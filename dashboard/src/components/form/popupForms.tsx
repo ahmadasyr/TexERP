@@ -2,6 +2,7 @@ import React from "react";
 // import Customer from "../../app/customer/form/page";
 import Bank from "../../app/bank/form/page";
 import Customer from "@/app/customer/form/page";
+import TaxOffice from "@/app/tax-office/form/page";
 
 interface PopupFormsProps {
   parsedString: string;
@@ -14,7 +15,6 @@ const PopupForms: React.FC<PopupFormsProps> = ({
   popupHandler,
   popupSetter,
 }) => {
-  console.log(parsedString);
   const renderContent = (content: string) => {
     switch (content) {
       case "bank":
@@ -23,8 +23,12 @@ const PopupForms: React.FC<PopupFormsProps> = ({
         return (
           <Customer popupSetter={popupSetter} popupHandler={popupHandler} />
         );
+      case "tax-office":
+        return (
+          <TaxOffice popupSetter={popupSetter} popupHandler={popupHandler} />
+        );
       default:
-        return <>EMPTY</>;
+        return <>No form found for {content}</>;
     }
   };
 

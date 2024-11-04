@@ -11,71 +11,77 @@
     "icon": "money",
     "subItems": [
       {
-        "title": "Müşteriler",
-        "link": "/customer",
-        "desc": "Müşteri listesi",
-        "icon": "group"
+        "title": "Müşteri İşlemleri",
+        "desc": "Müşteri işlemleri menüsü",
+        "icon": "supervisor_account",
+        "subItems": [
+          {
+            "title": "Müşteriler",
+            "link": "/customer",
+            "desc": "Müşteri listesi",
+            "icon": "group"
+          },
+          {
+            "title": "Müşteri Fiyatları",
+            "link": "/customer-price",
+            "desc": "Müşteri fiyatları listesi",
+            "icon": "tag"
+          },
+          {
+            "title": "Müşteri Görüşme Planı",
+            "link": "/customer-meet-plan",
+            "desc": "Müşteri görüşme planı listesi",
+            "icon": "airplane_ticket"
+          },
+
+          {
+            "title": "Müşteri Görüşme Raporu",
+            "link": "/customer-meet-report",
+            "desc": "Müşteri görüşme raporu listesi",
+            "icon": "description"
+          },
+          {
+            "title": "Müşteri Şikayetleri",
+            "link": "/customer-complaint",
+            "desc": "Müşteri şikayetleri listesi",
+            "icon": "record_voice_over"
+          }
+        ]
       },
       {
-        "title": "Bankalar",
-        "link": "/bank",
-        "desc": "Banka listesi",
-        "icon": "account_balance"
+        "title": "Ürün İşlemleri",
+        "desc ": "Ürün işlemleri menüsü",
+        "icon": "shopping_cart",
+        "subItems": [
+          {
+            "title": "Ürünler",
+            "link": "/product",
+            "desc": "Ürün listesi",
+            "icon": "category"
+          },
+
+          {
+            "title": "Teklifler",
+            "link": "/offer",
+            "desc": "Teklif listesi",
+            "icon": "request_quote"
+          },
+          {
+            "title": "Siparişler",
+            "link": "/order",
+            "desc": "Sipariş listesi",
+            "icon": "shopping_cart_checkout"
+          },
+
+          {
+            "title": "Ürün Fizibilite Formu",
+            "link": "/product-feasibility-form",
+            "desc": "Ürün fizibilite formu listesi",
+            "icon": "checklist"
+          }
+        ]
       },
-      {
-        "title": "Vergi Daireleri",
-        "link": "/tax-office",
-        "desc": "Vergi daireleri listesi",
-        "icon": "domain"
-      },
-      {
-        "title": "Müşteri Görüşme Planı",
-        "link": "/customer-meet-plan",
-        "desc": "Müşteri görüşme planı listesi",
-        "icon": "airplane_ticket"
-      },
-      {
-        "title": "Müşteri Görüşme Raporu",
-        "link": "/customer-meet-report",
-        "desc": "Müşteri görüşme raporu listesi",
-        "icon": "description"
-      },
-      {
-        "title": "Ürünler",
-        "link": "/product",
-        "desc": "Ürün listesi",
-        "icon": "category"
-      },
-      {
-        "title": "Müşteri Fiyatları",
-        "link": "/customer-price",
-        "desc": "Müşteri fiyatları listesi",
-        "icon": "tag"
-      },
-      {
-        "title": "Teklifler",
-        "link": "/offer",
-        "desc": "Teklif listesi",
-        "icon": "request_quote"
-      },
-      {
-        "title": "Siparişler",
-        "link": "/order",
-        "desc": "Sipariş listesi",
-        "icon": "shopping_cart_checkout"
-      },
-      {
-        "title": "Müşteri Şikayetleri",
-        "link": "/customer-complaint",
-        "desc": "Müşteri şikayetleri listesi",
-        "icon": "record_voice_over"
-      },
-      {
-        "title": "Ürün Fizibilite Formu",
-        "link": "/product-feasibility-form",
-        "desc": "Ürün fizibilite formu listesi",
-        "icon": "checklist"
-      },
+
       {
         "title": "Rakip işlemleri",
         "desc": "Rakip işlemleri menüsü",
@@ -98,6 +104,25 @@
             "link": "/competitor",
             "desc": "Rakip listesi",
             "icon": "supervisor_account"
+          }
+        ]
+      },
+      {
+        "title": "Diğer İşlemler",
+        "desc": "Diğer işlemler menüsü",
+        "icon": "supervisor_account",
+        "subItems": [
+          {
+            "title": "Bankalar",
+            "link": "/bank",
+            "desc": "Banka listesi",
+            "icon": "account_balance"
+          },
+          {
+            "title": "Vergi Daireleri",
+            "link": "/tax-office",
+            "desc": "Vergi daireleri listesi",
+            "icon": "domain"
           }
         ]
       }

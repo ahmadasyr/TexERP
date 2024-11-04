@@ -44,6 +44,7 @@ export const getOrderByCustomerId = async (req: Request, res: Response) => {
       where: { customerId: Number(id) },
       include: {
         product: true,
+        customer: true,
       },
     });
     if (order) {

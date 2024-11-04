@@ -8,7 +8,7 @@ export interface Data {
 }
 
 export const formFields = [
-  createField({ name: "name", label: "İsim", type: "text" }),
+  createField({ name: "name", label: "İsim", type: "text", required: true }),
 ];
 
 export const headCells: HeadCell[] = [

@@ -34,13 +34,24 @@ export interface Data {
 }
 
 export const formFields = [
-  createField({ name: "name", label: "Müşteri Adı", type: "text" }),
-  createField({ name: "foreign", label: "Yurtdışı", type: "checkbox" }),
+  createField({
+    name: "name",
+    label: "Müşteri Adı",
+    type: "text",
+    required: true,
+  }),
+  createField({
+    name: "foreign",
+    label: "Yurtdışı",
+    type: "checkbox",
+    required: true,
+  }),
   createField({
     name: "relatedPerson",
     label: "İlgili Kişi",
     type: "text",
   }),
+
   createField({ name: "title", label: "Unvan", type: "text" }),
   createField({ name: "email", label: "E-Posta", type: "email" }),
   createField({ name: "phoneNumber", label: "Telefon", type: "tel" }),
@@ -57,6 +68,8 @@ export const formFields = [
     table: "personnel/sales",
     value: "id",
     displayValue: ["firstName", "lastName"],
+    creatable: false,
+    required: true,
   }),
   createField({
     name: "firstRegisterDate",
@@ -68,6 +81,7 @@ export const formFields = [
     label: "Durum",
     type: "select",
     options: ["Mevcut", "Potansiyel", "Riskli", "Kara Liste"],
+    required: true,
   }),
   createField({
     name: "returnDate",
@@ -103,7 +117,7 @@ export const formFields = [
   }),
   createField({ name: "meterLimit", label: "Limit Metraj", type: "float" }),
   createField({ name: "address", label: "Adres", type: "text" }),
-  createField({ name: "city", label: "Şehir", type: "text" }),
+  createField({ name: "city", label: "Şehir", type: "text", required: true }),
   createField({
     name: "taxOfficeId",
     label: "Vergi Dairesi",
@@ -133,13 +147,14 @@ export const formFields = [
     table: "currency",
     value: "id",
     displayValue: "name",
+    creatable: false,
   }),
   createField({ name: "iban", label: "IBAN", type: "text" }),
   createField({ name: "swift", label: "SWIFT", type: "text" }),
 ];
 
 export const headCells: HeadCell[] = [
-  { id: "id", numeric: true, disablePadding: true, label: "NO" },
+  { id: "id", numeric: true, disablePadding: true, label: "No" },
   { id: "name", numeric: false, disablePadding: false, label: "MÜŞTERİ ADI" },
   {
     id: "foreign",

@@ -39,7 +39,6 @@ const Bank: React.FC<BankProps> = ({ popupHandler, popupSetter }) => {
       fetch(`http://localhost:3001/api/${tableName}/${id}`)
         .then((response) => response.json())
         .then((data) => {
-          console.log(data);
           Object.keys(data).forEach((key) => {
             handleChange({
               target: { name: key, value: data[key] },
@@ -69,7 +68,7 @@ const Bank: React.FC<BankProps> = ({ popupHandler, popupSetter }) => {
           setAlertValue(response.status);
         } else {
           const data = await response.json();
-          console.log("Success:", data);
+
           setAlertValue(200); // Set success status
         }
       } catch (error) {
@@ -92,9 +91,8 @@ const Bank: React.FC<BankProps> = ({ popupHandler, popupSetter }) => {
           setAlertValue(response.status);
         } else {
           const data = await response.json();
-          console.log("Success:", data);
+
           if (popupHandler) {
-            console.log("YES");
             popupHandler(data);
             if (popupSetter) {
               popupSetter({ on: false, table: "" });
@@ -136,17 +134,6 @@ const Bank: React.FC<BankProps> = ({ popupHandler, popupSetter }) => {
     });
   }
 
-  const [oldFormData, setOldFormData] = React.useState<any>({});
-
-  useEffect(() => {
-    formFields.forEach((field) => {
-      if (field.relation && oldFormData[field.name] !== formData[field.name]) {
-        runFetchData();
-      }
-    });
-    setOldFormData(formData);
-  }, [formData]);
-
   return (
     <>
       <Popup
@@ -161,24 +148,40 @@ const Bank: React.FC<BankProps> = ({ popupHandler, popupSetter }) => {
         alertValue={alertValue}
         setAlertValue={setAlertValue}
       />
-      <form onSubmit={handleSubmit}>
+      <form
+        style={
+          popupHandler
+            ? {}
+            : {
+                marginTop: "5%",
+                margin: "5% auto 5% auto",
+                width: "90% !important",
+                display: "flex",
+                padding: "5%",
+                justifyContent: "center",
+                boxShadow: "0 0 20px rgba(0,0,0,0.15)",
+                borderRadius: ".5rem",
+              }
+        }
+        onSubmit={handleSubmit}
+      >
         <Box width={"100%"}>
           <Typography variant="h4" gutterBottom>
             {title}
           </Typography>
           <Grid container spacing={1}>
-            <Grid item xs={12}>
+            <Grid item xs={12} md={4} md={4}>
               <NewTextField {...allProps} keyProp="name" />
             </Grid>
-            <Button
-              style={{ marginTop: "1rem" }}
-              type="submit"
-              variant="contained"
-              color="primary"
-            >
-              Submit
-            </Button>
           </Grid>
+          <Button
+            style={{ marginTop: "1rem" }}
+            type="submit"
+            variant="contained"
+            color="primary"
+          >
+            Kaydet
+          </Button>
         </Box>
       </form>
     </>

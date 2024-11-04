@@ -51,7 +51,6 @@ const CustomerComplaint: React.FC<CustomerComplaintProps> = ({
       fetch(`http://localhost:3001/api/${tableName}/${id}`)
         .then((response) => response.json())
         .then((data) => {
-          console.log(data);
           Object.keys(data).forEach((key) => {
             handleChange({
               target: { name: key, value: data[key] },
@@ -81,7 +80,7 @@ const CustomerComplaint: React.FC<CustomerComplaintProps> = ({
           setAlertValue(response.status);
         } else {
           const data = await response.json();
-          console.log("Success:", data);
+
           setAlertValue(200); // Set success status
         }
       } catch (error) {
@@ -104,9 +103,8 @@ const CustomerComplaint: React.FC<CustomerComplaintProps> = ({
           setAlertValue(response.status);
         } else {
           const data = await response.json();
-          console.log("Success:", data);
+
           if (popupHandler) {
-            console.log("YES");
             popupHandler(data);
             if (popupSetter) {
               popupSetter({ on: false, table: "" });
@@ -148,17 +146,6 @@ const CustomerComplaint: React.FC<CustomerComplaintProps> = ({
     });
   }
 
-  const [oldFormData, setOldFormData] = React.useState<any>({});
-
-  useEffect(() => {
-    formFields.forEach((field) => {
-      if (field.relation && oldFormData[field.name] !== formData[field.name]) {
-        runFetchData();
-      }
-    });
-    setOldFormData(formData);
-  }, [formData]);
-
   return (
     <>
       <Popup
@@ -174,15 +161,20 @@ const CustomerComplaint: React.FC<CustomerComplaintProps> = ({
         setAlertValue={setAlertValue}
       />
       <form
-        style={{
-          marginTop: "5%",
-          width: "90% !important",
-          display: "flex",
-          padding: "5%",
-          justifyContent: "center",
-          boxShadow: "0 0 20px rgba(0,0,0,0.15)",
-          borderRadius: ".5rem",
-        }}
+        style={
+          popupHandler
+            ? {}
+            : {
+                marginTop: "5%",
+                margin: "5% auto 5% auto",
+                width: "90% !important",
+                display: "flex",
+                padding: "5%",
+                justifyContent: "center",
+                boxShadow: "0 0 20px rgba(0,0,0,0.15)",
+                borderRadius: ".5rem",
+              }
+        }
         onSubmit={handleSubmit}
       >
         <Box width={"100%"}>
@@ -191,52 +183,63 @@ const CustomerComplaint: React.FC<CustomerComplaintProps> = ({
           </Typography>
           <Grid container spacing={1}>
             {" "}
-            <Grid item xs={4}>
+            <Grid item xs={12} md={4}>
               <NewRelation {...allProps} keyProp="personnelId" />
             </Grid>
-            <Grid item xs={4}>
+            <Grid item xs={12} md={4}>
               <NewRelation {...allProps} keyProp="customerId" />
             </Grid>
           </Grid>
 
           <Divider />
           <Grid container spacing={1}>
-            <Grid item xs={4}>
-              <NewTextField {...allProps} keyProp="contentsOfMeeting" />
-            </Grid>
-            <Grid item xs={4}>
+            <Grid item xs={12} md={4}>
               <NewDate {...allProps} keyProp="revisionDate" />
             </Grid>
-            <Grid item xs={4}>
+            <Grid item xs={12} md={4}>
               <NewDate {...allProps} keyProp="meetDate" />
             </Grid>
 
-            <Grid item xs={4}>
-              <NewTextField {...allProps} keyProp="visitReason" />
+            <Grid item xs={12} md={4}>
+              <NewSelect {...allProps} keyProp="visitReason" />
             </Grid>
 
-            <Grid item xs={4}>
+            <Grid item xs={12} md={4}>
               <NewTextField {...allProps} keyProp="city" />
             </Grid>
-            <Grid item xs={4}>
+            <Grid item xs={12} md={4}>
               <NewTextField {...allProps} keyProp="district" />
             </Grid>
 
-            <Grid item xs={4}>
+            <Grid item xs={12} md={4}>
               <NewTextField {...allProps} keyProp="wayOfMeeting" />
             </Grid>
-
-            <Grid item xs={4}>
-              <NewTextField {...allProps} keyProp="customerNote" />
+            <Grid item xs={12} md={4}>
+              <NewTextField
+                {...allProps}
+                multiline={true}
+                keyProp="contentsOfMeeting"
+              />
             </Grid>
-            <Grid item xs={4}>
-              <NewTextField {...allProps} keyProp="responseToCustomer" />
+            <Grid item xs={12} md={4}>
+              <NewTextField
+                {...allProps}
+                multiline={true}
+                keyProp="customerNote"
+              />
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <NewTextField
+                {...allProps}
+                multiline={true}
+                keyProp="responseToCustomer"
+              />
             </Grid>
           </Grid>
           <Divider />
           <Grid container spacing={1}>
             {" "}
-            <Grid item xs={4}>
+            <Grid item xs={12} md={4}>
               <NewMultiEntryField {...allProps} keyProp="peopleMet" />
             </Grid>
           </Grid>
@@ -246,7 +249,7 @@ const CustomerComplaint: React.FC<CustomerComplaintProps> = ({
             variant="contained"
             color="primary"
           >
-            Submit
+            Kaydet
           </Button>
         </Box>
       </form>

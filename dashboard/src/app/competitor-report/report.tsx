@@ -1,19 +1,37 @@
 import { HeadCell } from "../../components/table/utils";
 import { createField } from "../../components/form/utils";
-export const tableName = "bank";
+export const tableName = "competitor-report";
 
 export interface Data {
   id: number;
-  name: string;
+  competitorId: number;
+  date: string;
 }
 
 export const formFields = [
-  createField({ name: "name", label: "İsim", type: "text" }),
+  createField({
+    name: "competitorId",
+    label: "Rakip",
+    type: "relation",
+    relation: true,
+    table: "competitor",
+    value: "id",
+    displayValue: "name",
+    required: true,
+  }),
+  createField({ name: "date", label: "Tarih", type: "date", required: true }),
 ];
 
 export const headCells: HeadCell[] = [
-  { id: "id", numeric: true, disablePadding: true, label: "ID" },
-  { id: "name", numeric: false, disablePadding: false, label: "İsim" },
+  { id: "id", numeric: true, disablePadding: true, label: "No" },
+  {
+    id: "competitor",
+    numeric: true,
+    disablePadding: false,
+    label: "Rakip",
+    displayValue: ["name"],
+  },
+  { id: "date", numeric: false, disablePadding: false, label: "Tarih" },
 ];
 
-export const title = "Banka";
+export const title = "Rakip Analiz Raporları";

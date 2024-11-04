@@ -8,11 +8,11 @@ export interface Data {
 }
 
 export const formFields = [
-  createField({ name: "name", label: "İsim", type: "text" }),
+  createField({ name: "name", label: "İsim", type: "text", required: true }),
 ];
 
 export const headCells: HeadCell[] = [
-  { id: "id", numeric: true, disablePadding: true, label: "ID" },
+  { id: "id", numeric: true, disablePadding: true, label: "No" },
   { id: "name", numeric: false, disablePadding: false, label: "İsim" },
 ];
 

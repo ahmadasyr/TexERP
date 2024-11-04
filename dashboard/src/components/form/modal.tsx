@@ -11,8 +11,8 @@ import {
   IconButton,
   Typography,
 } from "@mui/material";
-import { useEffect } from "react";
-
+import { useEffect, useRef } from "react";
+import { Player } from "@lordicon/react";
 interface FormModalProps {
   alertValue: number;
   setAlertValue: React.Dispatch<React.SetStateAction<number>>;
@@ -24,12 +24,14 @@ export const FormModal: React.FC<FormModalProps> = ({
   setAlertValue,
   isPopup,
 }) => {
-  useEffect(() => {
-    console.log("change");
-  }, [alertValue]);
-
   const handleClose = () => setAlertValue(0);
-
+  const playerRef = useRef<Player>(null);
+  const ICON = require("./icons/success.json");
+  useEffect(() => {
+    if (alertValue === 200) {
+      playerRef.current?.play();
+    }
+  }, [alertValue]);
   return (
     <>
       <Dialog
@@ -38,34 +40,37 @@ export const FormModal: React.FC<FormModalProps> = ({
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
       >
-        <DialogTitle id="alert-dialog-title">{"Success"}</DialogTitle>
+        <Box display="flex" justifyContent="center">
+          <Player ref={playerRef} size={150} icon={ICON} />
+        </Box>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
-            Form submitted successfully!
+            Form başarıyla gönderildi.
           </DialogContentText>
         </DialogContent>
         <DialogActions>
           <Button
-            variant="contained"
+            variant="outlined"
             color="primary"
             onClick={() => {
               setAlertValue(0);
               window.location.reload();
             }}
           >
-            Create New
+            Yeni oluştur
           </Button>
-          <Button variant="contained" color="secondary" onClick={handleClose}>
-            Continue
+          <Button variant="outlined" color="secondary" onClick={handleClose}>
+            Devam et
           </Button>
           <Button
-            variant="contained"
+            variant="outlined"
+            color="error"
             onClick={() => {
               setAlertValue(0);
               window.history.back();
             }}
           >
-            Go Back
+            Geri dön
           </Button>
         </DialogActions>
       </Dialog>
@@ -77,7 +82,7 @@ export const FormModal: React.FC<FormModalProps> = ({
         aria-describedby="alert-dialog-description"
       >
         <DialogTitle id="alert-dialog-title">
-          {"Error"}
+          {"HATA"}
           <IconButton
             onClick={handleClose}
             style={{ position: "absolute", right: 8, top: 8 }}
@@ -87,7 +92,7 @@ export const FormModal: React.FC<FormModalProps> = ({
         </DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
-            There was an error submitting the form.
+            Formu gönderirken bir hata oluştu.
           </DialogContentText>
         </DialogContent>
         <DialogActions>
@@ -98,7 +103,7 @@ export const FormModal: React.FC<FormModalProps> = ({
               setAlertValue(0);
             }}
           >
-            Edit
+            Düzenle
           </Button>
           {!isPopup ? (
             <Button
@@ -110,7 +115,7 @@ export const FormModal: React.FC<FormModalProps> = ({
                 window.history.back();
               }}
             >
-              Go Back
+              Geri dön
             </Button>
           ) : null}
         </DialogActions>
