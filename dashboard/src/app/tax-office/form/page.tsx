@@ -163,45 +163,46 @@ const Page: React.FC<PageProps> = ({ popupHandler, popupSetter }) => {
         alertValue={alertValue}
         setAlertValue={setAlertValue}
       />
-      <form onSubmit={handleSubmit}>
-        <Typography variant="h4" gutterBottom>
-          {title}
-        </Typography>
-        <Grid
-          container
-          spacing={1}
-          style={
-            popupHandler
-              ? {}
-              : {
-                  marginTop: "5%",
-                  margin: "5% auto 5% auto",
-                  width: "90%",
-                  display: "flex",
-                  padding: "5%",
-                  justifyContent: "center",
-                  boxShadow: "0 0 20px rgba(0,0,0,0.15)",
-                  borderRadius: ".5rem",
-                }
-          }
-        >
-          <Grid item xs={6}>
-            <NewTextField {...allProps} keyProp="name" />
+      <form
+        style={
+          popupHandler
+            ? {}
+            : {
+                marginTop: "5%",
+                margin: "5% auto 5% auto",
+                width: "90%",
+                display: "flex",
+                padding: "5%",
+                justifyContent: "center",
+                boxShadow: "0 0 20px rgba(0,0,0,0.15)",
+                borderRadius: ".5rem",
+              }
+        }
+        onSubmit={handleSubmit}
+      >
+        <Box width={"100%"}>
+          <Typography variant="h4" gutterBottom>
+            {title}
+          </Typography>
+          <Grid container spacing={1}>
+            <Grid item xs={6}>
+              <NewTextField {...allProps} keyProp="name" />
+            </Grid>
+            <Grid item xs={6}>
+              <NewTextField {...allProps} keyProp="city" />
+            </Grid>
+            <Button
+              style={{
+                marginTop: "1rem",
+              }}
+              type="submit"
+              variant="contained"
+              color="primary"
+            >
+              Kaydet
+            </Button>
           </Grid>
-          <Grid item xs={6}>
-            <NewTextField {...allProps} keyProp="city" />
-          </Grid>
-          <Button
-            style={{
-              marginTop: "1rem",
-            }}
-            type="submit"
-            variant="contained"
-            color="primary"
-          >
-            Kaydet
-          </Button>
-        </Grid>
+        </Box>
       </form>
     </>
   );

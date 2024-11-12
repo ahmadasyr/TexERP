@@ -24,7 +24,6 @@ type Data = {
 type EnhancedTableProps = {
   title: string;
   headCells: any[];
-  data: Data[];
   tableName: string;
   viewable?: boolean;
   URI: string;
@@ -121,7 +120,6 @@ export default function EnhancedTable({
       String(value).toLowerCase().includes(searchTerm.toLowerCase())
     )
   );
-
   const emptyRows =
     page > 0 ? Math.max(0, (1 + page) * rowsPerPage - filteredRows.length) : 0;
   const [visibleColumns, setVisibleColumns] = React.useState(
@@ -178,6 +176,11 @@ export default function EnhancedTable({
                   return (
                     <StyledTableRow
                       hover
+                      onDoubleClick={() => {
+                        viewable
+                          ? router.push(`/${tableName}/form/?id=${row.id}`)
+                          : null;
+                      }}
                       aria-checked={isItemSelected}
                       tabIndex={-1}
                       key={row.id}
@@ -195,7 +198,14 @@ export default function EnhancedTable({
                       </TableCell>
                       {visibleColumns.map((headCell) =>
                         headCell?.visible ? (
-                          <TableCell key={headCell.id}>
+                          <TableCell
+                            style={{
+                              whiteSpace: "nowrap",
+                              overflow: "hidden",
+                              textOverflow: "ellipsis",
+                            }}
+                            key={headCell.id}
+                          >
                             {typeof row[headCell.id as keyof Data] ===
                             "boolean" ? (
                               row[headCell.id as keyof Data] ? (
@@ -207,7 +217,7 @@ export default function EnhancedTable({
                                 "object" &&
                               (row[headCell.id as keyof Data] as any)?.id ? (
                               <Link
-                                href={`/${headCell.id}/view/?id=${
+                                href={`/${headCell.id}/form/?id=${
                                   (row[headCell.id as keyof Data] as any)?.id
                                 }`}
                               >
@@ -237,6 +247,7 @@ export default function EnhancedTable({
                           key="view"
                           padding="none"
                           size="small"
+                          // always visible
                         >
                           <IconButton
                             onClick={() =>

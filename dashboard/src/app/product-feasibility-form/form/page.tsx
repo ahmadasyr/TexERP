@@ -8,6 +8,10 @@ import {
   Divider,
   Grid,
   Modal,
+  Step,
+  StepButton,
+  StepLabel,
+  Stepper,
   Typography,
 } from "@mui/material";
 import {
@@ -19,11 +23,18 @@ import {
   NewNumber,
   NewEmail,
   NewPhone,
+  NewMultiEntryField,
 } from "@/components/form/FormFields";
 import { useFormData } from "@/components/form/utils";
 import { FormModal } from "@/components/form/modal";
 import Popup from "@/components/form/Popup";
 import { useSearchParams } from "next/navigation";
+import Process from "./process";
+import Material from "./material";
+import AuxEquipment from "./auxEquipment";
+import { machine } from "os";
+import Machine from "./machine";
+import Costs from "./costs";
 interface PageProps {
   popupHandler?: (data: any) => void;
   popupSetter?: (data: any) => void;
@@ -42,6 +53,13 @@ const Page: React.FC<PageProps> = ({ popupHandler, popupSetter }) => {
     column: "",
   });
 
+  // subTable rows
+  const [processRows, setProcessRows] = React.useState<any[]>([]);
+  const [materialRows, setMaterialRows] = React.useState<any[]>([]);
+  const [auxEquipmentRows, setAuxEquipmentRows] = React.useState<any[]>([]);
+  const [machineRows, setMachineRows] = React.useState<any[]>([]);
+  const [costRows, setCostRows] = React.useState<any[]>([]);
+  const [refresh, setRefresh] = React.useState<boolean>(false);
   useEffect(() => {
     if (id && !popupHandler) {
       fetch(`http://localhost:3001/api/${tableName}/${id}`)
@@ -52,6 +70,12 @@ const Page: React.FC<PageProps> = ({ popupHandler, popupSetter }) => {
               target: { name: key, value: data[key] },
             } as React.ChangeEvent<{ name: string; value: any }>);
           });
+          setProcessRows(data.process || []);
+          setMaterialRows(data.material || []);
+          setAuxEquipmentRows(data.auxEquipment || []);
+          setMachineRows(data.machine || []);
+          setCostRows(data.costs || []);
+          setRefresh(!refresh);
         });
     }
   }, [id]);
@@ -142,6 +166,18 @@ const Page: React.FC<PageProps> = ({ popupHandler, popupSetter }) => {
     });
   }
 
+  // Stepper variables
+  const [activeStep, setActiveStep] = React.useState(0);
+  const steps = [
+    "Genel Bilgi",
+    "Onay Kutular",
+    "Prosesler",
+    "Malzemeler",
+    "Yardımcı Ekipmanlar",
+    "Makineler",
+    "Maliyetler",
+  ];
+
   return (
     <>
       <Popup
@@ -177,80 +213,133 @@ const Page: React.FC<PageProps> = ({ popupHandler, popupSetter }) => {
           <Typography variant="h4" gutterBottom>
             {title}
           </Typography>
-          <Grid container spacing={1}>
-            <Grid item xs={12} md={4}>
-              <NewDate {...allProps} keyProp="date" />
+          <Stepper nonLinear activeStep={activeStep}>
+            {steps.map((label, index) => {
+              return (
+                <Step key={label}>
+                  <StepButton
+                    color="inherit"
+                    onClick={() => setActiveStep(index)}
+                  >
+                    {label}
+                  </StepButton>
+                </Step>
+              );
+            })}
+          </Stepper>
+          <Divider style={{ margin: "1rem" }} />
+
+          {activeStep === 0 ? (
+            <>
+              <Grid container spacing={1}>
+                <Grid item xs={12} md={4}>
+                  <NewDate {...allProps} keyProp="date" />
+                </Grid>
+                <Grid item xs={12} md={4}>
+                  <NewRelation {...allProps} keyProp="customerId" />
+                </Grid>
+              </Grid>
+              <Divider style={{ margin: "1rem" }} />
+              <Grid container spacing={1}>
+                <Grid item xs={12} md={4}>
+                  <NewTextField {...allProps} keyProp="productName" />
+                </Grid>
+
+                <Grid item xs={12} md={4}>
+                  <NewNumber {...allProps} keyProp="yearlyProductionCount" />
+                </Grid>
+                <Grid item xs={12} md={4}>
+                  <NewDate {...allProps} keyProp="startDateGoal" />
+                </Grid>
+                <Grid item xs={12} md={4}>
+                  <NewNumber {...allProps} keyProp="productPriceGoal" />
+                </Grid>
+                <Grid item xs={12} md={4}>
+                  <NewNumber {...allProps} keyProp="rawMaterialCost" />
+                </Grid>
+                <Grid item xs={12} md={4}>
+                  <NewNumber {...allProps} keyProp="productionCost" />
+                </Grid>
+
+                <Grid item xs={12} md={4}>
+                  <NewNumber {...allProps} keyProp="cost" />
+                </Grid>
+                <Grid item xs={12} md={4}>
+                  <NewNumber {...allProps} keyProp="customerBudget" />
+                </Grid>
+                <Grid item xs={12} md={4}>
+                  <NewNumber {...allProps} keyProp="priceDifferencePercent" />
+                </Grid>
+              </Grid>
+              <Grid container spacing={1}>
+                <Grid item xs={12} md={4}>
+                  <NewMultiEntryField {...allProps} keyProp="attendees" />
+                </Grid>
+              </Grid>
+            </>
+          ) : activeStep === 1 ? (
+            <Grid container spacing={1}>
+              <Grid item xs={12} md={4}>
+                <NewCheckBox {...allProps} keyProp="marketReady" />
+              </Grid>
+              <Grid item xs={12} md={4}>
+                <NewCheckBox {...allProps} keyProp="demandReady" />
+              </Grid>
+              <Grid item xs={12} md={4}>
+                <NewCheckBox {...allProps} keyProp="legalReady" />
+              </Grid>
+              <Grid item xs={12} md={4}>
+                <NewCheckBox {...allProps} keyProp="testReady" />
+              </Grid>
+              <Grid item xs={12} md={4}>
+                <NewCheckBox {...allProps} keyProp="productionReady" />
+              </Grid>
+              <Grid item xs={12} md={4}>
+                <NewCheckBox {...allProps} keyProp="measurementReady" />
+              </Grid>
+              <Grid item xs={12} md={4}>
+                <NewCheckBox {...allProps} keyProp="suitable" />
+              </Grid>
+              <Grid item xs={12} md={4}>
+                <NewCheckBox {...allProps} keyProp="costsCovered" />
+              </Grid>
             </Grid>
-            <Grid item xs={12} md={4}>
-              <NewTextField {...allProps} keyProp="productName" />
-            </Grid>
-            <Grid item xs={12} md={4}>
-              <NewRelation {...allProps} keyProp="customerId" />
-            </Grid>
-            <Grid item xs={12} md={4}>
-              <NewNumber {...allProps} keyProp="yearlyProductionCount" />
-            </Grid>
-            <Grid item xs={12} md={4}>
-              <NewDate {...allProps} keyProp="startDateGoal" />
-            </Grid>
-            <Grid item xs={12} md={4}>
-              <NewNumber {...allProps} keyProp="productPriceGoal" />
-            </Grid>
-            <Grid item xs={12} md={4}>
-              <NewCheckBox {...allProps} keyProp="marketReady" />
-            </Grid>
-            <Grid item xs={12} md={4}>
-              <NewCheckBox {...allProps} keyProp="demandReady" />
-            </Grid>
-            <Grid item xs={12} md={4}>
-              <NewCheckBox {...allProps} keyProp="legalReady" />
-            </Grid>
-            <Grid item xs={12} md={4}>
-              <NewCheckBox {...allProps} keyProp="testReady" />
-            </Grid>
-            <Grid item xs={12} md={4}>
-              <NewCheckBox {...allProps} keyProp="productionReady" />
-            </Grid>
-            <Grid item xs={12} md={4}>
-              <NewCheckBox {...allProps} keyProp="measurementReady" />
-            </Grid>
-            <Grid item xs={12} md={4}>
-              <NewNumber {...allProps} keyProp="rawMaterialCost" />
-            </Grid>
-            <Grid item xs={12} md={4}>
-              <NewNumber {...allProps} keyProp="productionCost" />
-            </Grid>
-            <Grid item xs={12} md={4}>
-              <NewTextField {...allProps} keyProp="process" />
-            </Grid>
-            <Grid item xs={12} md={4}>
-              <NewTextField {...allProps} keyProp="material" />
-            </Grid>
-            <Grid item xs={12} md={4}>
-              <NewTextField {...allProps} keyProp="auxEquipment" />
-            </Grid>
-            <Grid item xs={12} md={4}>
-              <NewTextField {...allProps} keyProp="machine" />
-            </Grid>
-            <Grid item xs={12} md={4}>
-              <NewTextField {...allProps} keyProp="costs" />
-            </Grid>
-            <Grid item xs={12} md={4}>
-              <NewNumber {...allProps} keyProp="cost" />
-            </Grid>
-            <Grid item xs={12} md={4}>
-              <NewNumber {...allProps} keyProp="customerBudget" />
-            </Grid>
-            <Grid item xs={12} md={4}>
-              <NewNumber {...allProps} keyProp="priceDifferencePercent" />
-            </Grid>
-            <Grid item xs={12} md={4}>
-              <NewCheckBox {...allProps} keyProp="suitable" />
-            </Grid>
-            <Grid item xs={12} md={4}>
-              <NewCheckBox {...allProps} keyProp="costsCovered" />
-            </Grid>
-          </Grid>
+          ) : activeStep === 2 ? (
+            <Process
+              refresh={refresh}
+              subRows={processRows}
+              setSubRows={setProcessRows}
+              handleChange={handleChange}
+            />
+          ) : activeStep === 3 ? (
+            <Material
+              refresh={refresh}
+              subRows={materialRows}
+              setSubRows={setMaterialRows}
+              handleChange={handleChange}
+            />
+          ) : activeStep === 4 ? (
+            <AuxEquipment
+              refresh={refresh}
+              subRows={auxEquipmentRows}
+              setSubRows={setAuxEquipmentRows}
+              handleChange={handleChange}
+            />
+          ) : activeStep === 5 ? (
+            <Machine
+              refresh={refresh}
+              subRows={machineRows}
+              setSubRows={setMachineRows}
+              handleChange={handleChange}
+            />
+          ) : activeStep === 6 ? (
+            <Costs
+              refresh={refresh}
+              subRows={costRows}
+              setSubRows={setCostRows}
+              handleChange={handleChange}
+            />
+          ) : null}
           <Button
             style={{ marginTop: "1rem" }}
             type="submit"

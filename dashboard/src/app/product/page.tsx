@@ -13,7 +13,6 @@ const Page: React.FC = () => {
       <EnhancedTable
         title={title}
         headCells={headCells}
-        data={Data}
         tableName={tableName}
         viewable={false}
         URI={URI}

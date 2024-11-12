@@ -1,10 +1,12 @@
 import { HeadCell } from "../../components/table/utils";
 import { createField } from "../../components/form/utils";
+import { create } from "domain";
 export const tableName = "product-feasibility-form";
 
 export interface Data {
   id: number;
   date: Date;
+  attendees: any;
   productName: string;
   customerId: number;
   yearlyProductionCount: number;
@@ -31,70 +33,98 @@ export interface Data {
 }
 
 export const formFields = [
-  createField({ name: "id", label: "ID", type: "number" }),
+  createField({ name: "id", label: "No", type: "number" }),
   createField({ name: "date", label: "Tarih", type: "date" }),
-  createField({ name: "productName", label: "Ürün Adı", type: "text" }),
+  createField({
+    name: "attendees",
+    label: "Toplantı Katılımcıları",
+    type: "json",
+  }),
+  createField({
+    name: "productName",
+    label: "Ürün Adı",
+    type: "text",
+    required: true,
+  }),
   createField({
     name: "customerId",
-    label: "Müşteri ID",
+    label: "Müşteri Adı",
     type: "number",
     relation: true,
     table: "customer",
     value: "id",
     displayValue: "name",
+    required: true,
   }),
   createField({
     name: "yearlyProductionCount",
-    label: "Yıllık Üretim Sayısı",
+    label: "Yıllık Üretim Adedi",
     type: "number",
   }),
   createField({
     name: "startDateGoal",
-    label: "Başlangıç Tarihi Hedefi",
+    label: "Hedef Üretime Başlama Tarihi ",
     type: "date",
   }),
   createField({
     name: "productPriceGoal",
-    label: "Ürün Fiyatı Hedefi",
+    label: "Hedef Ürün Fiyatı",
     type: "number",
+    required: true,
   }),
-  createField({ name: "marketReady", label: "Pazara Hazır", type: "checkbox" }),
-  createField({ name: "demandReady", label: "Talep Hazır", type: "checkbox" }),
-  createField({ name: "legalReady", label: "Yasal Hazır", type: "checkbox" }),
-  createField({ name: "testReady", label: "Test Hazır", type: "checkbox" }),
+  createField({
+    name: "marketReady",
+    label: "Pazar şartları tanımlanmış mı?",
+    type: "checkbox",
+  }),
+  createField({
+    name: "demandReady",
+    label: "Tüm müşteri talepleri karşılanabiliyor mu?",
+    type: "checkbox",
+  }),
+  createField({
+    name: "legalReady",
+    label: "Yasal gereklilikler karşılanabiliyor mu?",
+    type: "checkbox",
+  }),
+  createField({
+    name: "testReady",
+    label: "Tüm testler yapılabilir mi?",
+    type: "checkbox",
+  }),
   createField({
     name: "productionReady",
-    label: "Üretime Hazır",
+    label: "Üretim ekipmanları ürünü üretebilir mi?",
     type: "checkbox",
   }),
   createField({
     name: "measurementReady",
-    label: "Ölçüm Hazır",
+    label: "Tüm ölçüler için ölçüm ekipmanı var mı?",
     type: "checkbox",
   }),
   createField({
     name: "rawMaterialCost",
-    label: "Hammadde Maliyeti",
+    label: "Planlanan hedef Hammadde maliyeti",
     type: "number",
   }),
   createField({
     name: "productionCost",
-    label: "Üretim Maliyeti",
+    label: "Planlanan hedef Üretim maliyeti",
     type: "number",
   }),
-  createField({ name: "process", label: "Süreç", type: "text" }),
-  createField({ name: "material", label: "Malzeme", type: "text" }),
+  createField({ name: "process", label: "Süreç", type: "Json" }),
+  createField({ name: "material", label: "Malzeme", type: "Json" }),
   createField({
     name: "auxEquipment",
     label: "Yardımcı Ekipman",
-    type: "text",
+    type: "Json",
   }),
-  createField({ name: "machine", label: "Makine", type: "text" }),
-  createField({ name: "costs", label: "Maliyetler", type: "text" }),
+  createField({ name: "machine", label: "Makine", type: "Json" }),
+  createField({ name: "costs", label: "Maliyetler", type: "Json" }),
   createField({ name: "cost", label: "Maliyet", type: "number" }),
   createField({
     name: "customerBudget",
-    label: "Müşteri Bütçesi",
+    label: "Müşteri Adı Bütçesi",
     type: "number",
   }),
   createField({
@@ -111,8 +141,14 @@ export const formFields = [
 ];
 
 export const headCells: HeadCell[] = [
-  { id: "id", numeric: true, disablePadding: true, label: "ID" },
+  { id: "id", numeric: true, disablePadding: true, label: "No" },
   { id: "date", numeric: false, disablePadding: false, label: "Tarih" },
+  {
+    id: "attendees",
+    numeric: false,
+    disablePadding: false,
+    label: "Toplantı Katılımcıları",
+  },
   {
     id: "productName",
     numeric: false,
@@ -123,73 +159,73 @@ export const headCells: HeadCell[] = [
     id: "customerId",
     numeric: false,
     disablePadding: false,
-    label: "Müşteri ID",
+    label: "Müşteri Adı",
   },
   {
     id: "yearlyProductionCount",
     numeric: false,
     disablePadding: false,
-    label: "Yıllık Üretim Sayısı",
+    label: "Yıllık Üretim Adedi",
   },
   {
     id: "startDateGoal",
     numeric: false,
     disablePadding: false,
-    label: "Başlangıç Tarihi Hedefi",
+    label: "Hedef Üretime Başlama Tarihi ",
   },
   {
     id: "productPriceGoal",
     numeric: false,
     disablePadding: false,
-    label: "Ürün Fiyatı Hedefi",
+    label: "Hedef Ürün Fiyatı",
   },
   {
     id: "marketReady",
     numeric: false,
     disablePadding: false,
-    label: "Pazara Hazır",
+    label: "Pazar şartları tanımlanmış mı?",
   },
   {
     id: "demandReady",
     numeric: false,
     disablePadding: false,
-    label: "Talep Hazır",
+    label: "Tüm müşteri talepleri karşılanabiliyor mu?",
   },
   {
     id: "legalReady",
     numeric: false,
     disablePadding: false,
-    label: "Yasal Hazır",
+    label: "Yasal gereklilikler karşılanabiliyor mu?",
   },
   {
     id: "testReady",
     numeric: false,
     disablePadding: false,
-    label: "Test Hazır",
+    label: "Tüm testler yapılabilir mi?",
   },
   {
     id: "productionReady",
     numeric: false,
     disablePadding: false,
-    label: "Üretime Hazır",
+    label: "Üretim ekipmanları ürünü üretebilir mi?",
   },
   {
     id: "measurementReady",
     numeric: false,
     disablePadding: false,
-    label: "Ölçüm Hazır",
+    label: "Tüm ölçüler için ölçüm ekipmanı var mı?",
   },
   {
     id: "rawMaterialCost",
     numeric: false,
     disablePadding: false,
-    label: "Hammadde Maliyeti",
+    label: "Planlanan hedef Hammadde maliyeti",
   },
   {
     id: "productionCost",
     numeric: false,
     disablePadding: false,
-    label: "Üretim Maliyeti",
+    label: "Planlanan hedef Üretim maliyeti",
   },
   { id: "process", numeric: false, disablePadding: false, label: "Süreç" },
   { id: "material", numeric: false, disablePadding: false, label: "Malzeme" },
@@ -201,4 +237,4 @@ export const headCells: HeadCell[] = [
   },
 ];
 
-export const title = "Müşteri Siparişleri";
+export const title = "Ürün Fizibilite Formu";

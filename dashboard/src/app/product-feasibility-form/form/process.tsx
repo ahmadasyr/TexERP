@@ -27,12 +27,10 @@ import { Alert, Dialog } from "@mui/material";
 const initialRows: GridRowsProp = [
   {
     id: 0,
-    competitionReportSubjectId: "",
-    exists: false,
-    status: "",
-    gap: "",
-    strategy: "",
-    action: "",
+    name: "",
+    manufacturingTime: "",
+    manufacturingCost: "",
+    totalCost: "",
   },
 ];
 
@@ -52,12 +50,10 @@ function EditToolbar(props: EditToolbarProps) {
       ...oldRows,
       {
         id,
-        competitionReportSubjectId: "",
-        exists: false,
-        status: "",
-        gap: "",
-        strategy: "",
-        action: "",
+        name: "",
+        manufacturingTime: "",
+        manufacturingCost: "",
+        totalCost: "",
       },
     ]);
     setRowModesModel((oldModel) => ({
@@ -78,10 +74,11 @@ interface SheetProps {
   refresh: boolean;
   subRows: any[];
   setSubRows: React.Dispatch<React.SetStateAction<any[]>>;
+  handleChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
-export default function Sheet(props: SheetProps) {
-  const { refresh, subRows, setSubRows } = props;
-  const [rows, setRows] = React.useState(initialRows);
+export default function Process(props: SheetProps) {
+  const { handleChange, refresh, subRows, setSubRows } = props;
+  const [rows, setRows] = React.useState<GridRowsProp>(initialRows);
   const [rowModesModel, setRowModesModel] = React.useState<GridRowModesModel>(
     {}
   );
@@ -128,22 +125,7 @@ export default function Sheet(props: SheetProps) {
   const handleRowModesModelChange = (newRowModesModel: GridRowModesModel) => {
     setRowModesModel(newRowModesModel);
   };
-  const [values, setValues] = React.useState([]);
   const [alert, setAlert] = React.useState(false);
-  React.useEffect(() => {
-    const fetchData = async () => {
-      const response = await fetch(
-        `http://localhost:3001/api/competitor-report-subject`
-      );
-      const data = await response.json();
-      setValues(
-        data.map((value: any) => {
-          return { value: value.id, label: value.name };
-        })
-      );
-    };
-    fetchData();
-  }, []);
 
   React.useEffect(() => {
     if (subRows.length > 0) {
@@ -151,52 +133,42 @@ export default function Sheet(props: SheetProps) {
     }
   }, [refresh]);
   React.useEffect(() => {
-    setSubRows([...rows]);
+    if (Array.isArray(rows)) {
+      setSubRows([...rows]);
+      handleChange({
+        target: { name: "process", value: rows },
+      } as unknown as React.ChangeEvent<HTMLInputElement>);
+    }
   }, [rows]);
 
   const columns: GridColDef[] = [
     {
-      field: "competitionReportSubjectId",
-      headerName: "Konu",
-      type: "singleSelect",
-      valueOptions: values,
-      editable: true,
-      width: 150,
-    },
-    {
-      field: "exists",
-      headerName: "Mevcut",
-      type: "boolean",
-      editable: true,
-      width: 150,
-    },
-    {
-      field: "status",
-      headerName: "Rakiplerin Durumu",
+      field: "name",
+      headerName: "Proses Adı",
       type: "string",
       editable: true,
-      width: 150,
+      width: 200,
     },
     {
-      field: "gap",
-      headerName: "Gap",
+      field: "manufacturingTime",
+      headerName: "Makine üretim süresi",
       type: "string",
       editable: true,
-      width: 150,
+      width: 200,
     },
     {
-      field: "strategy",
-      headerName: "Strateji",
-      type: "string",
+      field: "manufacturingCost",
+      headerName: "Makine ve İşçilik Maliyeti",
+      type: "number",
       editable: true,
-      width: 150,
+      width: 200,
     },
     {
-      field: "action",
-      headerName: "Aksiyon",
-      type: "string",
+      field: "totalCost",
+      headerName: "Toplam Maliyet",
+      type: "number",
       editable: true,
-      width: 150,
+      width: 200,
     },
     {
       field: "actions",
@@ -268,7 +240,7 @@ export default function Sheet(props: SheetProps) {
           editMode="row"
           rowModesModel={rowModesModel}
           onRowModesModelChange={handleRowModesModelChange}
-          onRowEditStop={handleRowEditStop}
+          onRowEditStop={processRowUpdate}
           processRowUpdate={processRowUpdate}
           slots={{
             toolbar: EditToolbar as GridSlots["toolbar"],

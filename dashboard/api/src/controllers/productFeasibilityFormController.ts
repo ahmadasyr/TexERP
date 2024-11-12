@@ -60,11 +60,17 @@ export const createProductFeasibilityForm = async (
   res: Response
 ) => {
   try {
+    const { id, ...data } = req.body;
     const newForm = await prisma.productFeasibilityForm.create({
-      data: req.body,
+      data: {
+        ...data,
+        date: new Date(data.date),
+        startDateGoal: new Date(data.startDateGoal),
+      },
     });
     res.status(201).json(newForm);
   } catch (error) {
+    console.log(error);
     res
       .status(500)
       .json({ error: "Failed to create product feasibility form" });
@@ -75,14 +81,19 @@ export const updateProductFeasibilityForm = async (
   req: Request,
   res: Response
 ) => {
-  const { id } = req.params;
   try {
+    const { id, ...data } = req.body;
     const updatedForm = await prisma.productFeasibilityForm.update({
-      where: { id: Number(id) },
-      data: req.body,
+      where: { id: Number(req.params.id) },
+      data: {
+        ...data,
+        date: new Date(req.body.date),
+        startDateGoal: new Date(req.body.startDateGoal),
+      },
     });
     res.status(200).json(updatedForm);
   } catch (error) {
+    console.log(error);
     res
       .status(500)
       .json({ error: "Failed to update product feasibility form" });

@@ -170,7 +170,7 @@ const Bank: React.FC<BankProps> = ({ popupHandler, popupSetter }) => {
             {title}
           </Typography>
           <Grid container spacing={1}>
-            <Grid item xs={12} md={4} md={4}>
+            <Grid item xs={12} md={4}>
               <NewTextField {...allProps} keyProp="name" />
             </Grid>
           </Grid>

@@ -109,7 +109,7 @@ export const formFields = [
   }),
   createField({
     name: "productId",
-    label: "Ürün ID",
+    label: "Ürün",
     type: "number",
     relation: true,
     table: "product",
@@ -365,7 +365,7 @@ export const headCells: HeadCell[] = [
     id: "productId",
     numeric: true,
     disablePadding: false,
-    label: "Ürün ID",
+    label: "Ürün",
   },
   {
     id: "specification",

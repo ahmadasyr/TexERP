@@ -340,32 +340,32 @@ model customerComplaint {
 }
 
 model productFeasibilityForm {
-  id                     Int      @id @default(autoincrement())
-  date                   DateTime
-  attendees              Json
+  id                     Int       @id @default(autoincrement())
+  date                   DateTime? @default(now())
+  attendees              Json?
   productName            String
   customerId             Int
-  yearlyProductionCount  Int
-  startDateGoal          DateTime
+  yearlyProductionCount  Int?
+  startDateGoal          DateTime?
   productPriceGoal       Float
-  marketReady            Boolean
-  demandReady            Boolean
-  legalReady             Boolean
-  testReady              Boolean
-  productionReady        Boolean
-  measurementReady       Boolean
-  rawMaterialCost        Float
-  productionCost         Float
-  process                Json
-  material               Json
-  auxEquipment           Json
-  machine                Json
-  costs                  Json
-  cost                   Float
-  customerBudget         Float
-  priceDifferencePercent Float
-  suitable               Boolean
-  costsCovered           Boolean
+  marketReady            Boolean?
+  demandReady            Boolean?
+  legalReady             Boolean?
+  testReady              Boolean?
+  productionReady        Boolean?
+  measurementReady       Boolean?
+  rawMaterialCost        Float?
+  productionCost         Float?
+  process                Json?
+  material               Json?
+  auxEquipment           Json?
+  machine                Json?
+  costs                  Json?
+  cost                   Float?
+  customerBudget         Float?
+  priceDifferencePercent Float?
+  suitable               Boolean?
+  costsCovered           Boolean?
 
   // Relations
   customer customer @relation(fields: [customerId], references: [id])

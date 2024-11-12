@@ -14,7 +14,6 @@ const Page: React.FC = () => {
       <EnhancedTable
         title="Müşteri Ziyaret Planları"
         headCells={headCells}
-        data={Data}
         tableName={tableName}
         viewable={false}
         URI={"/customer-meet-plan"}

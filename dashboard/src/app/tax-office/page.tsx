@@ -14,7 +14,6 @@ const Page: React.FC = () => {
       <EnhancedTable
         title="Vergi Daireleri"
         headCells={headCells}
-        data={Data}
         tableName={tableName}
         viewable={false}
         URI={"/tax-office"}

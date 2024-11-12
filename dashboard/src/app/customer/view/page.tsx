@@ -21,40 +21,19 @@ import { useSearchParams } from "next/navigation";
 import EnhancedTable from "@/components/table/tableMain";
 import { Data } from "../customer";
 
-import {
-  headCells as complaintHeadCells,
-  Data as ComplaintData,
-} from "../../customer-complaint/complaint";
+import { headCells as complaintHeadCells } from "../../customer-complaint/complaint";
 
-import {
-  headCells as offerHeadCells,
-  Data as OfferData,
-} from "../../offer/offer";
+import { headCells as offerHeadCells } from "../../offer/offer";
 
-import {
-  headCells as orderHeadCells,
-  Data as OrderData,
-} from "../../order/order";
+import { headCells as orderHeadCells } from "../../order/order";
 
-import {
-  headCells as feasibilityHeadCells,
-  Data as FeasibilityData,
-} from "../../product-feasibility-form/form";
+import { headCells as feasibilityHeadCells } from "../../product-feasibility-form/form";
 
-import {
-  headCells as priceHeadCells,
-  Data as PriceData,
-} from "../../customer-price/price";
+import { headCells as priceHeadCells } from "../../customer-price/price";
 
-import {
-  headCells as meetPlanHeadCells,
-  Data as MeetPlanData,
-} from "../../customer-meet-plan/plan";
+import { headCells as meetPlanHeadCells } from "../../customer-meet-plan/plan";
 
-import {
-  headCells as meetReportHeadCells,
-  Data as MeetReportData,
-} from "../../customer-meet-report/report";
+import { headCells as meetReportHeadCells } from "../../customer-meet-report/report";
 
 const Page: React.FC = () => {
   const searchParams = useSearchParams();
@@ -64,7 +43,6 @@ const Page: React.FC = () => {
     {
       title: "Müşteri şikayetleri",
       headCells: complaintHeadCells,
-      data: ComplaintData,
       URI: "/customer-complaint/customer/" + id,
       viewable: false,
       tableName: "/customer-complaint",
@@ -72,7 +50,6 @@ const Page: React.FC = () => {
     {
       title: "Müşteri fiyatları",
       headCells: priceHeadCells,
-      data: PriceData,
       URI: "/customer-price/customer/" + id,
       viewable: false,
       tableName: "/customer-price",
@@ -80,7 +57,6 @@ const Page: React.FC = () => {
     {
       title: "Müşteri teklifleri",
       headCells: offerHeadCells,
-      data: OfferData,
       URI: "/offer/customer/" + id,
       viewable: false,
       tableName: "/offer",
@@ -88,7 +64,6 @@ const Page: React.FC = () => {
     {
       title: "Müşteri siparişleri",
       headCells: orderHeadCells,
-      data: OrderData,
       URI: "/order/customer/" + id,
       viewable: false,
       tableName: "/order",
@@ -96,7 +71,6 @@ const Page: React.FC = () => {
     {
       title: "Ürün fabilizme listesi",
       headCells: feasibilityHeadCells,
-      data: FeasibilityData,
       URI: "/product-feasibility-form/customer/" + id,
       viewable: false,
       tableName: "/product-feasibility-form",
@@ -104,7 +78,6 @@ const Page: React.FC = () => {
     {
       title: "Müşteri ziyaret planları",
       headCells: meetPlanHeadCells,
-      data: MeetPlanData,
       URI: "/customer-meet-plan/customer/" + id,
       viewable: false,
       tableName: "/customer-meet-plan",
@@ -112,7 +85,6 @@ const Page: React.FC = () => {
     {
       title: "Müşteri ziyaret raporları",
       headCells: meetReportHeadCells,
-      data: MeetReportData,
       URI: "/customer-meet-report/customer/" + id,
       viewable: false,
       tableName: "/customer-meet-report",
@@ -223,7 +195,6 @@ const Page: React.FC = () => {
         <EnhancedTable
           title={selectedPage.title}
           headCells={selectedPage.headCells}
-          data={selectedPage.data}
           tableName={selectedPage.tableName}
           viewable={selectedPage.viewable}
           URI={selectedPage.URI}

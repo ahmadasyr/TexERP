@@ -20,7 +20,7 @@ export const formFields = [
   createField({ name: "orderNo", label: "Sipariş No", type: "text" }),
   createField({
     name: "customerId",
-    label: "Müşteri ID",
+    label: "Müşteri",
     type: "number",
     relation: true,
     table: "customer",
@@ -30,7 +30,7 @@ export const formFields = [
   createField({ name: "index", label: "Index", type: "number" }),
   createField({
     name: "productId",
-    label: "Ürün ID",
+    label: "Ürün",
     type: "number",
     relation: true,
     table: "product",
@@ -55,7 +55,7 @@ export const formFields = [
 ];
 
 export const headCells: HeadCell[] = [
-  { id: "id", numeric: true, disablePadding: true, label: "ID" },
+  { id: "id", numeric: true, disablePadding: true, label: "No" },
   {
     id: "orderNo",
     numeric: false,
@@ -66,7 +66,7 @@ export const headCells: HeadCell[] = [
     id: "customer",
     numeric: false,
     disablePadding: false,
-    label: "Müşteri ID",
+    label: "Müşteri",
     displayValue: ["name"],
   },
   { id: "index", numeric: true, disablePadding: false, label: "Index" },
@@ -74,7 +74,7 @@ export const headCells: HeadCell[] = [
     id: "product",
     numeric: false,
     disablePadding: false,
-    label: "Ürün ID",
+    label: "Ürün",
     displayValue: ["name"],
   },
   { id: "quantity", numeric: true, disablePadding: false, label: "Miktar" },

@@ -122,7 +122,7 @@ export const headCells: HeadCell[] = [
     id: "product",
     numeric: true,
     disablePadding: false,
-    label: "Ürün ID",
+    label: "Ürün",
     displayValue: ["name"],
   },
   {

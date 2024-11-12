@@ -12,9 +12,8 @@ const Page: React.FC = () => {
   return (
     <div>
       <EnhancedTable
-        title="Teklifler"
+        title="Ürün Fizibilite"
         headCells={headCells}
-        data={Data}
         tableName={tableName}
         viewable={false}
         URI={"/product-feasibility-form"}

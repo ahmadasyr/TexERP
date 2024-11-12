@@ -10,6 +10,7 @@ import {
   IconButton,
   Grid,
   Autocomplete,
+  InputAdornment,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 
@@ -142,7 +143,7 @@ export const NewPhone = ({
   const field = formFields.find((f) => f.name === keyProp);
   return (
     <Grid item xs={gridSize}>
-      <TextField
+      {/* <TextField
         fullWidth
         name={keyProp as string}
         type="tel"
@@ -151,6 +152,26 @@ export const NewPhone = ({
         onChange={(e) =>
           handleChange({ target: { name: keyProp, value: e.target.value } })
         }
+        required={field?.required}
+        InputLabelProps={{ shrink: !!formData[keyProp] }}
+        slotProps={{
+          input: {
+            
+            inputMode: "tel",
+            startAdornment: (
+              <InputAdornment position="start">
+                <Phone />
+              </InputAdornment>
+            ),
+          },
+        }}
+      /> */}
+      <MuiTelInput
+        defaultCountry={"TR"}
+        value={formData[keyProp]}
+        onChange={(e) => handleChange({ target: { name: keyProp, value: e } })}
+        label={field?.label}
+        fullWidth
         required={field?.required}
       />
     </Grid>
@@ -176,6 +197,16 @@ export const NewEmail = ({
           handleChange({ target: { name: keyProp, value: e.target.value } })
         }
         required={field?.required}
+        slotProps={{
+          input: {
+            inputMode: "email",
+            startAdornment: (
+              <InputAdornment position="start">
+                <Email />
+              </InputAdornment>
+            ),
+          },
+        }}
       />
     </Grid>
   );
@@ -334,7 +365,8 @@ import {
   TableRow,
   Paper,
 } from "@mui/material";
-import { Delete } from "@mui/icons-material";
+import { Delete, Email, Phone } from "@mui/icons-material";
+import { MuiTelInput } from "mui-tel-input";
 
 export const NewMultiEntryField = ({
   keyProp,
@@ -368,7 +400,7 @@ export const NewMultiEntryField = ({
           <TableHead>
             <TableRow>
               <TableCell>{field?.label}</TableCell>
-              <TableCell>Action</TableCell>
+              <TableCell>Aksiyon</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
