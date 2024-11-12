@@ -3,6 +3,7 @@ import React from "react";
 import Bank from "../../app/bank/form/page";
 import Customer from "@/app/customer/form/page";
 import TaxOffice from "@/app/tax-office/form/page";
+import Page from "@/app/product/form/page";
 
 interface PopupFormsProps {
   parsedString: string;
@@ -27,6 +28,8 @@ const PopupForms: React.FC<PopupFormsProps> = ({
         return (
           <TaxOffice popupSetter={popupSetter} popupHandler={popupHandler} />
         );
+      case "product":
+        return <Page popupSetter={popupSetter} popupHandler={popupHandler} />;
       default:
         return <>No form found for {content}</>;
     }

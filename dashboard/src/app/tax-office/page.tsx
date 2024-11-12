@@ -16,7 +16,7 @@ const Page: React.FC = () => {
         headCells={headCells}
         data={Data}
         tableName={tableName}
-        viewable={true}
+        viewable={false}
         URI={"/tax-office"}
       />
     </div>

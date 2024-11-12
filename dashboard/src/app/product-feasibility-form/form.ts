@@ -1,6 +1,6 @@
 import { HeadCell } from "../../components/table/utils";
 import { createField } from "../../components/form/utils";
-export const tableName = "bank";
+export const tableName = "product-feasibility-form";
 
 export interface Data {
   id: number;

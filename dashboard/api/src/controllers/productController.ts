@@ -29,10 +29,10 @@ export const getProductById = async (req: Request, res: Response) => {
 };
 
 export const createProduct = async (req: Request, res: Response) => {
-  const { code, name } = req.body;
+  const data = req.body;
   try {
     const newProduct = await prisma.product.create({
-      data: { code, name },
+      data: data,
     });
     res.status(201).json(newProduct);
   } catch (error) {
@@ -42,11 +42,11 @@ export const createProduct = async (req: Request, res: Response) => {
 
 export const updateProduct = async (req: Request, res: Response) => {
   const { id } = req.params;
-  const { code, name } = req.body;
+  const data = req.body;
   try {
     const updatedProduct = await prisma.product.update({
       where: { id: Number(id) },
-      data: { code, name },
+      data: data,
     });
     res.status(200).json(updatedProduct);
   } catch (error) {

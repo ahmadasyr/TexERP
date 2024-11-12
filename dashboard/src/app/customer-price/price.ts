@@ -54,7 +54,7 @@ export const formFields = [
     name: "unit",
     label: "Birim",
     type: "select",
-    options: ["kg", "mt"],
+    options: ["kg", "m"],
     required: true,
   }),
   createField({

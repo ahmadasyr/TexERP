@@ -13,6 +13,7 @@ export const createField = ({
   dependency = "",
   multiOptions = [] as { value: string; options: string[] }[],
   creatable = true,
+  disabled = false,
 }) => ({
   name,
   label,
@@ -27,6 +28,7 @@ export const createField = ({
   dependency,
   multiOptions,
   creatable,
+  disabled,
 });
 
 export const fetchData = async (

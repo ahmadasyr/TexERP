@@ -64,15 +64,16 @@ export const createCustomerPrice = async (req: Request, res: Response) => {
     const newCustomerPrice = await prisma.customerPrice.create({
       data: {
         date: new Date(date),
-        customerId,
-        productId,
-        currencyId,
+        customer: { connect: { id: customerId } },
+        product: { connect: { id: productId } },
+        currency: { connect: { id: currencyId } },
         price,
         unit,
       },
     });
     res.status(201).json(newCustomerPrice);
   } catch (error) {
+    console.log(error);
     res.status(500).json({ error: "Failed to create customer price" });
   }
 };

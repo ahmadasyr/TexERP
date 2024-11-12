@@ -34,10 +34,7 @@ export default function RootLayout({
             href="https://fonts.googleapis.com/icon?family=Material+Icons"
           />
         </head>
-        <body
-          className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-        >
-          <CssBaseline />
+        <body>
           <Layout>
             <div style={{ width: "100vw", overflow: "hidden" }}>{children}</div>
           </Layout>

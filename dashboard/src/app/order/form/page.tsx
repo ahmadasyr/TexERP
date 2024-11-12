@@ -148,7 +148,23 @@ const Bank: React.FC<BankProps> = ({ popupHandler, popupSetter }) => {
         alertValue={alertValue}
         setAlertValue={setAlertValue}
       />
-      <form onSubmit={handleSubmit}>
+      <form
+        style={
+          popupHandler
+            ? {}
+            : {
+                marginTop: "5%",
+                margin: "5% auto 5% auto",
+                width: "90%",
+                display: "flex",
+                padding: "5%",
+                justifyContent: "center",
+                boxShadow: "0 0 20px rgba(0,0,0,0.15)",
+                borderRadius: ".5rem",
+              }
+        }
+        onSubmit={handleSubmit}
+      >
         <Box width={"100%"}>
           <Typography variant="h4" gutterBottom>
             {title}

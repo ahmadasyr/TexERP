@@ -40,6 +40,9 @@ export const handleDelete = async (tableName: string, selected: number[]) => {
   await Promise.all(
     selected.map(async (id) => {
       try {
+        if (tableName.startsWith("/")) {
+          tableName = tableName.slice(1);
+        }
         const response = await fetch(
           `http://localhost:3001/api/${tableName}/${id}`,
           {

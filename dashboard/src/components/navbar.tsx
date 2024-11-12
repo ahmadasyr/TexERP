@@ -13,12 +13,17 @@ import AccountCircle from "@mui/icons-material/AccountCircle";
 import MailIcon from "@mui/icons-material/Mail";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import MoreIcon from "@mui/icons-material/MoreVert";
+import { Switch } from "@mui/material";
 
 interface PrimaryAppBarProps {
   toggleDrawer: () => void;
+  toggleTheme: () => void;
 }
 
-export default function PrimaryAppBar({ toggleDrawer }: PrimaryAppBarProps) {
+export default function PrimaryAppBar({
+  toggleDrawer,
+  toggleTheme,
+}: PrimaryAppBarProps) {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] =
     React.useState<null | HTMLElement>(null);
@@ -129,6 +134,7 @@ export default function PrimaryAppBar({ toggleDrawer }: PrimaryAppBarProps) {
               <MoreIcon />
             </IconButton>
           </Box>
+          <Switch onChange={toggleTheme} />
         </Toolbar>
       </AppBar>
       {renderMobileMenu}

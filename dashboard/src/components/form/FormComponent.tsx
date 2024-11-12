@@ -187,7 +187,7 @@ const FormComponent: React.FC<FormComponentProps> = ({
           spacing={1}
           style={{
             marginTop: "5%",
-            width: "90% !important",
+            width: "90%",
             display: "flex",
             padding: "5%",
             justifyContent: "center",

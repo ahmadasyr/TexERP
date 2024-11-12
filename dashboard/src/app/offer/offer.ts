@@ -54,25 +54,29 @@ export const formFields = [
     table: "customer",
     value: "id",
     displayValue: "name",
+    required: true,
   }),
   createField({
     name: "offerNo",
     label: "Teklif No",
     type: "number",
+    required: true,
   }),
   createField({
     name: "saleNo",
     label: "Satış No",
     type: "number",
+    required: true,
   }),
   createField({
     name: "offerDate",
     label: "Teklif Tarihi",
-    type: "date",
+    type: "datetime-local",
+    required: true,
   }),
   createField({
     name: "date",
-    label: "Tarih",
+    label: "Giriş Tarihi",
     type: "date",
   }),
   createField({
@@ -84,11 +88,13 @@ export const formFields = [
     name: "requestNo",
     label: "Talep No",
     type: "number",
+    required: true,
   }),
   createField({
     name: "requestDate",
     label: "Talep Tarihi",
     type: "date",
+    required: true,
   }),
   createField({
     name: "requestDeadline",
@@ -98,7 +104,8 @@ export const formFields = [
   createField({
     name: "requestBudget",
     label: "Talep Bütçesi",
-    type: "number",
+    type: "float",
+    required: true,
   }),
   createField({
     name: "productId",
@@ -108,6 +115,7 @@ export const formFields = [
     table: "product",
     value: "id",
     displayValue: "name",
+    required: true,
   }),
   createField({
     name: "specification",
@@ -123,17 +131,20 @@ export const formFields = [
     name: "quantity",
     label: "Miktar",
     type: "number",
+    required: true,
   }),
   createField({
     name: "unit",
     label: "Birim",
     type: "select",
-    options: ["mt", "kg"],
+    options: ["m", "kg"],
+    required: true,
   }),
   createField({
     name: "price",
     label: "Fiyat",
-    type: "number",
+    type: "float",
+    required: true,
   }),
   createField({
     name: "currencyId",
@@ -143,31 +154,37 @@ export const formFields = [
     table: "currency",
     value: "id",
     displayValue: "name",
+    required: true,
   }),
   createField({
     name: "vat",
     label: "KDV",
-    type: "number",
+    type: "float",
+    required: true,
   }),
   createField({
     name: "total",
     label: "Toplam",
-    type: "number",
+    type: "float",
+    required: true,
   }),
   createField({
     name: "maturity",
     label: "Vade",
-    type: "number",
+    type: "float",
+    required: true,
   }),
   createField({
     name: "daysDue",
     label: "Gün Sayısı",
     type: "number",
+    required: true,
   }),
   createField({
     name: "deadlineDate",
-    label: "Son Tarih",
+    label: "Termin Tarihi",
     type: "date",
+    required: true,
   }),
   createField({
     name: "specialRequirement",
@@ -178,11 +195,14 @@ export const formFields = [
     name: "deliveryAddress",
     label: "Teslimat Adresi",
     type: "text",
+    required: true,
   }),
   createField({
     name: "shippingMethod",
     label: "Nakliye Yöntemi",
     type: "select",
+    required: true,
+
     options: [
       "Fabrikadan",
       "Depodan",
@@ -213,18 +233,20 @@ export const formFields = [
   createField({
     name: "additionalTerms",
     label: "Ek Şartlar",
-    type: "text",
+    type: "json",
   }),
   createField({
     name: "validPeriod",
     label: "Geçerlilik Süresi",
     type: "number",
+    required: true,
   }),
   createField({
     name: "validPeriodType",
     label: "Geçerlilik Süresi Türü",
     type: "select",
     options: ["ay", "hafta", "gün"],
+    required: true,
   }),
   createField({
     name: "conditions",
@@ -235,6 +257,8 @@ export const formFields = [
     name: "lastValidityDate",
     label: "Son Geçerlilik Tarihi",
     type: "date",
+    required: true,
+    disabled: true,
   }),
   createField({
     name: "acceptanceDate",
@@ -250,7 +274,8 @@ export const formFields = [
     name: "status",
     label: "Durum",
     type: "select",
-    options: ["Verilecek", "Red", "onaylandi", "beklemede"],
+    options: ["Verilecek", "Red", "Onaylandi", "Beklemede"],
+    required: true,
   }),
   createField({
     name: "meetNote",
@@ -270,7 +295,8 @@ export const formFields = [
   createField({
     name: "totalKDV",
     label: "Toplam KDV",
-    type: "number",
+    type: "float",
+    required: true,
   }),
 ];
 

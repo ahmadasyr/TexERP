@@ -257,15 +257,15 @@ model offer {
   saleNo             Int
   offerDate          DateTime
   customerId         Int
-  date               DateTime
-  proformaNo         Int
+  date               DateTime?      @default(now())
+  proformaNo         Int?
   requestNo          Int
   requestDate        DateTime
-  requestDeadline    DateTime
+  requestDeadline    DateTime?
   requestBudget      Float
   productId          Int
-  specification      String
-  detail             String
+  specification      String?
+  detail             String?
   quantity           Float
   unit               unit
   price              Float
@@ -275,22 +275,22 @@ model offer {
   maturity           Int
   daysDue            Int
   deadlineDate       DateTime
-  specialRequirement String
+  specialRequirement String?
   deliveryAddress    String
   shippingMethod     shippingMethod
-  proformaDetails    String
-  packingListNo      Int
-  additionalTerms    String
+  proformaDetails    String?
+  packingListNo      Int?
+  additionalTerms    Json?
   validPeriod        Int
   validPeriodType    String // Replace with actual enum (ay, hafta, gün)
-  conditions         Json
+  conditions         Json?
   lastValidityDate   DateTime
-  acceptanceDate     DateTime
-  rejectionDate      DateTime
-  status             String // Replace with actual enum (Verilecek, Red, onaylandi, beklemede)
-  meetNote           String
-  lastMeetDate       DateTime
-  meetStatement      String
+  acceptanceDate     DateTime?
+  rejectionDate      DateTime?
+  status             String
+  meetNote           String?
+  lastMeetDate       DateTime?
+  meetStatement      String?
   totalKDV           Float
 
   // Relations
@@ -373,8 +373,15 @@ model productFeasibilityForm {
 
 model product {
   id                Int                 @id @default(autoincrement())
-  code              String
   name              String
+  fine              Int?
+  mayA              Int?
+  mayB              Int?
+  ham               Int?
+  maxGrA            Int?
+  maxGrB            Int?
+  minGrA            Int?
+  minGrB            Int?
   customerPrice     customerPrice[]
   offer             offer[]
   order             order[]

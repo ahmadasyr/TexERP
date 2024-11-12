@@ -205,7 +205,7 @@ export default function EnhancedTable({
                               )
                             ) : typeof row[headCell.id as keyof Data] ===
                                 "object" &&
-                              (row[headCell.id as keyof Data] as any).id ? (
+                              (row[headCell.id as keyof Data] as any)?.id ? (
                               <Link
                                 href={`/${headCell.id}/view/?id=${
                                   (row[headCell.id as keyof Data] as any)?.id
@@ -220,7 +220,7 @@ export default function EnhancedTable({
                               </Link>
                             ) : typeof row[headCell.id as keyof Data] ===
                               "object" ? (
-                              row[headCell.id as keyof Data].toString()
+                              row[headCell.id as keyof Data]?.toString()
                             ) : headCell.date ? (
                               new Date(
                                 row[headCell.id as keyof Data]

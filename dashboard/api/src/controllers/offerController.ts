@@ -64,17 +64,109 @@ export const getOfferByProduct = async (req: Request, res: Response) => {
   }
 };
 
-export const createOffer = async (req: Request, res: Response) => {
+export const createOffer = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  const {
+    offerNo,
+    saleNo,
+    offerDate,
+    customerId,
+    date,
+    proformaNo,
+    requestNo,
+    requestDate,
+    requestDeadline,
+    requestBudget,
+    productId,
+    specification,
+    detail,
+    quantity,
+    unit,
+    price,
+    currencyId,
+    vat,
+    total,
+    maturity,
+    daysDue,
+    deadlineDate,
+    specialRequirement,
+    deliveryAddress,
+    shippingMethod,
+    proformaDetails,
+    packingListNo,
+    additionalTerms,
+    validPeriod,
+    validPeriodType,
+    conditions,
+    lastValidityDate,
+    acceptanceDate,
+    rejectionDate,
+    status,
+    meetNote,
+    lastMeetDate,
+    meetStatement,
+    totalKDV,
+  } = req.body;
   try {
     const newOffer = await prisma.offer.create({
-      data: req.body,
+      data: {
+        offerNo,
+        saleNo,
+        offerDate: new Date(offerDate),
+        date: date ? new Date(date) : undefined,
+        proformaNo,
+        requestNo,
+        requestDate: new Date(requestDate),
+        requestDeadline: requestDeadline
+          ? new Date(requestDeadline)
+          : undefined,
+        requestBudget,
+        specification,
+        detail,
+        quantity,
+        unit,
+        price,
+        vat,
+        total,
+        maturity,
+        daysDue,
+        deadlineDate: new Date(deadlineDate),
+        specialRequirement,
+        deliveryAddress,
+        shippingMethod,
+        proformaDetails,
+        packingListNo,
+        additionalTerms,
+        validPeriod,
+        validPeriodType,
+        conditions,
+        lastValidityDate: new Date(lastValidityDate),
+        acceptanceDate: acceptanceDate ? new Date(acceptanceDate) : undefined,
+        rejectionDate: rejectionDate ? new Date(rejectionDate) : undefined,
+        status,
+        meetNote,
+        lastMeetDate: lastMeetDate ? new Date(lastMeetDate) : undefined,
+        meetStatement,
+        totalKDV,
+        customer: {
+          connect: { id: customerId },
+        },
+        product: {
+          connect: { id: productId },
+        },
+        currency: {
+          connect: { id: currencyId },
+        },
+      },
     });
     res.status(201).json(newOffer);
   } catch (error) {
+    console.log(error);
     res.status(500).json({ error: "Failed to create offer" });
   }
 };
-
 export const updateOffer = async (req: Request, res: Response) => {
   const { id } = req.params;
   try {

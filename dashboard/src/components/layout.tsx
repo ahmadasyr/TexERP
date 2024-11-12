@@ -45,8 +45,13 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   });
   return (
     <EmotionThemeProvider theme={theme}>
-      <ThemeProvider theme={theme}>
-        <PrimarySearchAppBar toggleDrawer={toggleDrawer} />
+      <ThemeProvider theme={theme} defaultMode="dark">
+        <CssBaseline />
+
+        <PrimarySearchAppBar
+          toggleTheme={toggleTheme}
+          toggleDrawer={toggleDrawer}
+        />
         {/* <AppBar position="static">
           <Toolbar>
             <IconButton edge="start" color="inherit" onClick={toggleDrawer}>

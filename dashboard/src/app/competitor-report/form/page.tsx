@@ -185,7 +185,7 @@ const Page: React.FC<Page> = ({ popupHandler, popupSetter }) => {
             : {
                 marginTop: "5%",
                 margin: "5% auto 5% auto",
-                width: "90% !important",
+                width: "90%",
                 display: "flex",
                 padding: "5%",
                 justifyContent: "center",

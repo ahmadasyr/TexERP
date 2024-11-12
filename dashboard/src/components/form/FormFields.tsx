@@ -40,6 +40,7 @@ export const NewTextField = ({
       rows={4}
       type="text"
       label={field?.label}
+      disabled={field?.disabled}
       value={formData[keyProp]}
       onChange={(e) =>
         handleChange({ target: { name: keyProp, value: e.target.value } })
@@ -102,8 +103,9 @@ export const NewSelect = ({
           } as React.ChangeEvent<{ name?: string; value: unknown }>)
         }
         disabled={
-          field.dependant &&
-          !formData[field.dependency as keyof typeof formData]
+          (field.dependant &&
+            !formData[field.dependency as keyof typeof formData]) ||
+          field.disabled
         }
       >
         <MenuItem value="">
@@ -193,6 +195,7 @@ export const NewNumber = ({
       type="number"
       label={field?.label}
       value={formData[keyProp]}
+      disabled={field?.disabled}
       onChange={(e) =>
         handleChange({
           target: { name: keyProp, value: parseFloat(e.target.value) },
@@ -214,6 +217,7 @@ export const NewDate = ({
   return (
     <TextField
       fullWidth
+      disabled={field?.disabled}
       name={keyProp as string}
       type={field?.type}
       value={
@@ -224,7 +228,12 @@ export const NewDate = ({
       label={field?.label}
       InputLabelProps={{ shrink: true }}
       onChange={(e) =>
-        handleChange({ target: { name: keyProp, value: e.target.value } })
+        handleChange({
+          target: {
+            name: keyProp,
+            value: e.target.value,
+          },
+        })
       }
       required={field?.required}
     />
@@ -270,6 +279,7 @@ export const NewRelation = ({
     <>
       <FormControl fullWidth>
         <Autocomplete
+          disabled={field?.disabled}
           options={filteredOptions || []}
           getOptionLabel={(option: any) =>
             Array.isArray(field.displayValue)

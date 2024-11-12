@@ -160,7 +160,7 @@ export const headCells: HeadCell[] = [
     id: "foreign",
     numeric: false,
     disablePadding: false,
-    label: "YUR DİŞİ",
+    label: "YURT DİŞİ",
   },
   {
     id: "relatedPerson",

@@ -1,7 +1,15 @@
 "use client";
 import { Data, formFields, tableName, title } from "../product";
 import React, { use, useEffect } from "react";
-import { Alert, Box, Button, Grid, Modal, Typography } from "@mui/material";
+import {
+  Alert,
+  Box,
+  Button,
+  Divider,
+  Grid,
+  Modal,
+  Typography,
+} from "@mui/material";
 import {
   NewTextField,
   NewSelect,
@@ -147,40 +155,68 @@ const Product: React.FC<ProductProps> = ({ popupHandler, popupSetter }) => {
         alertValue={alertValue}
         setAlertValue={setAlertValue}
       />
-      <form onSubmit={handleSubmit}>
-        <Typography variant="h4" gutterBottom>
-          {title}
-        </Typography>
-        <Grid
-          container
-          spacing={1}
-          style={{
-            marginTop: "5%",
-            width: "90% !important",
-            display: "flex",
-            padding: "5%",
-            justifyContent: "center",
-            boxShadow: "0 0 20px rgba(0,0,0,0.15)",
-            borderRadius: ".5rem",
-          }}
-        >
-          <Grid item xs={12} md={4}>
-            <NewTextField {...allProps} keyProp="name" />
+      <form
+        style={
+          popupHandler
+            ? {}
+            : {
+                marginTop: "5%",
+                margin: "5% auto 5% auto",
+                width: "90%",
+                display: "flex",
+                padding: "5%",
+                justifyContent: "center",
+                boxShadow: "0 0 20px rgba(0,0,0,0.15)",
+                borderRadius: ".5rem",
+              }
+        }
+        onSubmit={handleSubmit}
+      >
+        <Box width="100%">
+          <Typography variant="h4" gutterBottom>
+            {title}
+          </Typography>
+          <Grid container spacing={1}>
+            <Grid item xs={12} md={4}>
+              <NewTextField {...allProps} keyProp="name" />
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <NewNumber {...allProps} keyProp="fine" />
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <NewNumber {...allProps} keyProp="mayA" />
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <NewNumber {...allProps} keyProp="mayB" />
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <NewNumber {...allProps} keyProp="ham" />
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <NewNumber {...allProps} keyProp="maxGrA" />
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <NewNumber {...allProps} keyProp="minGrA" />
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <NewNumber {...allProps} keyProp="maxGrB" />
+            </Grid>
+
+            <Grid item xs={12} md={4}>
+              <NewNumber {...allProps} keyProp="minGrB" />
+            </Grid>
+            <Button
+              style={{
+                marginTop: "1rem",
+              }}
+              type="submit"
+              variant="contained"
+              color="primary"
+            >
+              Kaydet
+            </Button>
           </Grid>
-          <Grid item xs={12} md={4}>
-            <NewTextField {...allProps} keyProp="code" />
-          </Grid>
-          <Button
-            style={{
-              marginTop: "1rem",
-            }}
-            type="submit"
-            variant="contained"
-            color="primary"
-          >
-            Kaydet
-          </Button>
-        </Grid>
+        </Box>
       </form>
     </>
   );
