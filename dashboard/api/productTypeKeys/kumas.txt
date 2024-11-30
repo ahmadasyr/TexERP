@@ -1,0 +1,8 @@
+  fine              Int?
+  mayA              Int?
+  mayB              Int?
+  ham               Int?
+  maxGrA            Int?
+  maxGrB            Int?
+  minGrA            Int?
+  minGrB            Int?

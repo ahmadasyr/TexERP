@@ -271,7 +271,7 @@ export const headCells: HeadCell[] = [
 
 export const fetchOrders = async (setRows: any) => {
   try {
-    const response = await fetch("http://localhost:3001/api/customer");
+    const response = await fetch("/api/customer");
     const data = await response.json();
     setRows(data);
   } catch (error) {

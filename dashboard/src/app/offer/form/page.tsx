@@ -149,7 +149,7 @@ const Page: React.FC<PageProps> = ({ popupHandler, popupSetter }) => {
 
   useEffect(() => {
     if (id && !popupHandler) {
-      fetch(`http://localhost:3001/api/${tableName}/${id}`)
+      fetch(`/api/${tableName}/${id}`)
         .then((response) => response.json())
         .then((data) => {
           Object.keys(data).forEach((key) => {
@@ -165,16 +165,13 @@ const Page: React.FC<PageProps> = ({ popupHandler, popupSetter }) => {
     event.preventDefault();
     if (id) {
       try {
-        const response = await fetch(
-          `http://localhost:3001/api/${tableName}/${id}`,
-          {
-            method: "PUT",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(formData),
-          }
-        );
+        const response = await fetch(`/api/${tableName}/${id}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formData),
+        });
 
         if (!response.ok) {
           console.error("HTTP error:", response.status);
@@ -189,7 +186,7 @@ const Page: React.FC<PageProps> = ({ popupHandler, popupSetter }) => {
       }
     } else {
       try {
-        const response = await fetch(`http://localhost:3001/api/${tableName}`, {
+        const response = await fetch(`/api/${tableName}`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

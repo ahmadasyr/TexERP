@@ -18,11 +18,13 @@ import { Switch } from "@mui/material";
 interface PrimaryAppBarProps {
   toggleDrawer: () => void;
   toggleTheme: () => void;
+  open: boolean;
 }
 
 export default function PrimaryAppBar({
   toggleDrawer,
   toggleTheme,
+  open,
 }: PrimaryAppBarProps) {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] =
@@ -95,7 +97,7 @@ export default function PrimaryAppBar({
 
   return (
     <Box sx={{ flexGrow: 1 }}>
-      <AppBar position="static" color="primary">
+      <AppBar position="sticky" color="primary">
         <Toolbar>
           <IconButton
             edge="start"
@@ -103,6 +105,7 @@ export default function PrimaryAppBar({
             aria-label="open drawer"
             onClick={toggleDrawer}
             sx={{ mr: 2 }}
+            style={open ? { display: "none" } : { display: "block" }}
           >
             <MenuIcon />
           </IconButton>

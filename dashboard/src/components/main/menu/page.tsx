@@ -16,6 +16,7 @@ interface MenuItem {
   title: string;
   link?: string;
   icon?: string;
+  desc?: string;
   subItems?: MenuItem[];
 }
 
@@ -63,10 +64,12 @@ export default function Menu() {
             <>
               <ListItemButton
                 selected={pathname === item.link}
+                title={item.desc}
                 onClick={() => handleClick(key)}
                 sx={{
                   pl: level * 2 + 2, // Add padding based on the level
                   position: "relative", // For line positioning
+                  maxWidth: "100%",
                   "&:before": {
                     content: '""',
                     position: "absolute",
@@ -93,11 +96,13 @@ export default function Menu() {
             </>
           ) : (
             <ListItemButton
+              title={item.desc}
               onClick={() => handleNavigation(item.link!)}
               selected={pathname === item.link}
               sx={{
                 pl: level * 2 + 2,
                 position: "relative",
+                maxWidth: "100%",
                 "&:before": {
                   content: '""',
                   position: "absolute",
@@ -120,16 +125,5 @@ export default function Menu() {
     });
   };
 
-  return (
-    <List
-      component="nav"
-      subheader={
-        <ListSubheader component="div" id="nested-list-subheader">
-          Menu
-        </ListSubheader>
-      }
-    >
-      {renderMenuItems(menuItems)}
-    </List>
-  );
+  return <List component="nav">{renderMenuItems(menuItems)}</List>;
 }

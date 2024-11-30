@@ -39,9 +39,7 @@ export const fetchData = async (
     const promises = formFields
       .filter((field) => field.relation)
       .map(async (field) => {
-        const response = await fetch(
-          `http://localhost:3001/api/${field.table}`
-        );
+        const response = await fetch(`/api/${field.table}`);
         const data = await response.json();
         return { name: field.table, values: Array.isArray(data) ? data : [] };
       });

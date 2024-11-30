@@ -48,7 +48,7 @@ const CustomerComplaint: React.FC<CustomerComplaintProps> = ({
 
   useEffect(() => {
     if (id && !popupHandler) {
-      fetch(`http://localhost:3001/api/${tableName}/${id}`)
+      fetch(`/api/${tableName}/${id}`)
         .then((response) => response.json())
         .then((data) => {
           Object.keys(data).forEach((key) => {
@@ -63,16 +63,13 @@ const CustomerComplaint: React.FC<CustomerComplaintProps> = ({
     event.preventDefault();
     if (id) {
       try {
-        const response = await fetch(
-          `http://localhost:3001/api/${tableName}/${id}`,
-          {
-            method: "PUT",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(formData),
-          }
-        );
+        const response = await fetch(`/api/${tableName}/${id}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formData),
+        });
 
         if (!response.ok) {
           // If the status is not in the range 200-299, handle it as an error
@@ -89,7 +86,7 @@ const CustomerComplaint: React.FC<CustomerComplaintProps> = ({
       }
     } else {
       try {
-        const response = await fetch(`http://localhost:3001/api/${tableName}`, {
+        const response = await fetch(`/api/${tableName}`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

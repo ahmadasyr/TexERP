@@ -1,12 +1,12 @@
 [
   {
-    "title": "Home",
+    "title": "Anasayfa",
     "link": "/dashboard",
-    "desc": "Home page",
+    "desc": "Anasayfa menüsü",
     "icon": "dashboard"
   },
   {
-    "title": "Satış İşlemleri",
+    "title": "Satış",
     "desc": "Satış işlemleri menüsü",
     "icon": "money",
     "subItems": [
@@ -110,8 +110,14 @@
       {
         "title": "Diğer İşlemler",
         "desc": "Diğer işlemler menüsü",
-        "icon": "supervisor_account",
+        "icon": "more_horiz",
         "subItems": [
+          {
+            "title": "Hesaplar",
+            "link": "/account",
+            "desc": "Hesap listesi",
+            "icon": "account_balance_wallet"
+          },
           {
             "title": "Bankalar",
             "link": "/bank",
@@ -123,6 +129,506 @@
             "link": "/tax-office",
             "desc": "Vergi daireleri listesi",
             "icon": "domain"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "title": "Planlama",
+    "desc": "Planlama işlemleri menüsü",
+    "icon": "event_note",
+    "subItems": [
+      {
+        "title": "İplik İşlemleri",
+        "desc ": "İplik işlemleri menüsü",
+        "icon": "sports_volleyball",
+        "subItems": [
+          {
+            "title": "İplik Listesi",
+            "link": "/yarn-type",
+            "desc": "İplik listesi",
+            "icon": "list"
+          },
+          {
+            "title": "İplik Siparişleri",
+            "link": "/yarn-order",
+            "desc": "İplik satış listesi",
+            "icon": "shopping_cart"
+          },
+          {
+            "title": "İplik Satışları",
+            "link": "/yarn-sale",
+            "desc": "İplik satış listesi",
+            "icon": "attach_money"
+          }
+        ]
+      },
+      {
+        "title": "Boyahane İşlemleri",
+        "desc ": "Boyahane işlemleri menüsü",
+        "icon": "color_lens",
+        "subItems": [
+          {
+            "title": "Boyahane Siparişleri",
+            "link": "/dyeing-order",
+            "desc": "Boyahane sipariş listesi",
+            "icon": "shopping_cart"
+          },
+          {
+            "title": "Boyahane Çeki Listeleri",
+            "link": "/dyeing-draw-list",
+            "desc": "Boyahane çeki listesi",
+            "icon": "list"
+          },
+          {
+            "title": "Gelen ْİrsaliyeler",
+            "link": "/dyeing-receipt",
+            "desc": "Boyahane gelen irsaliye listesi",
+            "icon": "list"
+          }
+        ]
+      },
+      {
+        "title": "Fason İşlemleri",
+        "desc ": "Fason işlemleri menüsü",
+        "icon": "local_shipping",
+        "subItems": [
+          {
+            "title": "Fason Siparişleri",
+            "link": "/outsourcing-order",
+            "desc": "Fason sipariş listesi",
+            "icon": "shopping_cart"
+          },
+          {
+            "title": "Fason Çeki Listeleri",
+            "link": "/outsourcing-draw-list",
+            "desc": "Fason çeki listesi",
+            "icon": "list"
+          },
+          {
+            "title": "Fason Gelen İrsaliyeler",
+            "link": "/outsourcing-receipt",
+            "desc": "Fason gelen irsaliye listesi",
+            "icon": "list"
+          }
+        ]
+      },
+      {
+        "title": "Satış Siparişleri",
+        "desc ": "Satış siparişleri menüsü",
+        "icon": "shopping_cart",
+        "subItems": [
+          {
+            "title": "Satış Siparişleri",
+            "link": "/sales-order",
+            "desc": "Satış sipariş listesi",
+            "icon": "shopping_cart"
+          },
+          {
+            "title": "Satış Sipariş Raporları",
+            "link": "/sales-order-report",
+            "desc": "Satış sipariş rapor listesi",
+            "icon": "list"
+          },
+          {
+            "title": "Sevk Emirleri",
+            "link": "/shipment-order",
+            "desc": "Sevk emir listesi",
+            "icon": "list"
+          },
+          {
+            "title": "Satış Çeki Listeleri",
+            "link": "/sales-draw-list",
+            "desc": "Satış çeki listesi",
+            "icon": "list"
+          },
+          {
+            "title": "Satış İade İrsaliyeleri",
+            "link": "/sales-return-receipt",
+            "desc": "Satış iade irsaliye listesi",
+            "icon": "list"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "title": "Üretim",
+    "desc": "Üretim işlemleri menüsü",
+    "icon": "build",
+    "subItems": [
+      {
+        "title": "Makineler",
+        "desc ": "Makine işlemleri menüsü",
+        "icon": "settings",
+        "subItems": [
+          {
+            "title": "Makine Listesi",
+            "link": "/machine",
+            "desc": "Makine listesi",
+            "icon": "list"
+          },
+          {
+            "title": "Makine Arızaları",
+            "link": "/machine-fault",
+            "desc": "Makine arızaları listesi",
+            "icon": "report_problem"
+          },
+          {
+            "title": "Makine Bakımları",
+            "link": "/machine-maintenance",
+            "desc": "Makine bakımları listesi",
+            "icon": "build"
+          }
+        ]
+      },
+      {
+        "title": "Çözgü İşlemleri",
+        "desc ": "Çözgü işlemleri menüsü",
+        "icon": "sync",
+        "subItems": [
+          {
+            "title": "Çözgü Listesi",
+            "link": "/warp-type",
+            "desc": "Çözgü listesi",
+            "icon": "list"
+          },
+          {
+            "title": "Çözgü İş Emirleri",
+            "link": "/warp-job",
+            "desc": " Çözgü iş emirleri listesi",
+            "icon": "precision_manufacturing"
+          }
+        ]
+      },
+      {
+        "title": "Örme İş Emirleri",
+        "desc ": "Örme iş emirleri listesi",
+        "icon": "format_list_bulleted",
+        "link": "/knitting-job"
+      }
+    ]
+  },
+  {
+    "title": "Kalite Kontrol",
+    "desc": "Kalite kontrol işlemleri menüsü",
+    "icon": "check",
+    "subItems": [
+      {
+        "title": "Kalite Kontrol İş Emirleri",
+        "desc": "Kalite kontrol iş emirleri menüsü",
+        "icon": "format_list_bulleted",
+        "link": "/quality-control-job"
+      },
+      {
+        "title": "Kalite Kontrol Raporları",
+        "desc": "Kalite kontrol raporları menüsü",
+        "icon": "description",
+        "link": "/quality-control-report"
+      },
+      {
+        "title": "Kalite Kontrol Rapor Konuları",
+        "desc": "Kalite kontrol rapor konuları menüsü",
+        "icon": "schema",
+        "link": "/quality-control-report-subject"
+      },
+      {
+        "title": "Hatalı Kumaş listesi",
+        "desc": "Hatalı kumaş listesi",
+        "icon": "inventory_2",
+        "link": "/defective-fabric"
+      }
+    ]
+  },
+  {
+    "title": "Depo",
+    "desc": "Depo işlemleri menüsü",
+    "icon": "warehouse",
+    "subItems": [
+      {
+        "title": "İplik Depo",
+        "desc": "İplik depo işlemleri menüsü",
+        "icon": "sports_volleyball"
+      },
+      {
+        "title": "Çözgü Depo",
+        "desc": "Çözgü depo işlemleri menüsü",
+        "icon": "sync"
+      },
+      {
+        "title": "Kumaş Depo",
+        "desc": "Kumaş depo işlemleri menüsü",
+        "icon": "format_list_bulleted",
+        "subItems": [
+          {
+            "title": "Kesim Depo",
+            "desc": "Kesim depo işlemleri menüsü",
+            "icon": "content_cut"
+          },
+          {
+            "title": "Kalite Ham Depo",
+            "desc": "Kalite ham depo işlemleri menüsü",
+            "icon": "check"
+          },
+          {
+            "title": "Ham Depo",
+            "desc": "Ham depo işlemleri menüsü",
+            "icon": "inventory_2"
+          },
+          {
+            "title": "Boyaheden Gelen Kumaşlar",
+            "desc": "Boyaheden gelen kumaşlar depo işlemleri menüsü",
+            "icon": "inventory_2"
+          },
+          {
+            "title": "Kalite Boyali Depo",
+            "desc": "Kalite boyalı depo işlemleri menüsü",
+            "icon": "check"
+          },
+          {
+            "title": "Boyali Kumaş Depo",
+            "desc": "Boyali kumaş depo işlemleri menüsü",
+            "icon": "inventory_2"
+          },
+          {
+            "title": "Örtü Kumaş Depo",
+            "desc": "Örtü kumaş depo işlemleri menüsü",
+            "icon": "inventory_2"
+          },
+          {
+            "title": "Fasondan Gelenler",
+            "desc": "Fasondan gelenler depo işlemleri menüsü",
+            "icon": "inventory_2"
+          },
+          {
+            "title": "Lamineli Kumaş Depo",
+            "desc": "Lamineli kumaş depo işlemleri menüsü",
+            "icon": "inventory_2"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "title": "Sevkiyat",
+    "desc": "Sevkiyat işlemleri menüsü",
+    "icon": "local_shipping",
+    "subItems": [
+      {
+        "title": "İplik Satış Sevkiyatları",
+        "desc": "İplik satış sevkiyatları menüsü",
+        "icon": "sports_volleyball"
+      },
+      {
+        "title": "Kumaş Satış Sevkiyatları",
+        "desc": "Kumaş satış sevkiyatları menüsü",
+        "icon": "format_list_bulleted"
+      }
+    ]
+  },
+  {
+    "title": "Satın Alma",
+    "desc": "Satın alma işlemleri menüsü",
+    "icon": "shopping_cart",
+    "subItems": [
+      {
+        "title": "Satın Alma Listesi",
+        "desc": "Satın alma listesi",
+        "icon": "list",
+        "link": "/purchase"
+      },
+      {
+        "title": "Satın Alma Talepleri",
+        "desc": "Satın alma talepleri listesi",
+        "icon": "list",
+        "link": "/purchase-request"
+      },
+      {
+        "title": "Tedarike İade Edilenler",
+        "desc": "Tedarike iade edilenler listesi",
+        "icon": "list",
+        "link": "/supplier-returns"
+      },
+      {
+        "title": "Satın Alma Faturaları",
+        "desc": "Satın alma faturaları listesi",
+        "icon": "list",
+        "link": "/purchase-invoice"
+      },
+      {
+        "title": "Tedarıkçi Üyum Raporları",
+        "desc": "Tedarikçi uyum raporları listesi",
+        "icon": "list",
+        "link": "/supplier-compliance-report"
+      }
+    ]
+  },
+  {
+    "title": "Mühasabe",
+    "desc": "Mühasabe işlemleri menüsü",
+    "icon": "account_balance",
+    "subItems": [
+      {
+        "title": "Hesaplar",
+        "desc": "Hesaplar menüsü",
+        "icon": "account_balance_wallet",
+        "subItems": [
+          {
+            "title": "Hesap Listesi",
+            "desc": "Hesap listesi",
+            "icon": "list",
+            "link": "/account"
+          },
+          {
+            "title": "Hesap Hareketleri",
+            "desc": "Hesap hareketleri listesi",
+            "icon": "list",
+            "link": "/account-transaction"
+          }
+        ]
+      },
+      {
+        "title": "Bankalar",
+        "desc": "Bankalar menüsü",
+        "icon": "account_balance",
+        "subItems": [
+          {
+            "title": "Banka Listesi",
+            "desc": "Banka listesi",
+            "icon": "list",
+            "link": "/bank"
+          },
+          {
+            "title": "Banka Hareketleri",
+            "desc": "Banka hareketleri listesi",
+            "icon": "list",
+            "link": "/bank-transaction"
+          }
+        ]
+      },
+      {
+        "title": "Vergi Daireleri",
+        "desc": "Vergi daireleri menüsü",
+        "icon": "domain",
+        "link": "/tax-office"
+      },
+      {
+        "title": "Faturalar",
+        "desc": "Faturalar menüsü",
+        "icon": "receipt",
+        "subItems": [
+          {
+            "title": "Fatura Listesi",
+            "desc": "Fatura listesi",
+            "icon": "list",
+            "link": "/invoice"
+          },
+          {
+            "title": "Fatura Hareketleri",
+            "desc": "Fatura hareketleri listesi",
+            "icon": "list",
+            "link": "/invoice-transaction"
+          }
+        ]
+      },
+      {
+        "title": "Kasa",
+        "desc": "Kasa menüsü",
+        "icon": "account_balance_wallet",
+        "subItems": [
+          {
+            "title": "Kasa Listesi",
+            "desc": "Kasa listesi",
+            "icon": "list",
+            "link": "/cash-register"
+          },
+          {
+            "title": "Kasa Hareketleri",
+            "desc": "Kasa hareketleri listesi",
+            "icon": "list",
+            "link": "/cash-register-transaction"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "title": "İnsan Kaynakları",
+    "desc": "İnsan kaynakları işlemleri menüsü",
+    "icon": "people",
+    "subItems": [
+      {
+        "title": "Personel",
+        "desc": "Personel menüsü",
+        "icon": "people",
+        "subItems": [
+          {
+            "title": "Personel Listesi",
+            "desc": "Personel listesi",
+            "icon": "list",
+            "link": "/employee"
+          },
+          {
+            "title": "Personel İzinleri",
+            "desc": "Personel izinleri listesi",
+            "icon": "list",
+            "link": "/employee-permission"
+          },
+          {
+            "title": "Personel Maaşları",
+            "desc": "Personel maaşları listesi",
+            "icon": "list",
+            "link": "/employee-salary"
+          },
+          {
+            "title": "Personel Departmanları",
+            "desc": "Personel departmanları listesi",
+            "icon": "list",
+            "link": "/employee-department"
+          }
+        ]
+      },
+      {
+        "title": "İş Başvuruları",
+        "desc: ": "İş başvuruları menüsü",
+        "icon": "people",
+        "link": "/job-application"
+      },
+      {
+        "title": "İş İlanları",
+        "desc": "İş ilanları menüsü",
+        "icon": "people",
+        "link": "/job-advertisement"
+      },
+      {
+        "title": "İşe Alım Süreçleri",
+        "desc": "İşe alım süreçleri menüsü",
+        "icon": "people",
+        "link": "/recruitment-process"
+      },
+      {
+        "title": "İşe Alım Raporları",
+        "desc": "İşe alım raporları menüsü",
+        "icon": "people",
+        "link": "/recruitment-report"
+      },
+      {
+        "title": "Puantaj",
+        "desc": "Puantaj işlemleri menüsü",
+        "icon": "people",
+        "subItems": [
+          {
+            "title": "Puantaj Listesi",
+            "desc": "Puantaj listesi",
+            "icon": "list",
+            "link": "/attendance"
+          },
+          {
+            "title": "Puantaj Raporları",
+            "desc": "Puantaj raporları",
+            "icon": "list",
+            "link": "/attendance-report"
           }
         ]
       }

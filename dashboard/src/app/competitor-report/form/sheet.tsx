@@ -132,9 +132,7 @@ export default function Sheet(props: SheetProps) {
   const [alert, setAlert] = React.useState(false);
   React.useEffect(() => {
     const fetchData = async () => {
-      const response = await fetch(
-        `http://localhost:3001/api/competitor-report-subject`
-      );
+      const response = await fetch(`/api/competitor-report-subject`);
       const data = await response.json();
       setValues(
         data.map((value: any) => {

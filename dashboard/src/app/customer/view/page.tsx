@@ -93,9 +93,7 @@ const Page: React.FC = () => {
   useEffect(() => {
     const fetchCustomerInfo = async () => {
       if (id) {
-        const response = await fetch(
-          "http://localhost:3001/api/customer/" + id
-        );
+        const response = await fetch("/api/customer/" + id);
         const data = await response.json();
         setCustInfo(data);
       }

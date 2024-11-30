@@ -36,7 +36,7 @@ export default function RootLayout({
         </head>
         <body>
           <Layout>
-            <div style={{ width: "100vw", overflow: "hidden" }}>{children}</div>
+            <div style={{ width: "100%", overflow: "hidden" }}>{children}</div>
           </Layout>
         </body>
       </html>

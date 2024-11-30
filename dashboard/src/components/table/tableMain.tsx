@@ -136,14 +136,14 @@ export default function EnhancedTable({
   return (
     <Box
       style={{
-        maxWidth: "100vw",
+        maxWidth: "100%",
         minWidth: "90%",
       }}
       className="enhanced-table"
     >
       <Paper className="table-paper">
         <EnhancedTableToolbar
-          URI={URI}
+          URI={tableName}
           title={title}
           tableName={tableName}
           selected={selected}

@@ -59,6 +59,7 @@ export const NewCheckBox = ({
   handleChange,
 }: FormFieldProps) => {
   const field = formFields.find((f) => f.name === keyProp);
+
   return (
     <FormControl fullWidth>
       <FormControlLabel
@@ -233,7 +234,9 @@ export const NewNumber = ({
         })
       }
       required={field?.required}
-      InputLabelProps={{ shrink: !!formData[keyProp] }}
+      InputLabelProps={{
+        shrink: !!formData[keyProp] || formData[keyProp] === 0,
+      }}
     />
   );
 };

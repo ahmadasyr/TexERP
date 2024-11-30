@@ -1,0 +1,30 @@
+@keyframes gradientMove {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.gradient-background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  background: linear-gradient(
+    45deg,
+    #ff9a9e,
+    #fad0c4,
+    #fad0c4,
+    #a1c4fd,
+    #c2e9fb
+  );
+  background-size: 300% 300%;
+  animation: gradientMove 30s ease infinite;
+}

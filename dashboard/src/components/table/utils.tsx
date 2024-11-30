@@ -43,12 +43,9 @@ export const handleDelete = async (tableName: string, selected: number[]) => {
         if (tableName.startsWith("/")) {
           tableName = tableName.slice(1);
         }
-        const response = await fetch(
-          `http://localhost:3001/api/${tableName}/${id}`,
-          {
-            method: "DELETE",
-          }
-        );
+        const response = await fetch(`/api/${tableName}/${id}`, {
+          method: "DELETE",
+        });
         if (!response.ok) {
           throw new Error(`Failed to delete id: ${id}`);
         }

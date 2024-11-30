@@ -78,32 +78,18 @@ export const getOrderByProductId = async (req: Request, res: Response) => {
 };
 
 export const createOrder = async (req: Request, res: Response) => {
-  const {
-    orderNo,
-    customerId,
-    index,
-    productId,
-    quantity,
-    unit,
-    deliveryAddress,
-    acceptanceDate,
-    specifications,
-    details,
-  } = req.body;
+  const { type, accountId, description, personnelId, customerId, productId } =
+    req.body;
 
   try {
     const newOrder = await prisma.order.create({
       data: {
-        orderNo,
+        type,
+        accountId,
+        description,
+        personnelId,
         customerId,
-        index,
         productId,
-        quantity,
-        unit,
-        deliveryAddress,
-        acceptanceDate: new Date(acceptanceDate),
-        specifications,
-        details,
       },
     });
     res.status(201).json(newOrder);
@@ -115,32 +101,26 @@ export const createOrder = async (req: Request, res: Response) => {
 export const updateOrder = async (req: Request, res: Response) => {
   const { id } = req.params;
   const {
-    orderNo,
+    type,
+    accountId,
+    description,
+    personnelId,
     customerId,
-    index,
     productId,
-    quantity,
-    unit,
-    deliveryAddress,
-    acceptanceDate,
-    specifications,
-    details,
+    closed,
   } = req.body;
 
   try {
     const updatedOrder = await prisma.order.update({
       where: { id: Number(id) },
       data: {
-        orderNo,
+        type,
+        accountId,
+        description,
+        personnelId,
         customerId,
-        index,
         productId,
-        quantity,
-        unit,
-        deliveryAddress,
-        acceptanceDate: new Date(acceptanceDate),
-        specifications,
-        details,
+        closed,
       },
     });
     res.status(200).json(updatedOrder);

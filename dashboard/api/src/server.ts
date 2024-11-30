@@ -15,6 +15,25 @@ import productFeasibilityFormRoutes from "./routes/productFeasibilityFormRoutes"
 import competitorReportRoutes from "./routes/competitorReportRoutes";
 import competitorReportSubjectRoutes from "./routes/competitorReportSubjectRoutes";
 import competitorRoutes from "./routes/competitorRoutes";
+import accountRoutes from "./routes/accountRoutes";
+import accountTypeRoutes from "./routes/accountTypeRoutes";
+import cutStockRoutes from "./routes/cutStockRoutes";
+import machineRoutes from "./routes/machineRoutes";
+import machineTypeRoutes from "./routes/machineTypeRoutes";
+import productGroupRoutes from "./routes/productGroupRoutes";
+import productionOrderRoutes from "./routes/productionOrderRoutes";
+import productionOrderWrapRoutes from "./routes/productionOrderWrapRoutes";
+import rawQualityRoutes from "./routes/rawQualityRoutes";
+import rawStockRoutes from "./routes/rawStockRoutes";
+import wrapGroupRoutes from "./routes/wrapGroupRoutes";
+import wrapOrderRoutes from "./routes/wrapOrderRoutes";
+import wrapTypeRoutes from "./routes/wrapTypeRoutes";
+import yarnRoutes from "./routes/yarnRoutes";
+import yarnTypeRoutes from "./routes/yarnTypeRoutes";
+import yarnOrderRoutes from "./routes/yarnOrderRoutes";
+import yarnOrderShipmentSentRoutes from "./routes/yarnOrderShipmentSentRoutes";
+import yarnOrderShipmentItemRoutes from "./routes/yarnOrderShipmentItemRoutes";
+import yarnOrderItemRoutes from "./routes/yarnOrderItemRoutes";
 const cors = require("cors");
 
 const app = express();
@@ -22,36 +41,74 @@ app.use(cors());
 app.use(express.json());
 
 // Use personnel routes
-app.use("/api/personnel", personnelRoutes);
+app.use("/personnel", personnelRoutes);
 // Use customer routes
-app.use("/api/customer", customerRoutes);
+app.use("/customer", customerRoutes);
 // Use bank routes
-app.use("/api/bank", bankRoutes);
+app.use("/bank", bankRoutes);
 // Use currency routes
-app.use("/api/currency", currencyRoutes);
+app.use("/currency", currencyRoutes);
 // Use taxOffice routes
-app.use("/api/tax-office", taxOfficeRoutes);
+app.use("/tax-office", taxOfficeRoutes);
 // Use customerMeetPlan routes
-app.use("/api/customer-meet-plan", customerMeetPlanRoutes);
+app.use("/customer-meet-plan", customerMeetPlanRoutes);
 // Use customerMeetReport routes
-app.use("/api/customer-meet-report", customerMeetReportRoutes);
+app.use("/customer-meet-report", customerMeetReportRoutes);
 // Use product routes
-app.use("/api/product", productRoutes);
+app.use("/product", productRoutes);
 // Use customerPrice routes
-app.use("/api/customer-price", customerPriceRoutes);
+app.use("/customer-price", customerPriceRoutes);
 // Use offer routes
-app.use("/api/offer", offerRoutes);
+app.use("/offer", offerRoutes);
 // Use order routes
-app.use("/api/order", orderRoutes);
+app.use("/order", orderRoutes);
 // Use customer Complaint routes
-app.use("/api/customer-complaint", customerComplaintRoutes);
+app.use("/customer-complaint", customerComplaintRoutes);
 // Use productFeasibilityForm routes
-app.use("/api/product-feasibility-form", productFeasibilityFormRoutes);
+app.use("/product-feasibility-form", productFeasibilityFormRoutes);
 // Use competitorReport routes
-app.use("/api/competitor-report", competitorReportRoutes);
+app.use("/competitor-report", competitorReportRoutes);
 // Use competitorReportSubject routes
-app.use("/api/competitor-report-subject", competitorReportSubjectRoutes);
+app.use("/competitor-report-subject", competitorReportSubjectRoutes);
 // Use competitor routes
-app.use("/api/competitor", competitorRoutes);
+app.use("/competitor", competitorRoutes);
+// Use account routes
+app.use("/account", accountRoutes);
+// Use accountType routes
+app.use("/account-type", accountTypeRoutes);
+// Use cutStock routes
+app.use("/cut-stock", cutStockRoutes);
+// Use machine routes
+app.use("/machine", machineRoutes);
+// Use machineType routes
+app.use("/machine-type", machineTypeRoutes);
+// Use productGroup routes
+app.use("/product-group", productGroupRoutes);
+// Use productionOrder routes
+app.use("/production-order", productionOrderRoutes);
+// Use productionOrderWrap routes
+app.use("/production-order-wrap", productionOrderWrapRoutes);
+// Use rawQuality routes
+app.use("/raw-quality", rawQualityRoutes);
+// Use rawStock routes
+app.use("/raw-stock", rawStockRoutes);
+// Use wrapGroup routes
+app.use("/wrap-group", wrapGroupRoutes);
+// Use wrapOrder routes
+app.use("/wrap-order", wrapOrderRoutes);
+// Use wrapType routes
+app.use("/wrap-type", wrapTypeRoutes);
+// Use yarn routes
+app.use("/yarn", yarnRoutes);
+// Use yarnType routes
+app.use("/yarn-type", yarnTypeRoutes);
+// Use yarnOrder routes
+app.use("/yarn-order", yarnOrderRoutes);
+// Use yarnOrderShipmentSent routes
+app.use("/yarn-order-shipment-sent", yarnOrderShipmentSentRoutes);
+// Use yarnOrderShipmentItem routes
+app.use("/yarn-order-shipment-item", yarnOrderShipmentItemRoutes);
+// Use yarnOrderItem routes
+app.use("/yarn-order-item", yarnOrderItemRoutes);
 
 export default app;
