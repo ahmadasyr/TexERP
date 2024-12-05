@@ -196,51 +196,69 @@ export default function EnhancedTable({
                           onClick={() => handleClick(row.id)}
                         />
                       </TableCell>
-                      {visibleColumns.map((headCell) =>
-                        headCell?.visible ? (
-                          <TableCell
-                            style={{
-                              whiteSpace: "nowrap",
-                              overflow: "hidden",
-                              textOverflow: "ellipsis",
-                            }}
-                            key={headCell.id}
-                          >
-                            {typeof row[headCell.id as keyof Data] ===
-                            "boolean" ? (
-                              row[headCell.id as keyof Data] ? (
-                                "Evet"
-                              ) : (
-                                "Hayır"
-                              )
-                            ) : typeof row[headCell.id as keyof Data] ===
-                                "object" &&
-                              (row[headCell.id as keyof Data] as any)?.id ? (
-                              <Link
-                                href={`/${headCell.id}/form/?id=${
-                                  (row[headCell.id as keyof Data] as any)?.id
-                                }`}
-                              >
-                                {headCell.displayValue.map(
-                                  (value: keyof Data) =>
-                                    (row[headCell.id as keyof Data] as any)[
-                                      value
-                                    ] + " "
-                                )}
-                              </Link>
-                            ) : typeof row[headCell.id as keyof Data] ===
-                              "object" ? (
-                              row[headCell.id as keyof Data]?.toString()
-                            ) : headCell.date ? (
-                              new Date(
-                                row[headCell.id as keyof Data]
-                              ).toLocaleDateString()
-                            ) : (
-                              row[headCell.id as keyof Data]
-                            )}
-                          </TableCell>
-                        ) : null
+                      {visibleColumns.map(
+                        (headCell) =>
+                          headCell?.visible && (
+                            <TableCell
+                              style={{
+                                whiteSpace: "nowrap",
+                                overflow: "hidden",
+                                textOverflow: "ellipsis",
+                              }}
+                              key={headCell.id}
+                            >
+                              {(() => {
+                                const cellValue = row[
+                                  headCell.id as keyof Data
+                                ] as any;
+
+                                if (typeof cellValue === "boolean") {
+                                  return cellValue ? "Evet" : "Hayır";
+                                }
+
+                                if (
+                                  typeof cellValue === "object" &&
+                                  cellValue !== null &&
+                                  "id" in cellValue
+                                ) {
+                                  return (
+                                    <Link
+                                      href={`/${headCell.id}/form/?id=${cellValue.id}`}
+                                    >
+                                      {headCell.displayValue
+                                        .map(
+                                          (value: keyof Data) =>
+                                            cellValue[value]
+                                        )
+                                        .join(" ")}
+                                    </Link>
+                                  );
+                                }
+
+                                if (headCell.date) {
+                                  const date = new Date(cellValue);
+                                  return !isNaN(date.getTime())
+                                    ? date.toLocaleDateString()
+                                    : "Invalid Date";
+                                }
+
+                                if (headCell.datetime && cellValue) {
+                                  return new Date(cellValue).toLocaleString();
+                                }
+
+                                if (
+                                  typeof cellValue === "object" &&
+                                  cellValue !== null
+                                ) {
+                                  return cellValue.toString();
+                                }
+
+                                return cellValue;
+                              })()}
+                            </TableCell>
+                          )
                       )}
+
                       {viewable ? (
                         <TableCell
                           width={"1rem"}

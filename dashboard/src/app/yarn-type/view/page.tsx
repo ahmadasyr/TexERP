@@ -13,7 +13,9 @@ import {
 import { Box, Typography, Button, Grid } from "@mui/material";
 import SaveIcon from "@mui/icons-material/Save";
 import DeleteIcon from "@mui/icons-material/Delete";
+import EditIcon from "@mui/icons-material/Edit";
 import { trTR } from "@/components/trTrGrid";
+import { Cancel, CancelOutlined, EditOff } from "@mui/icons-material";
 const boxStyle = {
   mb: 3,
   p: 2,
@@ -60,6 +62,7 @@ interface YarnStockEntry {
   yarnOrderId: number | null;
   accountId: number | null;
   lot: string;
+  waybillNo: string;
 }
 
 interface Account {
@@ -141,7 +144,7 @@ const YarnTypeView = () => {
 
         if (yarnOrdersResponse.ok) {
           const yarnRes = await yarnOrdersResponse.json();
-          setYarnOrders(yarnRes);
+          setYarnOrders(yarnRes.filter((order: YarnOrder) => !order.sale));
         } else {
           console.warn("Failed to fetch yarn orders.");
         }
@@ -188,13 +191,13 @@ const YarnTypeView = () => {
     {
       field: "lot",
       headerName: "Lot",
-      width: 130,
+      width: 150,
       editable: true,
     },
     {
       field: "personnelId",
       headerName: "Oluşturan Kişi",
-      width: 130,
+      width: 150,
       editable: false,
       valueOptions: personnels,
       type: "singleSelect",
@@ -205,63 +208,166 @@ const YarnTypeView = () => {
       headerName: "Sipariş No",
       width: 200,
       editable: true,
-      valueOptions: yarnOrders.map((order: YarnOrder) => {
-        return {
+      valueOptions: [
+        { value: "", label: "Yok" },
+        ...yarnOrders.map((order: YarnOrder) => ({
           value: order.id,
-          label: order.id + " - " + order.description,
-        };
-      }),
+          label: `${order.id} - ${order.description}`,
+        })),
+      ],
       type: "singleSelect",
     },
 
     {
       field: "accountId",
       headerName: "Geldiği Yer",
-      width: 130,
+      width: 150,
       editable: false,
       valueOptions: accounts,
       type: "singleSelect",
     },
     {
-      field: "count",
-      headerName: "Bobin Sayısı",
-      width: 130,
+      field: "waybillNo",
+      headerName: "İrsaliye No",
+      width: 150,
       editable: true,
-      type: "number",
+    },
+    {
+      field: "entryKg",
+      headerName: "Giriş Kg",
+      width: 150,
+      editable: false,
+      // make it look uneditable
     },
     {
       field: "netKg",
-      headerName: "Net Kg",
-      width: 130,
+      headerName: "Net Kg (Mevcut)",
+      width: 150,
       editable: true,
       type: "number",
     },
     {
+      field: "entryCount",
+      headerName: "Giriş Bobin Sayısı",
+      width: 150,
+      editable: false,
+    },
+    {
+      field: "count",
+      headerName: "Bobin Sayısı (Mevcut)",
+      width: 150,
+      editable: true,
+      type: "number",
+    },
+
+    {
       field: "actions",
       headerName: "Aksiyonlar",
-      width: 130,
+      width: 150,
       renderCell: (params: GridRenderEditCellParams) => (
         <>
-          <GridActionsCellItem
-            icon={<SaveIcon />}
-            label="Save"
-            showInMenu={false}
-            onClick={() => {
-              handleSaveRow(params.row);
-            }}
-          />
-          <GridActionsCellItem
-            icon={<DeleteIcon />}
-            label="Delete"
-            showInMenu={false}
-            onClick={() => {
-              handleDeleteRow(params.row.no);
-            }}
-          />
+          {rowModesModel[params.id]?.mode === GridRowModes.Edit ? (
+            <>
+              <GridActionsCellItem
+                icon={<EditOff />}
+                label="Cancel"
+                showInMenu={false}
+                onClick={() => {
+                  setRowModesModel((prev) => ({
+                    ...prev,
+                    [params.id]: { mode: GridRowModes.View },
+                  }));
+                }}
+              />
+              <GridActionsCellItem
+                icon={<SaveIcon />}
+                label="Save"
+                showInMenu={false}
+                onClick={() => {
+                  setRowModesModel((prev) => ({
+                    ...prev,
+                    [params.id]: {
+                      mode: GridRowModes.View,
+                    },
+                  }));
+                  console.log(params);
+                }}
+              />
+            </>
+          ) : (
+            <>
+              <GridActionsCellItem
+                icon={<EditIcon />}
+                label="Edit"
+                showInMenu={false}
+                onClick={() => {
+                  setRowModesModel((prev) => ({
+                    ...prev,
+                    [params.id]: { mode: GridRowModes.Edit },
+                  }));
+                }}
+              />
+              <GridActionsCellItem
+                icon={<DeleteIcon />}
+                label="Delete"
+                showInMenu={false}
+                onClick={() => {
+                  handleDeleteRow(params.row.no);
+                }}
+              />
+            </>
+          )}
         </>
       ),
     },
   ];
+
+  const handleProcessRowUpdate = async (
+    newRow: YarnStockEntry,
+    oldRow: YarnStockEntry
+  ) => {
+    try {
+      // Prepare the payload
+      const payload = {
+        id: newRow.id,
+        net_kg: newRow.netKg,
+        count: newRow.count,
+        yarn_order_id: newRow.yarnOrderId,
+        lot: newRow.lot,
+        waybill_no: newRow.waybillNo,
+      };
+
+      // Send API request
+      const response = await fetch(`/api/yarn/${newRow.id || ""}`, {
+        method: newRow.id ? "PUT" : "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        const errorDetails = await response.json().catch(() => null);
+        throw new Error(
+          `Failed to save row. ${errorDetails?.message || "Unknown error"}`
+        );
+      }
+
+      const updatedRow = await response.json();
+
+      // Update the state
+      setYarnStockEntries((prev) =>
+        prev.map((entry) =>
+          entry.no === oldRow.no ? { ...entry, ...updatedRow } : entry
+        )
+      );
+
+      return updatedRow; // Necessary to update the DataGrid UI
+    } catch (error) {
+      console.error("Error saving row:", error);
+      return oldRow; // Rollback to old values in case of error
+    }
+  };
 
   const handleAddRow = () => {
     if (!yarnType) return;
@@ -278,82 +384,49 @@ const YarnTypeView = () => {
         yarnOrderId: null,
         accountId: null,
         lot: "",
+        waybillNo: "",
       },
     ]);
   };
 
   const handleSaveRow = async (row: YarnStockEntry) => {
-    const { id, netKg, count, yarnOrderId, lot } = row;
-    if (id) {
-      try {
-        const response = await fetch(`/api/yarn/${id}`, {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ netKg, count, yarnOrderId, lot }),
-        });
+    // const payload = {
+    //   id: row.id,
+    //   net_kg: row.netKg, // map camelCase to snake_case if needed
+    //   count: row.count,
+    //   yarn_order_id: row.yarnOrderId,
+    //   lot: row.lot,
+    //   waybill_no: row.waybillNo,
+    //   // Include other required fields if needed
+    // };
 
-        if (!response.ok) {
-          const errorDetails = await response.json().catch(() => null);
-          throw new Error(
-            `Failed to update row. ${
-              errorDetails?.message || "Unknown error occurred"
-            }`
-          );
-        }
+    // try {
+    //   const response = await fetch(`/api/yarn/${row.id || ""}`, {
+    //     method: row.id ? "PUT" : "POST",
+    //     headers: {
+    //       "Content-Type": "application/json",
+    //     },
+    //     body: JSON.stringify(payload),
+    //   });
 
-        const updatedRow = await response.json();
+    //   if (!response.ok) {
+    //     const errorDetails = await response.json().catch(() => null);
+    //     throw new Error(
+    //       `Failed to save row. ${errorDetails?.message || "Unknown error"}`
+    //     );
+    //   }
 
-        setYarnStockEntries((prev) =>
-          prev.map((r) => (r.id === updatedRow.id ? updatedRow : r))
-        );
-      } catch (err) {
-        console.error("Error updating row:", err);
-      }
-    } else {
-      const data = {
-        netKg,
-        count,
-        yarnOrderId,
-        accountId:
-          yarnOrders.find((order) => order.id === yarnOrderId)?.accountId ||
-          null,
-        lot,
-        personnelId: 1,
-        yarnTypeId: yarnType?.id,
-      };
+    //   const updatedRow = await response.json();
 
-      try {
-        const response = await fetch(`/api/yarn/`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(data),
-        });
-
-        // Check for successful response
-        if (!response.ok) {
-          const errorDetails = await response.json().catch(() => null);
-          throw new Error(
-            `Failed to update row. ${
-              errorDetails?.message || "Unknown error occurred"
-            }`
-          );
-        }
-
-        const updatedRow = await response.json();
-
-        // Update state with the modified row
-        setYarnStockEntries((prev) =>
-          prev.map((r) => (r.id === updatedRow.id ? updatedRow : r))
-        );
-      } catch (err) {
-        console.error("Error updating row:", err);
-      }
-    }
-    setRefresh(!refresh);
+    //   setYarnStockEntries((prev) =>
+    //     prev.map((entry) =>
+    //       entry.no === row.no ? { ...entry, ...updatedRow } : entry
+    //     )
+    //   );
+    // } catch (error) {
+    //   console.error("Error saving row:", error);
+    // }
+    console.log(row);
   };
 
   const handleDeleteRow = async (rowId: number) => {
@@ -504,13 +577,6 @@ const YarnTypeView = () => {
                   </Box>
                 </Grid>
               </Grid>
-              {/* Yarn Details */}
-
-              {/* Yarn Stock Information */}
-
-              {/* Yarn Order Information */}
-
-              {/* Yarn Sales Information */}
             </>
           )}
 
@@ -518,22 +584,24 @@ const YarnTypeView = () => {
             <Typography variant="h6" mt={2}>
               İplik stok girişleri
             </Typography>
-            <Button variant="contained" color="primary" onClick={handleAddRow}>
-              Add Row
-            </Button>
           </Box>
           <Box style={{ height: 600, width: "100%" }}>
+            <Button variant="contained" color="primary" onClick={handleAddRow}>
+              Yeni Giriş Ekle
+            </Button>
             {yarnStockEntries.length > 0 ? (
               <DataGrid
                 rows={yarnStockEntries}
                 columns={columns}
                 rowModesModel={rowModesModel}
                 localeText={trTR.components.MuiDataGrid.defaultProps.localeText}
-                getRowId={(row) => row.no}
+                getRowId={(row) => row.id || row.no}
+                editMode="row"
+                processRowUpdate={handleProcessRowUpdate}
               />
             ) : (
               <Typography variant="body1" align="center" color="textSecondary">
-                No entries available.
+                Kayıt bulunamadı.
               </Typography>
             )}
           </Box>

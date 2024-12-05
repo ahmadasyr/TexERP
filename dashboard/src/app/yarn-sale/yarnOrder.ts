@@ -81,6 +81,12 @@ export const headCells: HeadCell[] = [
     disablePadding: false,
     label: "Açıklama",
   },
+  {
+    id: "closed",
+    numeric: false,
+    disablePadding: false,
+    label: "Kapalı",
+  },
 ];
 
 export const title = "İplik Satışları";

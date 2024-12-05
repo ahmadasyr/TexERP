@@ -1,4 +1,5 @@
 import { PrismaClient } from "@prisma/client";
+import exp from "constants";
 
 const prisma = new PrismaClient();
 
@@ -9,9 +10,11 @@ export const createYarnOrderItem = async (data: {
   price: number;
   currencyId: number;
   personnelId: number;
+  lot: string;
 }) => {
   return await prisma.yarnOrderItem.create({
     data: {
+      lot: data.lot,
       yarnOrder: {
         connect: {
           id: data.yarnOrderId,
@@ -38,6 +41,18 @@ export const createYarnOrderItem = async (data: {
   });
 };
 
+export const getYarnOrderItems = async () => {
+  return await prisma.yarnOrderItem.findMany({
+    include: {
+      yarnOrder: true,
+      yarnType: true,
+      currency: true,
+      personnel: true,
+      yarnOrderShipmentItem: true,
+    },
+  });
+};
+
 export const getYarnOrderItemById = async (id: number) => {
   return await prisma.yarnOrderItem.findUnique({
     where: { id },
@@ -60,11 +75,13 @@ export const updateYarnOrderItem = async (
     price?: number;
     currencyId?: number;
     personnelId?: number;
+    lot?: string;
   }
 ) => {
   return await prisma.yarnOrderItem.update({
     where: { id },
     data: {
+      lot: data.lot,
       yarnOrder: {
         connect: {
           id: data.yarnOrderId,

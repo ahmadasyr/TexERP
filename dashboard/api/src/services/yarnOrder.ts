@@ -51,8 +51,20 @@ export const getYarnOrderById = async (id: number) => {
   return await prisma.yarnOrder.findUnique({
     where: { id },
     include: {
-      yarnOrderItem: true,
-      yarnOrderShipment: true,
+      yarnOrderItem: {
+        include: {
+          yarnType: true,
+        },
+      },
+      account: true,
+      yarnOrderShipment: {
+        include: {
+          yarnOrderShipmentItem: true,
+          yarnOrderShipmentSent: true,
+          shippingCompany: true,
+        },
+      },
+      personnel: true,
     },
   });
 };
@@ -84,6 +96,7 @@ export const updateYarnOrder = async (
       price: number;
       currencyId: number;
       personnelId: number;
+      lot: string;
     }[];
   }
 ) => {
@@ -111,8 +124,23 @@ export const updateYarnOrder = async (
         upsert: data.yarnOrderItem.map((item) => {
           return {
             where: { id: item.id },
-            update: item,
-            create: item,
+            update: {
+              yarnTypeId: item.yarnTypeId,
+              kg: item.kg,
+              price: item.price,
+              currencyId: item.currencyId,
+              personnelId: item.personnelId,
+              lot: item.lot,
+            },
+            create: {
+              id: item.id,
+              yarnTypeId: item.yarnTypeId,
+              kg: item.kg,
+              price: item.price,
+              currencyId: item.currencyId,
+              personnelId: item.personnelId,
+              lot: item.lot,
+            },
           };
         }),
       },

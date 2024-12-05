@@ -134,6 +134,64 @@
       }
     ]
   },
+
+  {
+    "title": "Üretim",
+    "desc": "Üretim işlemleri menüsü",
+    "icon": "build",
+    "subItems": [
+      {
+        "title": "Makineler",
+        "desc ": "Makine işlemleri menüsü",
+        "icon": "settings",
+        "subItems": [
+          {
+            "title": "Makine Listesi",
+            "link": "/machine",
+            "desc": "Makine listesi",
+            "icon": "list"
+          },
+          {
+            "title": "Makine Arızaları",
+            "link": "/machine-fault",
+            "desc": "Makine arızaları listesi",
+            "icon": "report_problem"
+          },
+          {
+            "title": "Makine Bakımları",
+            "link": "/machine-maintenance",
+            "desc": "Makine bakımları listesi",
+            "icon": "build"
+          }
+        ]
+      },
+      {
+        "title": "Çözgü İşlemleri",
+        "desc ": "Çözgü işlemleri menüsü",
+        "icon": "sync",
+        "subItems": [
+          {
+            "title": "Çözgü Listesi",
+            "link": "/warp-type",
+            "desc": "Çözgü listesi",
+            "icon": "list"
+          },
+          {
+            "title": "Çözgü İş Emirleri",
+            "link": "/warp-job",
+            "desc": " Çözgü iş emirleri listesi",
+            "icon": "precision_manufacturing"
+          }
+        ]
+      },
+      {
+        "title": "Örme İş Emirleri",
+        "desc ": "Örme iş emirleri listesi",
+        "icon": "format_list_bulleted",
+        "link": "/knitting-job"
+      }
+    ]
+  },
   {
     "title": "Planlama",
     "desc": "Planlama işlemleri menüsü",
@@ -254,63 +312,6 @@
     ]
   },
   {
-    "title": "Üretim",
-    "desc": "Üretim işlemleri menüsü",
-    "icon": "build",
-    "subItems": [
-      {
-        "title": "Makineler",
-        "desc ": "Makine işlemleri menüsü",
-        "icon": "settings",
-        "subItems": [
-          {
-            "title": "Makine Listesi",
-            "link": "/machine",
-            "desc": "Makine listesi",
-            "icon": "list"
-          },
-          {
-            "title": "Makine Arızaları",
-            "link": "/machine-fault",
-            "desc": "Makine arızaları listesi",
-            "icon": "report_problem"
-          },
-          {
-            "title": "Makine Bakımları",
-            "link": "/machine-maintenance",
-            "desc": "Makine bakımları listesi",
-            "icon": "build"
-          }
-        ]
-      },
-      {
-        "title": "Çözgü İşlemleri",
-        "desc ": "Çözgü işlemleri menüsü",
-        "icon": "sync",
-        "subItems": [
-          {
-            "title": "Çözgü Listesi",
-            "link": "/warp-type",
-            "desc": "Çözgü listesi",
-            "icon": "list"
-          },
-          {
-            "title": "Çözgü İş Emirleri",
-            "link": "/warp-job",
-            "desc": " Çözgü iş emirleri listesi",
-            "icon": "precision_manufacturing"
-          }
-        ]
-      },
-      {
-        "title": "Örme İş Emirleri",
-        "desc ": "Örme iş emirleri listesi",
-        "icon": "format_list_bulleted",
-        "link": "/knitting-job"
-      }
-    ]
-  },
-  {
     "title": "Kalite Kontrol",
     "desc": "Kalite kontrol işlemleri menüsü",
     "icon": "check",
@@ -416,9 +417,16 @@
     "icon": "local_shipping",
     "subItems": [
       {
-        "title": "İplik Satış Sevkiyatları",
+        "title": "İplik Satış Sevk Emirleri",
         "desc": "İplik satış sevkiyatları menüsü",
-        "icon": "sports_volleyball"
+        "icon": "sports_volleyball",
+        "link": "/yarn-order-shipment"
+      },
+      {
+        "title": "İplik Gönderimleri",
+        "desc": "İplik gönderimleri menüsü",
+        "icon": "sports_volleyball",
+        "link": "/yarn-order-shipment-sent"
       },
       {
         "title": "Kumaş Satış Sevkiyatları",
@@ -465,8 +473,8 @@
     ]
   },
   {
-    "title": "Mühasabe",
-    "desc": "Mühasabe işlemleri menüsü",
+    "title": "Muhasabe",
+    "desc": "Muhasabe işlemleri menüsü",
     "icon": "account_balance",
     "subItems": [
       {

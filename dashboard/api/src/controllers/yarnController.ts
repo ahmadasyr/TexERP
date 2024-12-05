@@ -57,6 +57,7 @@ export const updateYarnStockEntryController = async (
     const yarnStockEntry = await updateYarnStockEntry(id, data);
     res.json(yarnStockEntry);
   } catch (error) {
+    console.log(error);
     res.status(500).json({ message: error });
   }
 };

@@ -28,3 +28,18 @@
   background-size: 300% 300%;
   animation: gradientMove 30s ease infinite;
 }
+
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  #printable-section,
+  #printable-section * {
+    visibility: visible;
+  }
+  #printable-section {
+    position: absolute;
+    left: 0;
+    top: 0;
+  }
+}

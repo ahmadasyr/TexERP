@@ -14,6 +14,7 @@ export const createField = ({
   multiOptions = [] as { value: string; options: string[] }[],
   creatable = true,
   disabled = false,
+  relationDependancy = null as { field: string; value: string } | null,
 }) => ({
   name,
   label,
@@ -29,6 +30,7 @@ export const createField = ({
   multiOptions,
   creatable,
   disabled,
+  relationDependancy,
 });
 
 export const fetchData = async (

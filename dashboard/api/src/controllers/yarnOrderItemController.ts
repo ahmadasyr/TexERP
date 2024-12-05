@@ -1,8 +1,10 @@
+import exp from "constants";
 import {
   createYarnOrderItem,
   getYarnOrderItemById,
   updateYarnOrderItem,
   deleteYarnOrderItem,
+  getYarnOrderItems,
 } from "../services/yarnOrderItemServices";
 
 import { Request, Response } from "express";
@@ -14,6 +16,18 @@ export const createYarnOrderItemController = async (
   try {
     const yarnOrderItem = await createYarnOrderItem(req.body);
     res.status(201).json(yarnOrderItem);
+  } catch (error) {
+    res.status(400).json({ error: error });
+  }
+};
+
+export const getYarnOrderItemsController = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const yarnOrderItems = await getYarnOrderItems();
+    res.status(200).json(yarnOrderItems);
   } catch (error) {
     res.status(400).json({ error: error });
   }

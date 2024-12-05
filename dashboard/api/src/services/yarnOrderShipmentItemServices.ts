@@ -9,6 +9,7 @@ export const createYarnOrderShipmentItem = async (data: {
   yarnOrderItemId: number;
   sentKg: number;
   sentCount: number;
+  lot: string;
 }) => {
   return await prisma.yarnOrderShipmentItem.create({
     data: {
@@ -35,6 +36,7 @@ export const updateYarnOrderShipmentItem = async (
     yarnOrderItemId?: number;
     sentKg?: number;
     sentCount?: number;
+    lot: string;
   }
 ) => {
   return await prisma.yarnOrderShipmentItem.update({

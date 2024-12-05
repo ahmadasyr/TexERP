@@ -240,7 +240,17 @@ export const NewNumber = ({
     />
   );
 };
+const formatDateForDateTimeLocal = (date: Date) => {
+  const pad = (n: any) => String(n).padStart(2, "0");
 
+  const year = date.getFullYear();
+  const month = pad(date.getMonth() + 1); // Months are zero-based
+  const day = pad(date.getDate());
+  const hours = pad(date.getHours());
+  const minutes = pad(date.getMinutes());
+
+  return `${year}-${month}-${day}T${hours}:${minutes}`;
+};
 export const NewDate = ({
   keyProp,
   formFields,
@@ -257,6 +267,9 @@ export const NewDate = ({
       value={
         formData[keyProp] && field.type === "date"
           ? new Date(formData[keyProp]).toISOString().split("T")[0]
+          : formData[keyProp] && field.type === "datetime-local"
+          ? formData[keyProp] &&
+            formatDateForDateTimeLocal(new Date(formData[keyProp]))
           : formData[keyProp]
       }
       label={field?.label}
@@ -294,20 +307,37 @@ export const NewRelation = ({
       )
     : null;
 
-  const filteredOptions =
-    tableData
-      .find((table) => table.name === field.table)
-      ?.values?.filter((value: any) =>
-        Array.isArray(field.displayValue)
-          ? field.displayValue
-              .map((item: any) => value[item] ?? "")
-              .join(" ")
-              .toLowerCase()
-              .includes(searchTerm.toLowerCase())
-          : (value[field.displayValue] ?? "")
-              .toLowerCase()
-              .includes(searchTerm.toLowerCase())
-      ) ?? [];
+  const filteredOptions = field.relationDependancy
+    ? tableData
+        .find((table) => table.name === field.table)
+        ?.values?.filter((value: any) =>
+          Array.isArray(field.displayValue)
+            ? field.displayValue
+                .map((item: any) => String(value[item] ?? ""))
+                .join(" ")
+                .toLowerCase()
+                .includes(searchTerm.toLowerCase()) &&
+              value[field.relationDependancy.field] ===
+                formData[field.relationDependancy.value]
+            : String(value[field.displayValue] ?? "")
+                .toLowerCase()
+                .includes(searchTerm.toLowerCase()) &&
+              value[field.relationDependancy.field] ===
+                formData[field.relationDependancy.value]
+        ) ?? []
+    : tableData
+        .find((table) => table.name === field.table)
+        ?.values?.filter((value: any) =>
+          Array.isArray(field.displayValue)
+            ? field.displayValue
+                .map((item: any) => String(value[item] ?? ""))
+                .join(" ")
+                .toLowerCase()
+                .includes(searchTerm.toLowerCase())
+            : String(value[field.displayValue] ?? "")
+                .toLowerCase()
+                .includes(searchTerm.toLowerCase())
+        ) ?? [];
 
   return (
     <>

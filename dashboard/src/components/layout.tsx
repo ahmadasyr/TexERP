@@ -41,7 +41,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     palette: {
       mode: darkMode ? "dark" : "light",
       primary: {
-        main: darkMode ? "#E3CBA8" : "#E64A19", // Brighter primary color
+        main: darkMode ? "#E3CBA8" : "#F05A29", // Brighter primary color
       },
       secondary: {
         main: darkMode ? "#46EBC2" : "#22868A", // More vibrant secondary color
@@ -56,7 +56,8 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       },
     },
     typography: {
-      fontFamily: "'Roboto', sans-serif",
+      fontFamily: "Poppins",
+
       h1: {
         fontWeight: 700,
         fontSize: "3rem",
@@ -65,7 +66,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       h2: {
         fontWeight: 600,
         fontSize: "2.5rem",
-        color: darkMode ? "#E3CBA8" : "#E64A19", // Use primary color for emphasis
+        color: darkMode ? "#E3CBA8" : "#F05A29", // Use primary color for emphasis
       },
       h3: {
         fontWeight: 500,

@@ -4,6 +4,7 @@ import {
   updateYarnOrderShipment,
   deleteYarnOrderShipment,
   getAllYarnOrderShipments,
+  getYarnOrderShipmentByOrder,
 } from "../services/yarnOrderShipmentServices";
 import { Request, Response } from "express";
 
@@ -15,6 +16,7 @@ export const createYarnOrderShipmentController = async (
     const yarnOrderShipment = await createYarnOrderShipment(req.body);
     res.status(201).json(yarnOrderShipment);
   } catch (error) {
+    console.log(error);
     res.status(400).json({ error: error });
   }
 };
@@ -56,6 +58,7 @@ export const updateYarnOrderShipmentController = async (
     );
     res.status(200).json(yarnOrderShipment);
   } catch (error) {
+    console.log(error);
     res.status(400).json({ error: error });
   }
 };
@@ -67,6 +70,20 @@ export const deleteYarnOrderShipmentController = async (
   try {
     await deleteYarnOrderShipment(Number(req.params.id));
     res.status(204).end();
+  } catch (error) {
+    res.status(400).json({ error: error });
+  }
+};
+
+export const getYarnOrderShipmentByOrderController = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const yarnOrderShipment = await getYarnOrderShipmentByOrder(
+      Number(req.params.yarnOrderId)
+    );
+    res.status(200).json(yarnOrderShipment);
   } catch (error) {
     res.status(400).json({ error: error });
   }

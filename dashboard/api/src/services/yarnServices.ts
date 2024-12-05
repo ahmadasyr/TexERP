@@ -33,6 +33,7 @@ export const createYarnStockEntry = async (data: {
   yarnOrderId?: number;
   accountId?: number;
   lot: string;
+  waybillNo: string;
 }) => {
   return await prisma.yarnStockEntry.create({
     data: {
@@ -45,6 +46,9 @@ export const createYarnStockEntry = async (data: {
         : undefined,
       account: data.accountId ? { connect: { id: data.accountId } } : undefined,
       lot: data.lot,
+      waybillNo: data.waybillNo,
+      entryKg: data.netKg,
+      entryCount: data.count,
     },
   });
 };
@@ -52,18 +56,19 @@ export const createYarnStockEntry = async (data: {
 export const updateYarnStockEntry = async (
   id: number,
   data: {
-    yarnTypeId?: number;
     netKg?: number;
     count?: number;
     yarnOrderId?: number;
     accountId?: number;
     lot: string;
+    waybillNo: string;
   }
 ) => {
   return await prisma.yarnStockEntry.update({
     where: { id },
     data: {
-      yarnType: { connect: { id: data.yarnTypeId } },
+      waybillNo: data.waybillNo,
+      lot: data.lot,
       netKg: data.netKg,
       count: data.count,
       yarnOrder: data.yarnOrderId
@@ -96,6 +101,7 @@ export const submitMultipleYarnStockEntriesByYarnTypeId = async (
     yarnOrderId?: number;
     accountId?: number;
     lot: string;
+    waybillNo: string;
   }[]
 ) => {
   return await prisma.yarnType.update({
@@ -116,6 +122,7 @@ export const submitMultipleYarnStockEntriesByYarnTypeId = async (
                 ? { connect: { id: entry.accountId } }
                 : undefined,
               lot: entry.lot,
+              waybillNo: entry.waybillNo,
             },
             create: {
               yarnType: { connect: { id: entry.yarnTypeId } },
@@ -129,6 +136,9 @@ export const submitMultipleYarnStockEntriesByYarnTypeId = async (
                 ? { connect: { id: entry.accountId } }
                 : undefined,
               lot: entry.lot,
+              waybillNo: entry.waybillNo,
+              entryKg: entry.netKg,
+              entryCount: entry.count,
             },
           };
         }),

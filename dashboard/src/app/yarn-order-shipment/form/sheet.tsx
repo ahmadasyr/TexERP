@@ -27,12 +27,11 @@ import { trTR } from "@/components/trTrGrid";
 const initialRows: GridRowsProp = [
   {
     id: 0,
-    yarnOrderId: 0,
-    yarnTypeId: 0,
-    kg: 0,
-    price: 0,
-    currencyId: "",
     personnelId: 1,
+    yarnOrderShipmentId: 0,
+    yarnOrderItemId: 0,
+    sentKg: 0,
+    sentCount: 0,
   },
 ];
 
@@ -52,11 +51,11 @@ function EditToolbar(props: EditToolbarProps) {
       ...oldRows,
       {
         id,
-        yarnTypeId: "",
-        kg: 0,
-        price: 0,
-        currencyId: "",
         personnelId: 1,
+        yarnOrderShipmentId: 0,
+        yarnOrderItemId: 0,
+        sentKg: 0,
+        sentCount: 0,
       },
     ]);
     setRowModesModel((oldModel) => ({
@@ -86,8 +85,6 @@ export default function Sheet(props: SheetProps) {
   const [rowModesModel, setRowModesModel] = React.useState<GridRowModesModel>(
     {}
   );
-  const [yarnTypes, setYarnTypes] = React.useState<any[]>([]);
-  const [currencies, setCurrencies] = React.useState<any[]>([]);
 
   const handleRowEditStop: GridEventListener<"rowEditStop"> = (
     params,
@@ -133,68 +130,50 @@ export default function Sheet(props: SheetProps) {
   };
 
   const [alert, setAlert] = React.useState(false);
-
+  const [personnels, setPersonnels] = React.useState<any[]>([]);
   React.useEffect(() => {
     if (subRows.length > 0) {
       setRows(subRows);
     }
+    const fetchData = async () => {
+      const response = await fetch("/api/personnel");
+      const data = await response.json();
+      setPersonnels(
+        data.map((personnel: any) => {
+          return {
+            value: personnel.id,
+            label: `${personnel.firstName} ${personnel.lastName}`,
+          };
+        })
+      );
+    };
+    fetchData();
   }, [refresh]);
 
   React.useEffect(() => {
     setSubRows([...rows]);
   }, [rows]);
-  React.useEffect(() => {
-    fetch("/api/yarn-type")
-      .then((response) => response.json())
-      .then((data) => {
-        setYarnTypes(
-          data.map((value: any) => ({ value: value.id, label: value.name }))
-        );
-      });
-    fetch("/api/currency")
-      .then((response) => response.json())
-      .then((data) => {
-        setCurrencies(
-          data.map((value: any) => ({ value: value.id, label: value.name }))
-        );
-      });
-  }, []);
 
   const columns: GridColDef[] = [
     {
-      field: "yarnTypeId",
-      headerName: "İplik Türü",
+      field: "personnelId",
+      headerName: "Oluşturan Personel",
       type: "singleSelect",
-      valueOptions: yarnTypes,
-
       editable: true,
       width: 150,
+      valueOptions: personnels,
     },
     {
-      field: "lot",
-      headerName: "Lot",
-      type: "string",
-      editable: true,
-    },
-    {
-      field: "kg",
-      headerName: "Miktar (kg)",
+      field: "sentKg",
+      headerName: "Kg",
       type: "number",
       editable: true,
       width: 150,
     },
     {
-      field: "price",
-      headerName: "Fiyat",
+      field: "sentCount",
+      headerName: "Bobin Adet",
       type: "number",
-      editable: true,
-      width: 150,
-    },
-    {
-      field: "currencyId",
-      headerName: "Döviz",
-      type: "singleSelect",
-      valueOptions: currencies,
       editable: true,
       width: 150,
     },

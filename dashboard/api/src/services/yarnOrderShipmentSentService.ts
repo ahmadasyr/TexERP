@@ -2,6 +2,30 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
+const subtractStock = async (data: {
+  yarnStockEntryId: number;
+  sentKg: number;
+  sentCount: number;
+}) => {
+  const stock: any = await prisma.yarnStockEntry.findUnique({
+    where: { id: data.yarnStockEntryId },
+  });
+
+  if (stock.entryKg < data.sentKg || stock.entryCount < data.sentCount) {
+    throw new Error("Insufficient stock to fulfill the order.");
+  }
+
+  const updatedStock = await prisma.yarnStockEntry.update({
+    where: { id: data.yarnStockEntryId },
+    data: {
+      entryKg: stock.entryKg - data.sentKg,
+      entryCount: stock.entryCount - data.sentCount,
+    },
+  });
+
+  return updatedStock;
+};
+
 export const createYarnOrderShipmentSent = async (data: {
   yarnOrderShipmentId: number;
   yarnOrderItemId: number;
@@ -10,6 +34,12 @@ export const createYarnOrderShipmentSent = async (data: {
   sentCount: number;
   personnelId: number;
 }) => {
+  subtractStock({
+    yarnStockEntryId: data.yarnStockEntryId,
+    sentKg: data.sentKg,
+    sentCount: data.sentCount,
+  });
+
   return await prisma.yarnOrderShipmentSent.create({
     data: {
       sentKg: data.sentKg,
@@ -29,7 +59,14 @@ export const getYarnOrderShipmentSent = async (id: number) => {
 };
 
 export const getAllYarnOrderShipmentSent = async () => {
-  return await prisma.yarnOrderShipmentSent.findMany();
+  return await prisma.yarnOrderShipmentSent.findMany({
+    include: {
+      yarnOrderShipment: true,
+      yarnOrderItem: true,
+      yarnStockEntry: true,
+      personnel: true,
+    },
+  });
 };
 
 export const updateYarnOrderShipmentSent = async (data: {

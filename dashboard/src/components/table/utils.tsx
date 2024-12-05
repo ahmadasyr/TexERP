@@ -33,6 +33,7 @@ export interface HeadCell {
   date?: boolean;
   splitTime?: boolean;
   sum?: boolean;
+  datetime?: boolean;
 }
 
 export const handleDelete = async (tableName: string, selected: number[]) => {

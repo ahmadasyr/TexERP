@@ -32,8 +32,13 @@ import yarnRoutes from "./routes/yarnRoutes";
 import yarnTypeRoutes from "./routes/yarnTypeRoutes";
 import yarnOrderRoutes from "./routes/yarnOrderRoutes";
 import yarnOrderShipmentSentRoutes from "./routes/yarnOrderShipmentSentRoutes";
+import yarnOrderShipmentRoutes from "./routes/yarnOrderShipmentRoutes";
 import yarnOrderShipmentItemRoutes from "./routes/yarnOrderShipmentItemRoutes";
 import yarnOrderItemRoutes from "./routes/yarnOrderItemRoutes";
+import shippingCompanyRoutes from "./routes/shippingCompanyRoutes";
+import shippingCarrierRoutes from "./routes/shippingCarrierRoutes";
+import shippingCarRoutes from "./routes/shippingCarRoutes";
+
 const cors = require("cors");
 
 const app = express();
@@ -110,5 +115,13 @@ app.use("/yarn-order-shipment-sent", yarnOrderShipmentSentRoutes);
 app.use("/yarn-order-shipment-item", yarnOrderShipmentItemRoutes);
 // Use yarnOrderItem routes
 app.use("/yarn-order-item", yarnOrderItemRoutes);
+// Use yarnOrderShipment routes
+app.use("/yarn-order-shipment", yarnOrderShipmentRoutes);
+// Use shippingCompany routes
+app.use("/shipping-company", shippingCompanyRoutes);
+// Use shippingCarrier routes
+app.use("/shipping-carrier", shippingCarrierRoutes);
+// Use shippingCar routes
+app.use("/shipping-car", shippingCarRoutes);
 
 export default app;

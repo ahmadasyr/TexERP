@@ -465,8 +465,11 @@ model yarnStockEntry {
   yarnTypeId            Int
   createdAt             DateTime                @default(now())
   lot                   String
+  entryKg               Float
+  entryCount            Int
   netKg                 Float
   count                 Int
+  waybillNo             String?
   personnelId           Int
   yarnOrderId           Int?
   accountId             Int?
@@ -501,6 +504,7 @@ model yarnOrderItem {
   yarnTypeId            Int
   kg                    Float
   price                 Float
+  lot                   String?
   currencyId            Int
   personnelId           Int
   // Relations
@@ -513,11 +517,11 @@ model yarnOrderItem {
 }
 
 model yarnOrderShipment {
-  id                Int      @id @default(autoincrement())
+  id                Int       @id @default(autoincrement())
   yarnOrderId       Int
-  createdAt         DateTime @default(now())
-  sentDate          DateTime
-  closed            Boolean  @default(false)
+  createdAt         DateTime  @default(now())
+  sentDate          DateTime?
+  closed            Boolean   @default(false)
   shippingCompanyId Int?
   shippingCarrierId Int?
   shippingCarId     Int?
