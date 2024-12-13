@@ -26,8 +26,6 @@ import EditIcon from "@mui/icons-material/Edit";
 import { trTR } from "@/components/trTrGrid";
 import { Add, CancelOutlined, EditOff } from "@mui/icons-material";
 import { getPersonnelInfo, usePersonnelId } from "@/contexts/auth";
-import { updateAccount } from "../../../../api/src/services/accountServices";
-import CustomerSelectionModal from "./custSelectModal";
 
 // Define types
 interface Currency {

@@ -1,8 +1,9 @@
 SELECT
     tblhesaplar.unvan AS "Şirket",
     DATE(boyahanesiparis.zaman) as "Çıkış Tarihi",
+    (DATE(boyahanesiparis.zaman) + INTERVAL 10 DAY) AS "Termin Tarihi",
     DATE(boyahaneirsaliye.tarih) as "Geliş Tarihi",
-    DATEDIFF(boyahanesiparis.zaman, boyahaneirsaliye.tarih) AS "Fark",
+    DATEDIFF((DATE(boyahanesiparis.zaman) + INTERVAL 10 DAY) , boyahaneirsaliye.tarih) AS "Fark",
     CASE 
         WHEN DATEDIFF(boyahaneirsaliye.tarih, boyahanesiparis.zaman) <= 10 THEN 100
         ELSE (100 - ((DATEDIFF(boyahaneirsaliye.tarih, boyahanesiparis.zaman) - 10) * 10))
@@ -24,4 +25,4 @@ JOIN
 JOIN 
     tblhesaplar ON tblhesaplar.id = boyahanefis.hesapno
 WHERE 
-    DATE(boyahaneirsaliye.tarih) BETWEEN '2024-09-01' AND '2024-09-30';
+    DATE(boyahaneirsaliye.tarih) BETWEEN '2024-07-01' AND '2024-07-31';
