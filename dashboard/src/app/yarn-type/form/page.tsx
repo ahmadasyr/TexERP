@@ -1,6 +1,6 @@
 "use client";
 import { Data, formFields, tableName, title } from "../yarnType";
-import React, { use, useEffect } from "react";
+import React, { useEffect } from "react";
 import { Alert, Box, Button, Grid, Modal, Typography } from "@mui/material";
 import {
   NewTextField,
@@ -16,13 +16,14 @@ import { useFormData } from "@/components/form/utils";
 import { FormModal } from "@/components/form/modal";
 import Popup from "@/components/form/Popup";
 import { useSearchParams } from "next/navigation";
+import { usePersonnelId } from "@/contexts/auth";
 interface PageProps {
   popupHandler?: (data: any) => void;
   popupSetter?: (data: any) => void;
-  render: any[];
+  render?: any[];
 }
 
-const Page: React.FC<PageProps> = ({ popupHandler, popupSetter }) => {
+const Page: React.FC = ({ popupHandler, popupSetter }: PageProps) => {
   const searchParams = useSearchParams();
   const id = searchParams.get("id");
   const { formData, handleChange, tableData, runFetchData } =
@@ -49,6 +50,7 @@ const Page: React.FC<PageProps> = ({ popupHandler, popupSetter }) => {
   }, [id]);
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    formData["personnelId"] = usePersonnelId();
     if (id) {
       try {
         const response = await fetch(`/api/${tableName}/${id}`, {
@@ -200,16 +202,13 @@ const Page: React.FC<PageProps> = ({ popupHandler, popupSetter }) => {
               <NewTextField {...allProps} keyProp="colorCode" />
             </Grid>
             <Grid item xs={6}>
-              <NewTextField {...allProps} keyProp="price" />
+              <NewNumber {...allProps} keyProp="price" />
             </Grid>
             <Grid item xs={6}>
               <NewRelation {...allProps} keyProp="currencyId" />
             </Grid>
             <Grid item xs={6}>
               <NewDate {...allProps} keyProp="createdAt" />
-            </Grid>
-            <Grid item xs={6}>
-              <NewRelation {...allProps} keyProp="personnelId" />
             </Grid>
           </Grid>
           <Button

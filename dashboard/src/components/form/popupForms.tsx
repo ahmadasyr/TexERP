@@ -7,15 +7,15 @@ import Page from "@/app/product/form/page";
 
 interface PopupFormsProps {
   parsedString: string;
-  popupHandler?: (data: any) => void;
-  popupSetter?: (data: any) => void;
+  popupHandler: (data: any) => void;
+  popupSetter: (data: any) => void;
 }
 
-const PopupForms: React.FC<PopupFormsProps> = ({
+const PopupForms: React.FC<any> = ({
   parsedString,
   popupHandler,
   popupSetter,
-}) => {
+}: PopupFormsProps) => {
   const renderContent = (content: string) => {
     switch (content) {
       case "bank":

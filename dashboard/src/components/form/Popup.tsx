@@ -5,7 +5,7 @@ import { Clear } from "@mui/icons-material";
 interface PopupProps {
   open: boolean;
   table: string;
-  togglePopup: (table: string, column: string) => void;
+  togglePopup: (table: string, column: string, on: boolean) => void;
   popupHandler?: (data: any) => void;
   popupSetter?: (data: any) => void;
 }
@@ -20,7 +20,7 @@ const Popup: React.FC<PopupProps> = ({
   return (
     <Modal
       open={open}
-      onClose={() => togglePopup({ on: false, table: "" })}
+      onClose={() => togglePopup("", "", false)}
       aria-labelledby="popup-title"
     >
       <Box
@@ -42,7 +42,7 @@ const Popup: React.FC<PopupProps> = ({
             top: 0,
             right: 0,
           }}
-          onClick={() => togglePopup({ on: false, table: "" })}
+          onClick={() => togglePopup("", "", false)}
         >
           <Clear />
         </IconButton>

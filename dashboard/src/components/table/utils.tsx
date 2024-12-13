@@ -34,6 +34,9 @@ export interface HeadCell {
   splitTime?: boolean;
   sum?: boolean;
   datetime?: boolean;
+  clickable?: boolean;
+  uri?: string;
+  boolean?: boolean;
 }
 
 export const handleDelete = async (tableName: string, selected: number[]) => {
@@ -75,3 +78,107 @@ export const handleDelete = async (tableName: string, selected: number[]) => {
     };
   }
 };
+
+export async function fetchExcelRows(
+  URI: string,
+  columnTypes: any[],
+  setRows: Function,
+  setInitialRows: Function
+) {
+  try {
+    const response = await fetch(`/api/${URI}`);
+    const data: any[] = await response.json();
+    setInitialRows(data);
+    const mappedRows = data.map((row) => {
+      let mappedRow: any = [];
+      columnTypes.forEach((col) => {
+        if (col.type === "relation" && row[col.value]) {
+          mappedRow.push(
+            `${row[col.valueItem]?.[col.value]} - ${
+              col.displayValue
+                ? col.displayValue
+                    .map((field: string) => row[col.valueItem]?.[field] || "")
+                    .join(", ")
+                : ""
+            }`
+          );
+        } else if (col.type === "datetime") {
+          if (row[col.name]) {
+            const date = new Date(row[col.name]);
+            mappedRow.push(date.toLocaleDateString());
+            mappedRow.push(date.toLocaleTimeString());
+          } else {
+            mappedRow.push("");
+            mappedRow.push("");
+          }
+        } else {
+          mappedRow.push(row[col.name]);
+        }
+      });
+      console.log(mappedRow);
+      return mappedRow;
+    });
+
+    setRows(mappedRows);
+  } catch (error) {
+    console.error("Error fetching rows:", error);
+  }
+}
+
+export function reverseMappedRows(
+  mappedRows: any[][],
+  columnTypes: any[]
+): any[] {
+  return mappedRows.map((mappedRow) => {
+    const originalRow: any = {};
+    let currentIndex = 0;
+
+    columnTypes.forEach((col) => {
+      if (col.type === "relation") {
+        // Reconstruct relation values
+        const displayValue = mappedRow[currentIndex];
+        if (displayValue && col.displayValue) {
+          // example value 2 - Super, admin
+          // take only the first part (2)
+          const relationValue = displayValue.split(" - ")[0];
+          originalRow[col.name] = Number(relationValue);
+        } else {
+          originalRow[col.name] = null;
+        }
+        currentIndex += 1;
+      } else if (col.type === "datetime") {
+        // Recombine datetime
+        const dateValue = mappedRow[currentIndex]
+          ? new Date(mappedRow[currentIndex])
+          : null;
+        const timeValue = mappedRow[currentIndex + 1]
+          ? mappedRow[currentIndex + 1]
+          : null;
+        if (dateValue && timeValue) {
+          const dateString = dateValue.toLocaleDateString();
+          let timeString = timeValue;
+          if (timeString.endsWith("öö")) {
+            timeString = timeString.slice(0, -2) + "am";
+          }
+          if (timeString.endsWith("ös")) {
+            timeString = timeString.slice(0, -2) + "pm";
+          }
+          console.log(dateString, timeString);
+          originalRow[col.name] = new Date(
+            `${dateString} ${timeString}`
+          ).toISOString();
+        } else {
+          originalRow[col.name] = null;
+        }
+        currentIndex += 2;
+      } else {
+        // Handle regular columns
+        const value = mappedRow[currentIndex];
+        originalRow[col.name] = value === "" ? null : value;
+        currentIndex += 1;
+      }
+    });
+
+    return originalRow;
+  });
+}

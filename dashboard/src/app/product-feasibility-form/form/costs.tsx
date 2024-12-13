@@ -281,9 +281,11 @@ export default function Costs(props: SheetProps) {
           onRowModesModelChange={handleRowModesModelChange}
           onRowEditStop={handleRowEditStop}
           processRowUpdate={processRowUpdate}
-          slotProps={{
-            toolbar: { setRows, setRowModesModel },
-          }}
+          slotProps={
+            {
+              toolbar: { setRows, setRowModesModel },
+            } as any
+          }
           slots={{ footer: Footer }}
         />
       </Box>

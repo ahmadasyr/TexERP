@@ -1,5 +1,6 @@
 import { HeadCell } from "../../components/table/utils";
 import { createField } from "../../components/form/utils";
+import { relative } from "path";
 export const tableName = "customer-meet-plan";
 
 export interface Data {
@@ -40,13 +41,13 @@ export const formFields = [
   createField({
     name: "plannedDate",
     label: "Planlanan Ziyaret Tarihi",
-    type: "date",
+    type: "datetime-local",
     required: true,
   }),
   createField({
     name: "realDate",
     label: "Gerçekleşen Ziyaret Tarihi",
-    type: "date",
+    type: "datetime-local",
   }),
   createField({
     name: "visitingPersonnelId",
@@ -86,6 +87,46 @@ export const formFields = [
     label: "Basılı Doküman / Kartela Gideri",
     type: "float",
   }),
+];
+
+export const columns = [
+  { name: "id", label: "No", type: "number", disabled: true },
+  {
+    name: "customerId", // name of key/field
+    label: "Firma Adı", // label to display
+    valueItem: "customer", // where to read from row
+    value: "id", // value to send and set
+    displayValue: ["name"], // value to display
+    type: "relation", // type of column
+    table: "customer", // table name to fetch from api
+    relation: true, // is it a relation
+  },
+  { name: "country", label: "Ülke", type: "text" },
+  { name: "visitReason", label: "Ziyaret Nedeni", type: "text" },
+  { name: "plannedDate", label: "Planlanan Ziyaret Tarihi", type: "datetime" },
+  { name: "realDate", label: "Gerçekleşen Ziyaret Tarihi", type: "datetime" },
+  {
+    name: "visitingPersonnelId",
+    label: "Ziyareti Gerçekleştiren Personel",
+    valueItem: "visitingPersonnel",
+    value: "id",
+    displayValue: ["firstName", "lastName"],
+    type: "relation",
+    table: "personnel",
+    relation: true,
+  },
+  { name: "result", label: "Ziyaret Sonucu", type: "text" },
+  { name: "accuracyRate", label: "Ziyaret Gerçekleşme Oranı", type: "number" },
+  { name: "note", label: "Açıklama", type: "text" },
+  { name: "travelExpense", label: "Yol Gideri", type: "float" },
+  { name: "accommodationExpense", label: "Konaklama Gideri", type: "float" },
+  { name: "foodExpense", label: "Yemek Gideri", type: "float" },
+  { name: "giftExpense", label: "Promosyon / Hediye Gideri", type: "float" },
+  {
+    name: "officeExpense",
+    label: "Basılı Doküman / Kartela Gideri",
+    type: "float",
+  },
 ];
 
 export const headCells: HeadCell[] = [

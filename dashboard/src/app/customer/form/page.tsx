@@ -1,6 +1,6 @@
 "use client";
 import { Data, formFields, tableName, title } from "../customer";
-import React, { use, useEffect } from "react";
+import React, { useEffect } from "react";
 import {
   Alert,
   Box,
@@ -27,10 +27,13 @@ import { useSearchParams } from "next/navigation";
 interface customerProps {
   popupHandler?: (data: any) => void;
   popupSetter?: (data: any) => void;
-  render: any[];
+  render?: any[];
 }
 
-const customer: React.FC<customerProps> = ({ popupHandler, popupSetter }) => {
+const customer: React.FC<any> = ({
+  popupHandler,
+  popupSetter,
+}: customerProps) => {
   const searchParams = useSearchParams();
   const id = searchParams.get("id");
   const { formData, handleChange, tableData, runFetchData } =

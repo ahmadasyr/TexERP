@@ -1,6 +1,6 @@
 "use client";
 import { Data, formFields, tableName, title } from "../product";
-import React, { use, useEffect } from "react";
+import React, { useEffect } from "react";
 import {
   Alert,
   Box,
@@ -29,7 +29,10 @@ interface ProductProps {
   popupSetter?: (data: any) => void;
 }
 
-const Product: React.FC<ProductProps> = ({ popupHandler, popupSetter }) => {
+const Product: React.FC<any> = ({
+  popupHandler,
+  popupSetter,
+}: ProductProps) => {
   const searchParams = useSearchParams();
   const id = searchParams.get("id");
   const { formData, handleChange, tableData, runFetchData } =

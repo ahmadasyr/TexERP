@@ -1,5 +1,5 @@
 "use client";
-import React, { use, useEffect } from "react";
+import React, { useEffect } from "react";
 import { Alert, Box, Button, Grid, Modal, Typography } from "@mui/material";
 import {
   NewTextField,
@@ -18,14 +18,14 @@ import { useSearchParams } from "next/navigation";
 interface FormComponentProps {
   popupHandler?: (data: any) => void;
   popupSetter?: (data: any) => void;
-  render: any[];
-  Data: any;
+  render?: any[];
+  Data?: any;
   formFields: any[];
-  tableName: string;
+  tableName?: string;
   title?: string;
 }
 
-const FormComponent: React.FC<FormComponentProps> = ({
+const FormComponent: React.FC<any> = ({
   popupHandler,
   popupSetter,
   render,
@@ -33,10 +33,10 @@ const FormComponent: React.FC<FormComponentProps> = ({
   formFields,
   tableName,
   title,
-}) => {
+}: FormComponentProps) => {
   const searchParams = useSearchParams();
   const id = searchParams.get("id");
-  const { formData, handleChange, tableData } = useFormData(formFields);
+  const { formData, handleChange, tableData } = useFormData(formFields || []);
   const [alertValue, setAlertValue] = React.useState<number>(0);
   const [popup, setPopup] = React.useState<any>({
     on: false,
@@ -192,11 +192,12 @@ const FormComponent: React.FC<FormComponentProps> = ({
             borderRadius: ".5rem",
           }}
         >
-          {render.map((field: any) => (
-            <Grid item xs={12} md={4} sm={6} key={field.field}>
-              {renderField(field)}
-            </Grid>
-          ))}
+          {render &&
+            render.map((field: any) => (
+              <Grid item xs={12} md={4} sm={6} key={field.field}>
+                {renderField(field)}
+              </Grid>
+            ))}
           <Grid item xs={12} md={4}></Grid>
           <Button type="submit" variant="contained" color="primary">
             Kaydet

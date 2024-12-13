@@ -36,8 +36,12 @@ export const formFields = [
   createField({
     name: "currencyId",
     label: "Döviz",
-    type: "Number",
+    type: "relation",
     required: false,
+    table: "currency",
+    displayValue: ["name"],
+    value: "id",
+    relation: true,
   }),
   createField({
     name: "createdAt",

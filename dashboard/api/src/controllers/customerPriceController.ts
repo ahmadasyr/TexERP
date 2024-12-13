@@ -59,7 +59,17 @@ export const getCustomerPriceByCustomer = async (
 };
 
 export const createCustomerPrice = async (req: Request, res: Response) => {
-  const { date, customerId, productId, currencyId, price, unit } = req.body;
+  const {
+    date,
+    customerId,
+    productId,
+    currencyId,
+    price,
+    unit,
+    upfront,
+    installment,
+    personnelId,
+  } = req.body;
   try {
     const newCustomerPrice = await prisma.customerPrice.create({
       data: {
@@ -67,7 +77,10 @@ export const createCustomerPrice = async (req: Request, res: Response) => {
         customer: { connect: { id: customerId } },
         product: { connect: { id: productId } },
         currency: { connect: { id: currencyId } },
+        personnel: { connect: { id: personnelId } },
         price,
+        upfront,
+        installment,
         unit,
       },
     });
@@ -80,16 +93,29 @@ export const createCustomerPrice = async (req: Request, res: Response) => {
 
 export const updateCustomerPrice = async (req: Request, res: Response) => {
   const { id } = req.params;
-  const { date, customerId, productId, currencyId, price, unit } = req.body;
+  const {
+    date,
+    customerId,
+    productId,
+    currencyId,
+    price,
+    unit,
+    upfront,
+    installment,
+    personnelId,
+  } = req.body;
   try {
     const updatedCustomerPrice = await prisma.customerPrice.update({
       where: { id: Number(id) },
       data: {
         date: new Date(date),
+        personnel: { connect: { id: personnelId } },
         customerId,
         productId,
         currencyId,
         price,
+        upfront,
+        installment,
         unit,
       },
     });
@@ -107,6 +133,7 @@ export const deleteCustomerPrice = async (req: Request, res: Response) => {
     });
     res.status(204).send();
   } catch (error) {
+    console.log(error);
     res.status(500).json({ error: "Failed to delete customer price" });
   }
 };

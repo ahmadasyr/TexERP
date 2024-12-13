@@ -20,10 +20,12 @@ model personnel {
   position         String?   @db.VarChar(50)
   department       String?   @db.VarChar(50)
   dateOfHire       DateTime?
-  email            String?   @db.VarChar(100)
+  email            String?   @unique @db.VarChar(100)
   phone            String?   @db.VarChar(15)
   handleComplaints Boolean?
   handleSales      Boolean?
+  password         String?
+  username         String?
 
   customerMeetPlan          customerMeetPlan[]
   customerMeetReport        customerMeetReport[]
@@ -55,6 +57,8 @@ model personnel {
   yarnOrderShipmentItem     yarnOrderShipmentItem[]
   yarnOrder                 yarnOrder[]
   yarnOrderShipmentSent     yarnOrderShipmentSent[]
+  productPrice              productPrice[]
+  customerPrice             customerPrice[]
 }
 
 // GENERAL SECTION
@@ -138,13 +142,14 @@ model currency {
   dyeOrderItem    dyeOrderItem[]
   yarnType        yarnType[]
   yarnOrderItem   yarnOrderItem[]
+  productPrice    productPrice[]
 }
 
 // SALES SECTION
 
 model customer {
   id                Int             @id @default(autoincrement())
-  name              String
+  name              String          @unique
   foreign           Boolean
   relatedPerson     String?
   title             String?
@@ -209,6 +214,7 @@ model customerMeetPlan {
   foodExpense          Float?
   giftExpense          Float?
   officeExpense        Float?
+  sampleExpense        Float?
 
   // Relations
   customer          customer   @relation(fields: [customerId], references: [id])
@@ -267,18 +273,22 @@ model competitorReportContent {
 }
 
 model customerPrice {
-  id         Int       @id @default(autoincrement())
-  date       DateTime? @default(now())
-  customerId Int
-  productId  Int
-  currencyId Int
-  price      Float
-  unit       unit
+  id          Int       @id @default(autoincrement())
+  date        DateTime? @default(now())
+  customerId  Int
+  productId   Int
+  currencyId  Int
+  upfront     Float
+  price       Float
+  installment Float
+  unit        unit
+  personnelId Int
 
   // Relations
-  customer customer @relation(fields: [customerId], references: [id])
-  product  product  @relation(fields: [productId], references: [id])
-  currency currency @relation(fields: [currencyId], references: [id])
+  customer  customer   @relation(fields: [customerId], references: [id])
+  product   product    @relation(fields: [productId], references: [id])
+  currency  currency   @relation(fields: [currencyId], references: [id])
+  personnel personnel? @relation(fields: [personnelId], references: [id])
 }
 
 model offer {
@@ -386,12 +396,12 @@ model productFeasibilityForm {
 model account {
   id        Int       @id @default(autoincrement())
   name      String
-  outsource Boolean
-  dye       Boolean
-  yarn      Boolean
-  buys      Boolean
-  debit     Float
-  credit    Float
+  outsource Boolean   @default(false)
+  dye       Boolean   @default(false)
+  yarn      Boolean   @default(false)
+  buys      Boolean   @default(false)
+  debit     Float     @default(0)
+  credit    Float     @default(0)
   createdAt DateTime  @default(now())
   updatedAt DateTime? @updatedAt
 
@@ -414,13 +424,18 @@ model accountType {
 model product {
   id                     Int                      @id @default(autoincrement())
   name                   String
-  productGroupId         Int
-  details                String
+  fine                   Int?
+  mayA                   Int?
+  mayB                   Int?
+  ham                    Int?
+  maxGrA                 Int?
+  maxGrB                 Int?
+  minGrA                 Int?
+  minGrB                 Int?
   customerPrice          customerPrice[]
   offer                  offer[]
   order                  order[]
   customerComplaint      customerComplaint[]
-  productGroup           productGroup             @relation(fields: [productGroupId], references: [id])
   productionOrder        productionOrder[]
   cutStock               cutStock[]
   rawQualityControlStock rawQualityControlStock[]
@@ -431,12 +446,46 @@ model product {
   outsourceOrderItem     outsourceOrderItem[]
   outsourceReturnStock   outsourceReturnStock[]
   orderItem              orderItem[]
+  productPrice           productPrice[]
+  productWrap            productWrap[]
 }
 
-model productGroup {
-  id      Int       @id @default(autoincrement())
-  name    String
-  product product[]
+enum ProductionSide {
+  HavA
+  HavB
+  ZeminA
+  ZeminB
+  FranceA
+  FranceB
+}
+
+model productWrap {
+  id         Int            @id @default(autoincrement())
+  productId  Int
+  wrapTypeId Int
+  salimMeter Float
+  side       ProductionSide
+
+  // Relations
+  product  product  @relation(fields: [productId], references: [id])
+  wrapType wrapType @relation(fields: [wrapTypeId], references: [id])
+}
+
+model productPrice {
+  id          Int      @id @default(autoincrement())
+  productId   Int
+  upfront     Float
+  price       Float
+  installment Float
+  currencyId  Int
+  date        DateTime @default(now())
+  unit        unit
+  personnelId Int
+
+  // Relations
+  product   product   @relation(fields: [productId], references: [id])
+  currency  currency  @relation(fields: [currencyId], references: [id])
+  personnel personnel @relation(fields: [personnelId], references: [id])
 }
 
 model yarnType {
@@ -602,8 +651,9 @@ model wrapType {
   stringCount Int
   en          Float
 
-  wrapGroup wrapGroup?  @relation(fields: [wrapGroupId], references: [id])
-  wrapOrder wrapOrder[]
+  wrapGroup   wrapGroup?    @relation(fields: [wrapGroupId], references: [id])
+  wrapOrder   wrapOrder[]
+  productWrap productWrap[]
 }
 
 model wrapOrder {

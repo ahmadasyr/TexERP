@@ -3,7 +3,7 @@
 import React from "react";
 import { Button } from "@mui/material";
 import { useRouter } from "next/navigation";
-import EnhancedTable from "@/components/table/tableMain";
+import EnhancedTable from "@/components/table/newTableMain";
 import { headCells, tableName } from "./orderShipment";
 import { Data } from "./orderShipment";
 

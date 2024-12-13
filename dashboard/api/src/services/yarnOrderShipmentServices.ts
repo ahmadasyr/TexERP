@@ -73,6 +73,24 @@ export const updateYarnOrderShipment = async (
     yarnOrderShipmentItem: any[];
   }
 ) => {
+  // Fetch existing items
+  const existingItems = await prisma.yarnOrderShipmentItem.findMany({
+    where: { yarnOrderShipmentId: id },
+  });
+
+  // Determine items to delete
+  const itemsToDelete = existingItems.filter(
+    (existingItem) =>
+      !data.yarnOrderShipmentItem.some((item) => item.id === existingItem.id)
+  );
+
+  // Delete items that are not in the update data
+  await prisma.yarnOrderShipmentItem.deleteMany({
+    where: {
+      id: { in: itemsToDelete.map((item) => item.id) },
+    },
+  });
+
   return await prisma.yarnOrderShipment.update({
     where: { id },
     data: {
@@ -85,7 +103,6 @@ export const updateYarnOrderShipment = async (
       personnel: data.personnelId
         ? { connect: { id: data.personnelId } }
         : undefined,
-
       shippingCompany: data.shippingCompanyId
         ? { connect: { id: data.shippingCompanyId } }
         : undefined,

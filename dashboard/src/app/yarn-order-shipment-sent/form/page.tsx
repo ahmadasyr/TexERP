@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState, useCallback, use } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { Alert, Box, Button, Grid, Typography } from "@mui/material";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { useSearchParams } from "next/navigation";
@@ -10,7 +10,7 @@ import Popup from "@/components/form/Popup";
 import { Data, formFields, tableName, title } from "../sent";
 import { NewNumber, NewRelation } from "@/components/form/FormFields";
 
-interface BankProps {
+interface Props {
   popupHandler?: (data: any) => void;
   popupSetter?: (data: any) => void;
 }
@@ -53,7 +53,7 @@ const useFetchData = (id: string | null, handleChange: any) => {
   }, [id, handleChange]);
 };
 
-const Bank: React.FC<BankProps> = ({ popupHandler, popupSetter }) => {
+const Bank: React.FC = ({ popupHandler, popupSetter }: Props) => {
   const searchParams = useSearchParams();
   const id = searchParams.get("id");
   const { formData, handleChange, tableData, runFetchData } =

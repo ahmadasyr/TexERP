@@ -1,6 +1,6 @@
 "use client";
 import { Data, formFields, tableName, title } from "../offer";
-import React, { use, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Alert,
   Box,
@@ -32,7 +32,7 @@ import { useSearchParams } from "next/navigation";
 interface PageProps {
   popupHandler?: (data: any) => void;
   popupSetter?: (data: any) => void;
-  render: any[];
+  render?: any[];
 }
 
 const formSteps = [
@@ -112,7 +112,7 @@ const formSteps = [
   },
 ];
 
-const Page: React.FC<PageProps> = ({ popupHandler, popupSetter }) => {
+const Page: React.FC = ({ popupHandler, popupSetter }: PageProps) => {
   const [activeStep, setActiveStep] = useState(0);
   const [completedSteps, setCompletedSteps] = useState<boolean[]>([]);
 

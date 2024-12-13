@@ -1,6 +1,6 @@
 "use client";
 import { Data, formFields, tableName, title } from "../report";
-import React, { use, useEffect } from "react";
+import React, { useEffect } from "react";
 import { Alert, Box, Button, Grid, Modal, Typography } from "@mui/material";
 import {
   NewTextField,
@@ -20,10 +20,10 @@ import Sheet from "./sheet";
 interface Page {
   popupHandler?: (data: any) => void;
   popupSetter?: (data: any) => void;
-  render: any[];
+  render?: any[];
 }
 
-const Page: React.FC<Page> = ({ popupHandler, popupSetter }) => {
+const Page: React.FC = ({ popupHandler, popupSetter }: Page) => {
   const searchParams = useSearchParams();
   const id = searchParams.get("id");
   const { formData, handleChange, tableData, runFetchData } =

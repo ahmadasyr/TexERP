@@ -14,7 +14,7 @@ const Page: React.FC = () => {
         title={title}
         headCells={headCells}
         tableName={tableName}
-        viewable={false}
+        viewable={true}
         URI={URI}
       />
     </div>

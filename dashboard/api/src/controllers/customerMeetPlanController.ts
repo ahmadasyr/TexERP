@@ -75,7 +75,7 @@ export const createCustomerMeetPlan = async (req: Request, res: Response) => {
         country,
         visitReason,
         plannedDate: new Date(plannedDate),
-        realDate: new Date(realDate),
+        realDate: realDate ? new Date(realDate) : null,
         visitingPersonnelId,
         result,
         accuracyRate,
@@ -89,6 +89,7 @@ export const createCustomerMeetPlan = async (req: Request, res: Response) => {
     });
     res.status(201).json(newCustomerMeetPlan);
   } catch (error) {
+    console.log(error);
     res.status(500).json({ error: "Failed to create customer meet plan" });
   }
 };
@@ -120,7 +121,7 @@ export const updateCustomerMeetPlan = async (req: Request, res: Response) => {
         country,
         visitReason,
         plannedDate: new Date(plannedDate),
-        realDate: new Date(realDate),
+        realDate: realDate ? new Date(realDate) : null,
         visitingPersonnelId,
         result,
         accuracyRate,

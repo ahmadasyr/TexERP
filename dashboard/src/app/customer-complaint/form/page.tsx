@@ -1,6 +1,6 @@
 "use client";
 import { Data, formFields, tableName, title } from "../complaint";
-import React, { use, useEffect } from "react";
+import React, { useEffect } from "react";
 import {
   Alert,
   Box,
@@ -27,13 +27,13 @@ import { useSearchParams } from "next/navigation";
 interface CustomerComplaintProps {
   popupHandler?: (data: any) => void;
   popupSetter?: (data: any) => void;
-  render: any[];
+  render?: any[];
 }
 
-const CustomerComplaint: React.FC<CustomerComplaintProps> = ({
+const CustomerComplaint: React.FC = ({
   popupHandler,
   popupSetter,
-}) => {
+}: CustomerComplaintProps) => {
   const searchParams = useSearchParams();
   const id = searchParams.get("id");
   const { formData, handleChange, tableData, runFetchData } =

@@ -1,6 +1,6 @@
 "use client";
 import { Data, formFields, tableName, title } from "../account";
-import React, { use, useEffect } from "react";
+import React, { useEffect } from "react";
 import { Alert, Box, Button, Grid, Modal, Typography } from "@mui/material";
 import {
   NewTextField,
@@ -19,10 +19,10 @@ import { useSearchParams } from "next/navigation";
 interface AccountProps {
   popupHandler?: (data: any) => void;
   popupSetter?: (data: any) => void;
-  render: any[];
+  render?: any[];
 }
 
-const Account: React.FC<AccountProps> = ({ popupHandler, popupSetter }) => {
+const Account: React.FC = ({ popupHandler, popupSetter }: AccountProps) => {
   const searchParams = useSearchParams();
   const id = searchParams.get("id");
   const { formData, handleChange, tableData, runFetchData } =

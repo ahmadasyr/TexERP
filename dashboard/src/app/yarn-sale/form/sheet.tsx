@@ -23,6 +23,7 @@ import {
 } from "@mui/x-data-grid";
 import { Alert } from "@mui/material";
 import { trTR } from "@/components/trTrGrid";
+import { usePersonnelId } from "@/contexts/auth";
 
 const initialRows: GridRowsProp = [
   {
@@ -32,7 +33,7 @@ const initialRows: GridRowsProp = [
     kg: 0,
     price: 0,
     currencyId: "",
-    personnelId: 1,
+    personnelId: usePersonnelId(),
   },
 ];
 
@@ -56,7 +57,7 @@ function EditToolbar(props: EditToolbarProps) {
         kg: 0,
         price: 0,
         currencyId: "",
-        personnelId: 1,
+        personnelId: usePersonnelId(),
       },
     ]);
     setRowModesModel((oldModel) => ({
@@ -271,10 +272,10 @@ export default function Sheet(props: SheetProps) {
           onRowEditStop={handleRowEditStop}
           processRowUpdate={processRowUpdate}
           slots={{
-            toolbar: EditToolbar as GridSlots["toolbar"],
+            toolbar: EditToolbar as unknown as GridSlots["toolbar"],
           }}
           slotProps={{
-            toolbar: { setRows, setRowModesModel },
+            toolbar: { setRows, setRowModesModel } as any,
           }}
           localeText={trTR.components.MuiDataGrid.defaultProps.localeText}
         />

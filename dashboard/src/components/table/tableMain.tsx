@@ -1,5 +1,5 @@
 "use client";
-import React, { use, useEffect } from "react";
+import React, { useEffect } from "react";
 import Box from "@mui/material/Box";
 import Paper from "@mui/material/Paper";
 import TableContainer from "@mui/material/TableContainer";
@@ -9,14 +9,37 @@ import TableRow from "@mui/material/TableRow";
 import TablePagination from "@mui/material/TablePagination";
 import EnhancedTableHead from "../../components/table/tableHead";
 import EnhancedTableToolbar from "../../components/table/tableToolBar";
-import { getComparator, stableSort } from "../../components/table/utils";
-import { Button, IconButton, Link, TableCell } from "@mui/material";
+import {
+  getComparator,
+  handleDelete,
+  stableSort,
+} from "../../components/table/utils";
+import {
+  Button,
+  Divider,
+  IconButton,
+  Link,
+  TableCell,
+  TextField,
+  Typography,
+} from "@mui/material";
 import Checkbox from "@mui/material/Checkbox";
 import "./table.scss";
 import { styled } from "@mui/material/styles";
-import { Visibility } from "@mui/icons-material";
+import { Add, Delete, Edit, Refresh, Visibility } from "@mui/icons-material";
 import { useRouter } from "next/navigation";
 import { fetchData } from "../../components/utils";
+import {
+  DataGrid,
+  GridRowId,
+  GridToolbar,
+  GridToolbarColumnsButton,
+  GridToolbarContainer,
+  GridToolbarDensitySelector,
+  GridToolbarExport,
+  GridToolbarFilterButton,
+} from "@mui/x-data-grid";
+import { trTR } from "../trTrGrid";
 type Data = {
   id: number;
 };
@@ -38,263 +61,269 @@ export default function EnhancedTable({
 }: EnhancedTableProps): JSX.Element {
   const router = useRouter();
   const [rows, setRows] = React.useState<Data[]>([]);
-  const [order, setOrder] = React.useState<"asc" | "desc">("asc");
-  const [orderBy, setOrderBy] = React.useState<keyof Data>("id");
-  const [selected, setSelected] = React.useState<number[]>([]);
-  const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(5);
+  const [selected, setSelected] = React.useState<readonly GridRowId[]>([]);
   const [refresh, setRefresh] = React.useState(false);
-  const [searchTerm, setSearchTerm] = React.useState("");
+  const [skeleton, setSkeleton] = React.useState(true);
+  const [newHeadCells, setNewHeadCells] = React.useState<any[]>([]);
+
   React.useEffect(() => {
-    fetchData(setRows, URI);
-  }, [URI]);
+    setSkeleton(true);
+    fetchData((data: Data[]) => {
+      const processedRows: Data[] = data.map((row: any) => {
+        const newRow: any = { id: row.id, ...row };
+        headCells.forEach((cell) => {
+          if (cell.datetime) {
+            const date = row[cell.id]
+              ? new Date(row[cell.id]).toLocaleDateString("tr-TR", {
+                  day: "2-digit",
+                  month: "2-digit",
+                  year: "numeric",
+                })
+              : "";
+            const time = row[cell.id]
+              ? new Date(row[cell.id]).toLocaleTimeString("tr-TR", {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })
+              : "";
+            newRow[`${cell.id}_date`] = date;
+            newRow[`${cell.id}_time`] = time;
+          } else if (cell.date) {
+            newRow[cell.id] = row[cell.id]
+              ? new Date(row[cell.id]).toLocaleDateString("tr-TR", {
+                  day: "2-digit",
+                  month: "2-digit",
+                  year: "numeric",
+                })
+              : "";
+          } else if (cell.displayValue && Array.isArray(cell.displayValue)) {
+            newRow[cell.id] = cell.displayValue
+              .map((key: string) => row[cell.id]?.[key] || "")
+              .join(" ");
+          }
+        });
+        return newRow;
+      });
 
-  const handleRequestSort = (
-    event: React.MouseEvent<unknown>,
-    property: keyof Data
-  ) => {
-    const isAsc = orderBy === property && order === "asc";
-    setOrder(isAsc ? "desc" : "asc");
-    setOrderBy(property);
-  };
+      setRows(processedRows);
+    }, URI);
+  }, [URI, refresh]);
 
-  const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.checked) {
-      const newSelected = rows.map((n) => n.id);
-      setSelected(newSelected);
-      return;
-    }
-    setSelected([]);
-  };
+  React.useEffect(() => {
+    // Fetch data and preprocess rows
 
-  const handleClick = (id: number) => {
-    const selectedIndex = selected.indexOf(id);
-    let newSelected: number[] = [];
+    const newHeadCell = headCells.flatMap((cell) => {
+      if (cell.datetime) {
+        return [
+          {
+            field: `${cell.id}_date`,
+            headerName: `${cell.label} - Tarih`,
+            width: cell.width || 130,
+            hide: !cell.visible,
+            type: "date",
+            valueGetter: (params: any, row: any) => {
+              return row[cell.id] ? new Date(row[cell.id]) : null;
+            },
+          },
+          {
+            field: `${cell.id}_time`,
+            headerName: `${cell.label} - Saat`,
+            width: cell.width || 130,
+            hide: !cell.visible,
+            type: "string",
+          },
+        ];
+      }
+      return {
+        field: cell.id,
+        headerName: cell.label,
+        width: cell.width || 130,
+        hide: !cell.visible,
+        type: cell.numeric ? "number" : cell.boolean ? "boolean" : "string",
 
-    if (selectedIndex === -1) {
-      newSelected = newSelected.concat(selected, id);
-    } else if (selectedIndex === 0) {
-      newSelected = newSelected.concat(selected.slice(1));
-    } else if (selectedIndex === selected.length - 1) {
-      newSelected = newSelected.concat(selected.slice(0, -1));
-    } else if (selectedIndex > 0) {
-      newSelected = newSelected.concat(
-        selected.slice(0, selectedIndex),
-        selected.slice(selectedIndex + 1)
-      );
-    }
-    setSelected(newSelected);
-  };
+        renderCell: (params: any) => {
+          const value = params.value;
+          if (cell.boolean) {
+            // Render a Checkbox for boolean values
+            return (
+              <Checkbox
+                checked={Boolean(value)} // Ensures proper boolean type
+                style={{
+                  textDecoration: "none",
+                  cursor: "default",
+                }}
+                inputProps={{ "aria-label": "boolean value" }}
+              />
+            );
+          }
+          if (typeof value === "object" && value !== null) {
+            return JSON.stringify(value);
+          }
+          return cell.clickable ? (
+            <span
+              style={{
+                cursor: "pointer",
+                textDecoration: "underline",
+                fontWeight: "bold",
+              }}
+              onClick={() => {
+                router.push(`${cell.uri}${params.row[cell.id]}`);
+              }}
+            >
+              {value}
+            </span>
+          ) : (
+            value
+          );
+        },
+      };
+    });
+    setNewHeadCells([
+      ...newHeadCell,
+      {
+        field: "actions",
+        headerName: "İşlemler",
+        width: 150,
+        hidable: false,
+        sortable: false,
 
-  const handleChangePage = (newPage: number) => {
-    setPage(newPage);
-  };
+        renderCell: (params: any) => {
+          return (
+            <div>
+              {viewable && (
+                <IconButton
+                  onClick={() => {
+                    router.push(`${URI}/view/?id=${params.row.id}`);
+                  }}
+                >
+                  <Visibility />
+                </IconButton>
+              )}
+              <IconButton
+                onClick={() => {
+                  router.push(`${URI}/form/?id=${params.row.id}`);
+                }}
+              >
+                <Edit />
+              </IconButton>
+            </div>
+          );
+        },
+      },
+    ]);
+    console.log("newHeadCells", newHeadCells);
+    setSkeleton(false);
+  }, [URI, headCells, rows]);
 
-  const handleChangeRowsPerPage = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
-  };
-
-  // const emptyRows =
-  //   page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
-  const StyledTableRow = styled(TableRow)(({ theme }) => ({
-    "&:nth-of-type(even)": {
-      backgroundColor: theme.palette.action.hover,
-    },
-    "&:nth-of-type(even):hover": {
-      backgroundColor: theme.palette.action.selected,
-    },
-    "&:nth-of-type(odd):hover": {
-      backgroundColor: theme.palette.action.selected,
-    },
-    "&:last-child td, &:last-child th": {
-      border: 0,
-    },
-  }));
-
-  // Filter rows based on search term
-  const filteredRows = rows.filter((row) =>
-    Object.values(row).some((value) =>
-      String(value).toLowerCase().includes(searchTerm.toLowerCase())
-    )
-  );
-  const emptyRows =
-    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - filteredRows.length) : 0;
-  const [visibleColumns, setVisibleColumns] = React.useState(
-    headCells.map((column) => ({ ...column, visible: true }))
-  );
-  useEffect(() => {
-    setVisibleColumns(
-      headCells.map((column) => ({
-        ...column,
-        visible: true,
-      }))
+  function CustomToolbar() {
+    return (
+      <>
+        <GridToolbarContainer>
+          <GridToolbarColumnsButton />
+          <GridToolbarFilterButton />
+          <GridToolbarDensitySelector />
+          <GridToolbarExport
+            csvOptions={{
+              fileName: `${title}-${new Date().toLocaleDateString()}`,
+            }}
+            printOptions={{
+              hideFooter: true,
+              hideToolbar: true,
+            }}
+          />
+          <Button
+            style={{ marginLeft: "auto" }}
+            variant="contained"
+            onClick={() => {
+              router.push(`${URI}/form`);
+            }}
+          >
+            Yeni Oluştur
+            <Add />
+          </Button>
+          <Button
+            variant="outlined"
+            color="secondary"
+            onClick={() => {
+              setRefresh(!refresh);
+            }}
+          >
+            Yenile
+            <Refresh />
+          </Button>
+          {selected.length > 0 && (
+            <Button
+              variant="outlined"
+              color="error"
+              onClick={() => {
+                const selections = selected.map((id) => id as number);
+                handleDelete(tableName, selections);
+                setRefresh(!refresh);
+              }}
+            >
+              <Delete />
+            </Button>
+          )}
+        </GridToolbarContainer>
+      </>
     );
-  }, [headCells]);
+  }
   return (
     <Box
       style={{
-        maxWidth: "100%",
+        maxWidth: "130%",
         minWidth: "90%",
       }}
       className="enhanced-table"
     >
       <Paper className="table-paper">
-        <EnhancedTableToolbar
-          URI={tableName}
-          title={title}
-          tableName={tableName}
-          selected={selected}
-          setSelected={setSelected}
-          numSelected={selected.length}
-          refresh={refresh}
-          setRefresh={setRefresh}
-          searchTerm={searchTerm} // Pass search term state
-          setSearchTerm={setSearchTerm} // Pass setSearchTerm function
-          visibleColumns={visibleColumns} // Pass headCells
-          setVisibleColumns={setVisibleColumns} // Pass setRows function
-          headCells={headCells} // Pass headCells
-        />
-        <TableContainer>
-          <Table stickyHeader>
-            <EnhancedTableHead
-              headCells={visibleColumns}
-              numSelected={selected.length}
-              order={order}
-              orderBy={orderBy as string}
-              onSelectAllClick={(e) => handleSelectAllClick(e)}
-              onRequestSort={handleRequestSort}
-              rowCount={filteredRows.length}
-            />
-            <TableBody>
-              {stableSort(filteredRows, getComparator(order, orderBy)) // Use filteredRows
-                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                .map((row) => {
-                  const isItemSelected = selected.indexOf(row.id) !== -1;
-                  return (
-                    <StyledTableRow
-                      hover
-                      onDoubleClick={() => {
-                        viewable
-                          ? router.push(`/${tableName}/form/?id=${row.id}`)
-                          : null;
-                      }}
-                      aria-checked={isItemSelected}
-                      tabIndex={-1}
-                      key={row.id}
-                      selected={isItemSelected}
-                      className={`table-row ${
-                        isItemSelected ? "selected" : ""
-                      }`}
-                    >
-                      <TableCell padding="checkbox">
-                        <Checkbox
-                          color="primary"
-                          checked={isItemSelected}
-                          onClick={() => handleClick(row.id)}
-                        />
-                      </TableCell>
-                      {visibleColumns.map(
-                        (headCell) =>
-                          headCell?.visible && (
-                            <TableCell
-                              style={{
-                                whiteSpace: "nowrap",
-                                overflow: "hidden",
-                                textOverflow: "ellipsis",
-                              }}
-                              key={headCell.id}
-                            >
-                              {(() => {
-                                const cellValue = row[
-                                  headCell.id as keyof Data
-                                ] as any;
+        <Typography fontWeight={500} mb={1} variant="h5" component="h5">
+          {title}
+        </Typography>
+        <Divider />
+        <br />
+        <DataGrid
+          ignoreDiacritics={true}
+          loading={skeleton}
+          {...rows}
+          rows={rows}
+          getRowClassName={(params) =>
+            params.indexRelativeToCurrentPage % 2 === 0 ? "even" : "odd"
+          }
+          // when rows are empty, no rows
 
-                                if (typeof cellValue === "boolean") {
-                                  return cellValue ? "Evet" : "Hayır";
-                                }
-
-                                if (
-                                  typeof cellValue === "object" &&
-                                  cellValue !== null &&
-                                  "id" in cellValue
-                                ) {
-                                  return (
-                                    <Link
-                                      href={`/${headCell.id}/form/?id=${cellValue.id}`}
-                                    >
-                                      {headCell.displayValue
-                                        .map(
-                                          (value: keyof Data) =>
-                                            cellValue[value]
-                                        )
-                                        .join(" ")}
-                                    </Link>
-                                  );
-                                }
-
-                                if (headCell.date) {
-                                  const date = new Date(cellValue);
-                                  return !isNaN(date.getTime())
-                                    ? date.toLocaleDateString()
-                                    : "Invalid Date";
-                                }
-
-                                if (headCell.datetime && cellValue) {
-                                  return new Date(cellValue).toLocaleString();
-                                }
-
-                                if (
-                                  typeof cellValue === "object" &&
-                                  cellValue !== null
-                                ) {
-                                  return cellValue.toString();
-                                }
-
-                                return cellValue;
-                              })()}
-                            </TableCell>
-                          )
-                      )}
-
-                      {viewable ? (
-                        <TableCell
-                          width={"1rem"}
-                          key="view"
-                          padding="none"
-                          size="small"
-                          // always visible
-                        >
-                          <IconButton
-                            onClick={() =>
-                              router.push(`/${tableName}/view/?id=${row.id}`)
-                            }
-                          >
-                            <Visibility />
-                          </IconButton>
-                        </TableCell>
-                      ) : null}
-                    </StyledTableRow>
-                  );
-                })}
-              {emptyRows > 0 && (
-                <TableRow style={{ height: 53 * emptyRows }}>
-                  <TableCell colSpan={6} />
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </TableContainer>
-        <TablePagination
-          rowsPerPageOptions={[5, 10, 25]}
-          component="div"
-          count={filteredRows.length} // Use filteredRows length
-          rowsPerPage={rowsPerPage}
-          page={page}
-          onPageChange={(_, newPage) => setPage(newPage)}
-          onRowsPerPageChange={handleChangeRowsPerPage}
+          disableColumnSorting={false}
+          columns={newHeadCells}
+          localeText={trTR.components.MuiDataGrid.defaultProps.localeText}
+          slots={{ toolbar: CustomToolbar }}
+          slotProps={{
+            toolbar: {
+              showQuickFilter: true,
+            },
+            loadingOverlay: {
+              variant: "skeleton",
+              noRowsVariant: "skeleton",
+            },
+          }}
+          initialState={{
+            pagination: {
+              rowCount: 5,
+            },
+            sorting: {
+              sortModel: [
+                {
+                  field: "id",
+                  sort: "desc",
+                },
+              ],
+            },
+          }}
+          // add row selection and deletion
+          checkboxSelection
+          disableRowSelectionOnClick
+          onRowSelectionModelChange={(newSelection) => {
+            setSelected(newSelection);
+          }}
         />
       </Paper>
     </Box>

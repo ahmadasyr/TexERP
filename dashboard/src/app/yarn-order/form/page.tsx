@@ -1,6 +1,6 @@
 "use client";
 import { Data, formFields, tableName, title } from "../yarnOrder";
-import React, { use, useEffect } from "react";
+import React, { useEffect } from "react";
 import { Alert, Box, Button, Grid, Modal, Typography } from "@mui/material";
 import {
   NewTextField,
@@ -17,13 +17,14 @@ import { FormModal } from "@/components/form/modal";
 import Popup from "@/components/form/Popup";
 import { useSearchParams } from "next/navigation";
 import Sheet from "./sheet";
+import { usePersonnelId } from "@/contexts/auth";
 interface Page {
   popupHandler?: (data: any) => void;
   popupSetter?: (data: any) => void;
-  render: any[];
+  render?: any[];
 }
 
-const Page: React.FC<Page> = ({ popupHandler, popupSetter }) => {
+const Page: React.FC = ({ popupHandler, popupSetter }: Page) => {
   const searchParams = useSearchParams();
   const id = searchParams.get("id");
   const { formData, handleChange, tableData, runFetchData } =
@@ -86,8 +87,9 @@ const Page: React.FC<Page> = ({ popupHandler, popupSetter }) => {
       }
     } else {
       try {
+        const personnelId = usePersonnelId();
         // add personnelId to formData
-        formData["personnelId"] = 1;
+        formData["personnelId"] = personnelId;
         formData["sale"] = false;
         const response = await fetch(`/api/${tableName}`, {
           method: "POST",

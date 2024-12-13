@@ -17,6 +17,20 @@ export const getProductById = async (req: Request, res: Response) => {
   try {
     const product = await prisma.product.findUnique({
       where: { id: Number(id) },
+      include: {
+        productPrice: {
+          include: {
+            currency: true,
+            personnel: true,
+          },
+        },
+        customerPrice: {
+          include: {
+            currency: true,
+            customer: true,
+          },
+        },
+      },
     });
     if (product) {
       res.status(200).json(product);

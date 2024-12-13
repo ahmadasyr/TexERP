@@ -16,6 +16,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import { trTR } from "@/components/trTrGrid";
 import { Cancel, CancelOutlined, EditOff } from "@mui/icons-material";
+import { usePersonnelId } from "@/contexts/auth";
 const boxStyle = {
   mb: 3,
   p: 2,
@@ -329,12 +330,9 @@ const YarnTypeView = () => {
     try {
       // Prepare the payload
       const payload = {
-        id: newRow.id,
-        net_kg: newRow.netKg,
-        count: newRow.count,
-        yarn_order_id: newRow.yarnOrderId,
-        lot: newRow.lot,
-        waybill_no: newRow.waybillNo,
+        ...newRow,
+        accountId: yarnOrders.find((acc) => acc.id === newRow.yarnOrderId)
+          ?.accountId,
       };
 
       // Send API request
@@ -379,7 +377,7 @@ const YarnTypeView = () => {
         netKg: 0,
         count: 0,
         yarnTypeId: yarnType.id,
-        personnelId: 1,
+        personnelId: usePersonnelId(),
         createdAt: new Date().toISOString(),
         yarnOrderId: null,
         accountId: null,

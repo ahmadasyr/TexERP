@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   AppBar,
   Toolbar,
@@ -24,10 +24,24 @@ import { ThemeProvider as EmotionThemeProvider } from "@emotion/react";
 import Menu from "./main/menu/page";
 import { lightPalette, darkPalette } from "./theme";
 import PrimarySearchAppBar from "./navbar";
-
+import Login from "../app/login/page";
 const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [open, setOpen] = useState(true);
   const [darkMode, setDarkMode] = useState(false);
+  const [token, setToken] = useState<string | null>(null);
+  useEffect(() => {
+    const handleTokenChange = () => {
+      setToken(localStorage.token);
+    };
+    handleTokenChange();
+    // Listen for logout events
+    window.addEventListener("logout", handleTokenChange);
+    window.addEventListener("login", handleTokenChange);
+    return () => {
+      window.removeEventListener("logout", handleTokenChange);
+      window.removeEventListener("login", handleTokenChange);
+    };
+  }, []);
 
   const toggleDrawer = () => {
     setOpen(!open);
@@ -37,6 +51,11 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     setDarkMode(!darkMode);
   };
 
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      localStorage.setItem("darkMode", JSON.stringify(darkMode));
+    }
+  }, [darkMode]);
   const theme = createTheme({
     palette: {
       mode: darkMode ? "dark" : "light",
@@ -117,103 +136,109 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     <EmotionThemeProvider theme={theme}>
       <ThemeProvider theme={theme} defaultMode="dark">
         <CssBaseline />
-        <Grid container>
-          {/* Drawer Section */}
-          <Grid
-            item
-            xs={open ? 12 : 0}
-            sm={open ? 1 : 0}
-            md={open ? 2 : 0}
-            sx={
-              open
-                ? {
-                    overflow: "auto", // Prevent content spill
-                    width: "100%",
-                    boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.2)",
-                    height: "100vh",
-                    "&::-webkit-scrollbar": {
-                      width: "0.4em",
-                    },
-                    "&::-webkit-scrollbar-track": {
-                      boxShadow: "inset 0 0 6px rgba(0,0,0,0.00)",
-                    },
-                    "&::-webkit-scrollbar-thumb": {
-                      backgroundColor: "rgba(0,0,0,.1)",
-                      outline: `1px solid ${theme.palette.primary.main}`,
-                    },
-                  }
-                : {}
-            }
-          >
-            <Drawer
-              variant={
-                isMobile ? "temporary" : open ? "permanent" : "temporary"
+        {token ? (
+          <Grid container>
+            {/* Drawer Section */}
+            <Grid
+              item
+              xs={open ? 12 : 0}
+              sm={open ? 1 : 0}
+              md={open ? 2 : 0}
+              sx={
+                open
+                  ? {
+                      overflow: "auto", // Prevent content spill
+                      width: "100%",
+                      boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.2)",
+                      height: "100vh",
+                      "&::-webkit-scrollbar": {
+                        width: "0.4em",
+                      },
+                      "&::-webkit-scrollbar-track": {
+                        boxShadow: "inset 0 0 6px rgba(0,0,0,0.00)",
+                      },
+                      "&::-webkit-scrollbar-thumb": {
+                        backgroundColor: "rgba(0,0,0,.1)",
+                        outline: `1px solid ${theme.palette.primary.main}`,
+                      },
+                    }
+                  : {}
               }
-              open={open}
-              onClose={toggleDrawer}
-              anchor="left"
-              PaperProps={{
-                style: {
-                  transition: "all 0.3s ease",
-                  overflowY: "auto", // Enable smooth scrolling
-                  width: "inherit", // Inherit the width of the parent drawer
-                  display: isMobile ? "block" : "contents",
-                },
-                sx: {
-                  "&::-webkit-scrollbar": {
-                    display: "none", // Hide scrollbar for modern browsers
+            >
+              <Drawer
+                variant={
+                  isMobile ? "temporary" : open ? "permanent" : "temporary"
+                }
+                open={open}
+                onClose={toggleDrawer}
+                anchor="left"
+                PaperProps={{
+                  style: {
+                    transition: "all 0.3s ease",
+                    overflowY: "auto", // Enable smooth scrolling
+                    width: "inherit", // Inherit the width of the parent drawer
+                    display: isMobile ? "block" : "contents",
                   },
-                },
+                  sx: {
+                    "&::-webkit-scrollbar": {
+                      display: "none", // Hide scrollbar for modern browsers
+                    },
+                  },
+                }}
+              >
+                <Box display="flex" justifyContent="flex-end">
+                  <IconButton onClick={toggleDrawer}>
+                    <MenuIcon />
+                  </IconButton>
+                </Box>
+                <Box
+                  display="flex"
+                  alignItems="center"
+                  justifyContent="center"
+                  padding="1rem"
+                >
+                  <img
+                    src="/logo.png"
+                    alt="Logo"
+                    style={{
+                      width: "100%",
+                      maxWidth: "100%", // Ensure responsiveness
+                      height: "auto",
+                    }}
+                  />
+                </Box>
+                <Menu />
+              </Drawer>
+            </Grid>
+
+            {/* Main Content Section */}
+            <Grid
+              item
+              xs={12}
+              sm={open ? 11 : 12}
+              md={open ? 10 : 12}
+              container
+              justifyContent="center"
+              alignItems="center"
+              style={{
+                overflow: "hidden", // Ensure no pushing or overlapping
+                boxSizing: "border-box", // Include padding in width/height calculation
+                display: "block",
               }}
             >
-              <Box display="flex" justifyContent="flex-end">
-                <IconButton onClick={toggleDrawer}>
-                  <MenuIcon />
-                </IconButton>
-              </Box>
-              <Box
-                display="flex"
-                alignItems="center"
-                justifyContent="center"
-                padding="1rem"
-              >
-                <img
-                  src="/logo.png"
-                  alt="Logo"
-                  style={{
-                    width: "100%",
-                    maxWidth: "100%", // Ensure responsiveness
-                    height: "auto",
-                  }}
-                />
-              </Box>
-              <Menu />
-            </Drawer>
+              <PrimarySearchAppBar
+                toggleTheme={toggleTheme}
+                toggleDrawer={toggleDrawer}
+                open={open}
+                theme={darkMode}
+                setTheme={setDarkMode}
+              />
+              {children}
+            </Grid>
           </Grid>
-
-          {/* Main Content Section */}
-          <Grid
-            item
-            xs={12}
-            sm={open ? 11 : 12}
-            md={open ? 10 : 12}
-            container
-            justifyContent="center"
-            alignItems="center"
-            style={{
-              overflow: "hidden", // Ensure no pushing or overlapping
-              boxSizing: "border-box", // Include padding in width/height calculation
-              display: "block",
-            }}
-          >
-            <PrimarySearchAppBar
-              toggleTheme={toggleTheme}
-              toggleDrawer={toggleDrawer}
-              open={open}
-            />
-            {children}
-          </Grid>
-        </Grid>
+        ) : (
+          <Login />
+        )}
       </ThemeProvider>
     </EmotionThemeProvider>
   );

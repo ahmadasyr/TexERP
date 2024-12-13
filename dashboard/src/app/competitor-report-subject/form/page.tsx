@@ -1,6 +1,6 @@
 "use client";
 import { Data, formFields, tableName, title } from "../reportSubject";
-import React, { use, useEffect } from "react";
+import React, { useEffect } from "react";
 import { Alert, Box, Button, Grid, Modal, Typography } from "@mui/material";
 import {
   NewTextField,
@@ -19,13 +19,13 @@ import { useSearchParams } from "next/navigation";
 interface reportSubjectProps {
   popupHandler?: (data: any) => void;
   popupSetter?: (data: any) => void;
-  render: any[];
+  render?: any[];
 }
 
-const reportSubject: React.FC<reportSubjectProps> = ({
+const reportSubject: React.FC = ({
   popupHandler,
   popupSetter,
-}) => {
+}: reportSubjectProps) => {
   const searchParams = useSearchParams();
   const id = searchParams.get("id");
   const { formData, handleChange, tableData, runFetchData } =

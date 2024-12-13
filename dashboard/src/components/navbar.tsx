@@ -13,23 +13,75 @@ import AccountCircle from "@mui/icons-material/AccountCircle";
 import MailIcon from "@mui/icons-material/Mail";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import MoreIcon from "@mui/icons-material/MoreVert";
+import Brightness4Icon from "@mui/icons-material/Brightness4";
+import Brightness7Icon from "@mui/icons-material/Brightness7";
 import { Switch } from "@mui/material";
+import { handleLogout, getPersonnelInfo } from "@/contexts/auth";
+import { useRouter } from "next/navigation";
 
 interface PrimaryAppBarProps {
   toggleDrawer: () => void;
   toggleTheme: () => void;
   open: boolean;
+  theme: any;
+  setTheme: any;
 }
+
+const ThemeSwitch = styled(Switch)(({ theme }) => ({
+  width: 62,
+  height: 34,
+  padding: 7,
+  "& .MuiSwitch-switchBase": {
+    margin: 1,
+    padding: 0,
+    transform: "translateX(6px)",
+    transitionDuration: "300ms",
+    "&.Mui-checked": {
+      color: "#fff",
+      transform: "translateX(22px)",
+      "& .MuiSwitch-thumb:before": {
+        content: "'🌙'",
+      },
+      "& + .MuiSwitch-track": {
+        opacity: 1,
+        backgroundColor: theme.palette.mode === "dark" ? "#8796A5" : "#aab4be",
+      },
+    },
+  },
+  "& .MuiSwitch-thumb": {
+    backgroundColor: theme.palette.mode === "dark" ? "#003892" : "#ffd700",
+    width: 32,
+    height: 32,
+    "&:before": {
+      content: "'☀️'",
+      position: "absolute",
+      width: "100%",
+      height: "100%",
+      left: 0,
+      top: 0,
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+    },
+  },
+  "& .MuiSwitch-track": {
+    opacity: 1,
+    backgroundColor: theme.palette.mode === "dark" ? "#8796A5" : "#aab4be",
+    borderRadius: 20 / 2,
+  },
+}));
 
 export default function PrimaryAppBar({
   toggleDrawer,
   toggleTheme,
   open,
+  theme,
+  setTheme,
 }: PrimaryAppBarProps) {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] =
     React.useState<null | HTMLElement>(null);
-
+  const router = useRouter();
   const isMenuOpen = Boolean(anchorEl);
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
 
@@ -47,6 +99,14 @@ export default function PrimaryAppBar({
     setMobileMoreAnchorEl(event.currentTarget);
   };
 
+  const toggleThemeWithStorage = () => {
+    const newTheme = theme === "light" ? "dark" : "light";
+    setTheme(newTheme);
+    toggleTheme();
+    if (typeof window !== "undefined") {
+      localStorage.setItem("theme", newTheme);
+    }
+  };
   const menuId = "primary-account-menu";
   const renderMenu = (
     <Menu
@@ -60,6 +120,14 @@ export default function PrimaryAppBar({
     >
       <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
       <MenuItem onClick={handleMenuClose}>My account</MenuItem>
+      <MenuItem
+        onClick={() => {
+          handleLogout();
+          router.push("/");
+        }}
+      >
+        Logout
+      </MenuItem>
     </Menu>
   );
 
@@ -94,7 +162,7 @@ export default function PrimaryAppBar({
       </MenuItem>
     </Menu>
   );
-
+  const personnel = getPersonnelInfo();
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="sticky" color="primary">
@@ -112,6 +180,9 @@ export default function PrimaryAppBar({
           <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
             Dokumaş Fabric
           </Typography>
+          <p style={{ display: "flex", alignItems: "center" }}>
+            Merhaba, {personnel?.firstName + " " + personnel?.lastName}
+          </p>
           <Box sx={{ display: { xs: "none", md: "flex" } }}>
             <IconButton size="large" color="inherit">
               <MailIcon />
@@ -121,11 +192,19 @@ export default function PrimaryAppBar({
             </IconButton>
             <IconButton
               size="large"
-              edge="end"
+              // edge="end"
               color="inherit"
               onClick={handleProfileMenuOpen}
             >
-              <AccountCircle />
+              {personnel?.avatar ? (
+                <img
+                  src={personnel.avatar}
+                  alt="avatar"
+                  style={{ borderRadius: "50%", width: "30px" }}
+                />
+              ) : (
+                <AccountCircle />
+              )}
             </IconButton>
           </Box>
           <Box sx={{ display: { xs: "flex", md: "none" } }}>
@@ -137,11 +216,12 @@ export default function PrimaryAppBar({
               <MoreIcon />
             </IconButton>
           </Box>
-          <Switch onChange={toggleTheme} />
+          <ThemeSwitch
+            checked={theme === "dark"}
+            onChange={toggleThemeWithStorage}
+          />
         </Toolbar>
       </AppBar>
-      {renderMobileMenu}
-      {renderMenu}
     </Box>
   );
 }

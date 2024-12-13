@@ -12,7 +12,7 @@ const Page: React.FC = () => {
   return (
     <div>
       <EnhancedTable
-        title="Banks"
+        title="Banka Listesi"
         headCells={headCells}
         tableName={tableName}
         viewable={false}

@@ -1,4 +1,6 @@
 import express from "express";
+require("dotenv").config();
+
 import personnelRoutes from "./routes/personnelRoutes";
 import customerRoutes from "./routes/customerRoutes";
 import bankRoutes from "./routes/bankRoutes";
@@ -20,7 +22,6 @@ import accountTypeRoutes from "./routes/accountTypeRoutes";
 import cutStockRoutes from "./routes/cutStockRoutes";
 import machineRoutes from "./routes/machineRoutes";
 import machineTypeRoutes from "./routes/machineTypeRoutes";
-import productGroupRoutes from "./routes/productGroupRoutes";
 import productionOrderRoutes from "./routes/productionOrderRoutes";
 import productionOrderWrapRoutes from "./routes/productionOrderWrapRoutes";
 import rawQualityRoutes from "./routes/rawQualityRoutes";
@@ -38,6 +39,8 @@ import yarnOrderItemRoutes from "./routes/yarnOrderItemRoutes";
 import shippingCompanyRoutes from "./routes/shippingCompanyRoutes";
 import shippingCarrierRoutes from "./routes/shippingCarrierRoutes";
 import shippingCarRoutes from "./routes/shippingCarRoutes";
+import authRoutes from "./routes/authRoutes";
+import productPriceRoutes from "./routes/productPriceRoutes";
 
 const cors = require("cors");
 
@@ -87,8 +90,6 @@ app.use("/cut-stock", cutStockRoutes);
 app.use("/machine", machineRoutes);
 // Use machineType routes
 app.use("/machine-type", machineTypeRoutes);
-// Use productGroup routes
-app.use("/product-group", productGroupRoutes);
 // Use productionOrder routes
 app.use("/production-order", productionOrderRoutes);
 // Use productionOrderWrap routes
@@ -123,5 +124,8 @@ app.use("/shipping-company", shippingCompanyRoutes);
 app.use("/shipping-carrier", shippingCarrierRoutes);
 // Use shippingCar routes
 app.use("/shipping-car", shippingCarRoutes);
-
+// auth routes
+app.use("/auth", authRoutes);
+// Use productPrice routes
+app.use("/product-price", productPriceRoutes);
 export default app;

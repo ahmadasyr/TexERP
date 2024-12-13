@@ -78,48 +78,57 @@ export const createCustomer = async (
     iban,
     swift,
   } = req.body;
+
   try {
-    const newCustomer = await prisma.customer.create({
+    const account: any = await prisma.account.create({
       data: {
-        name,
-        foreign,
-        relatedPerson,
-        title,
-        email,
-        phoneNumber,
-        firstOfferDate: new Date(firstOfferDate),
-        firstRegisterDate: new Date(firstRegisterDate),
-        status,
-        returnDate: new Date(returnDate),
-        salesOpinion,
-        creditNote,
-        shippingMethod,
-        meterLimit,
-        address,
-        city,
-        taxNumber,
-        paymentKind,
-        note,
-        iban,
-        swift,
-        taxOffice: {
-          connect: { id: taxOfficeId },
-        },
-        bank: {
-          connect: { id: bankId },
-        },
-        currency: {
-          connect: { id: currencyId },
-        },
-        personnel: {
-          connect: { id: personnelId },
+        name: name,
+        outsource: false,
+        dye: false,
+        yarn: false,
+        buys: true,
+        debit: 0,
+        credit: 0,
+        customer: {
+          create: {
+            name,
+            foreign,
+            relatedPerson,
+            title,
+            email,
+            phoneNumber,
+            firstOfferDate: firstOfferDate ? new Date(firstOfferDate) : null,
+            firstRegisterDate: firstRegisterDate
+              ? new Date(firstRegisterDate)
+              : undefined,
+            status,
+            returnDate: returnDate ? new Date(returnDate) : null,
+            salesOpinion,
+            creditNote,
+            shippingMethod,
+            meterLimit,
+            address,
+            city,
+            taxNumber,
+            paymentKind,
+            note,
+            iban,
+            swift,
+            taxOffice: taxOfficeId
+              ? { connect: { id: taxOfficeId } }
+              : undefined,
+            bank: bankId ? { connect: { id: bankId } } : undefined,
+            currency: currencyId ? { connect: { id: currencyId } } : undefined,
+            personnel: { connect: { id: personnelId } },
+          },
         },
       },
     });
-    res.status(201).json(newCustomer);
+
+    res.status(201).json(account);
   } catch (error) {
     console.log(error);
-    res.status(500).json({ error: "Failed to create" });
+    res.status(500).json({ error: "Failed to create customer" });
   }
 };
 
@@ -157,35 +166,46 @@ export const updateCustomer = async (req: Request, res: Response) => {
     const updatedCustomer = await prisma.customer.update({
       where: { id: Number(id) },
       data: {
-        name,
+        name: name || undefined,
         foreign,
         relatedPerson,
         title,
         email,
         phoneNumber,
-        firstOfferDate: new Date(firstOfferDate),
-        personnelId,
-        firstRegisterDate: new Date(firstRegisterDate),
+        firstOfferDate: firstOfferDate ? new Date(firstOfferDate) : undefined,
+        personnelId: personnelId || undefined,
+        firstRegisterDate: firstRegisterDate
+          ? new Date(firstRegisterDate)
+          : undefined,
         status,
-        returnDate: new Date(returnDate),
+        returnDate: returnDate ? new Date(returnDate) : undefined,
         salesOpinion,
         creditNote,
         shippingMethod,
         meterLimit,
         address,
         city,
-        taxOfficeId,
+        taxOfficeId: taxOfficeId || undefined,
         taxNumber,
         paymentKind,
         note,
-        bankId,
-        currencyId,
+        bankId: bankId || undefined,
+        currencyId: currencyId || undefined,
         iban,
         swift,
+        account: name
+          ? {
+              update: {
+                name: name,
+              },
+            }
+          : undefined,
       },
     });
+
     res.status(200).json(updatedCustomer);
   } catch (error) {
+    console.error(error);
     res.status(500).json({ error: "Failed to update customer" });
   }
 };

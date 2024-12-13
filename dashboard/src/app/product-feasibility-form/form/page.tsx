@@ -1,6 +1,6 @@
 "use client";
 import { Data, formFields, tableName, title } from "../form";
-import React, { use, useEffect } from "react";
+import React, { useEffect } from "react";
 import {
   Alert,
   Box,
@@ -38,10 +38,10 @@ import Costs from "./costs";
 interface PageProps {
   popupHandler?: (data: any) => void;
   popupSetter?: (data: any) => void;
-  render: any[];
+  render?: any[];
 }
 
-const Page: React.FC<PageProps> = ({ popupHandler, popupSetter }) => {
+const Page: React.FC = ({ popupHandler, popupSetter }: PageProps) => {
   const searchParams = useSearchParams();
   const id = searchParams.get("id");
   const { formData, handleChange, tableData, runFetchData } =

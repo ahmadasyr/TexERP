@@ -20,6 +20,7 @@ import SaveIcon from "@mui/icons-material/Save";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { trTR } from "@/components/trTrGrid";
 import { Close, Edit, LocalShipping } from "@mui/icons-material";
+import { usePersonnelId } from "@/contexts/auth";
 
 const boxStyle = {
   mb: 3,
@@ -208,7 +209,7 @@ const YarnSaleView = () => {
   }>({
     sentKg: 0,
     sentCount: 0,
-    personnelId: 0,
+    personnelId: usePersonnelId(),
     yarnOrderItemId: null,
     yarnOrderShipmentId: null,
   });
@@ -217,7 +218,7 @@ const YarnSaleView = () => {
     setFormData({
       sentKg: 0,
       sentCount: 0,
-      personnelId: 1,
+      personnelId: usePersonnelId(),
       yarnOrderItemId: Number(row.id),
       yarnOrderShipmentId: null,
     });
@@ -246,7 +247,7 @@ const YarnSaleView = () => {
         },
         body: JSON.stringify({
           yarnOrderId: yarnOrderId,
-          personnelId: 1,
+          personnelId: usePersonnelId(),
         }),
       });
       if (res.ok) {

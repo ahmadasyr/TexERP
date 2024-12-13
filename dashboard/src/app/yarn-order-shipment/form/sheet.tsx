@@ -23,11 +23,12 @@ import {
 } from "@mui/x-data-grid";
 import { Alert } from "@mui/material";
 import { trTR } from "@/components/trTrGrid";
+import { usePersonnelId } from "@/contexts/auth";
 
 const initialRows: GridRowsProp = [
   {
     id: 0,
-    personnelId: 1,
+    personnelId: usePersonnelId(),
     yarnOrderShipmentId: 0,
     yarnOrderItemId: 0,
     sentKg: 0,
@@ -36,22 +37,18 @@ const initialRows: GridRowsProp = [
 ];
 
 interface EditToolbarProps {
-  setRows: (newRows: (oldRows: GridRowsProp) => GridRowsProp) => void;
-  setRowModesModel: (
-    newModel: (oldModel: GridRowModesModel) => GridRowModesModel
-  ) => void;
+  setRows: React.Dispatch<React.SetStateAction<GridRowsProp>>;
+  setRowModesModel: React.Dispatch<React.SetStateAction<GridRowModesModel>>;
 }
 
-function EditToolbar(props: EditToolbarProps) {
-  const { setRows, setRowModesModel } = props;
-
-  const handleClick = () => {
+function EditToolbar({ setRows, setRowModesModel }: EditToolbarProps) {
+  const handleClick = React.useCallback(() => {
     const id = Math.random();
     setRows((oldRows) => [
       ...oldRows,
       {
         id,
-        personnelId: 1,
+        personnelId: usePersonnelId(),
         yarnOrderShipmentId: 0,
         yarnOrderItemId: 0,
         sentKg: 0,
@@ -60,9 +57,9 @@ function EditToolbar(props: EditToolbarProps) {
     ]);
     setRowModesModel((oldModel) => ({
       ...oldModel,
-      [id]: { mode: GridRowModes.Edit, fieldToFocus: "id" },
+      [id]: { mode: GridRowModes.Edit, fieldToFocus: "personnelId" },
     }));
-  };
+  }, [setRows, setRowModesModel]);
 
   return (
     <GridToolbarContainer>
@@ -75,16 +72,48 @@ function EditToolbar(props: EditToolbarProps) {
 
 interface SheetProps {
   refresh: boolean;
-  subRows: any[];
-  setSubRows: React.Dispatch<React.SetStateAction<any[]>>;
+  subRows: GridRowsProp;
+  setSubRows: any;
 }
 
-export default function Sheet(props: SheetProps) {
-  const { refresh, subRows, setSubRows } = props;
-  const [rows, setRows] = React.useState(initialRows);
+export default function Sheet({ refresh, subRows, setSubRows }: SheetProps) {
+  const [rows, setRows] = React.useState<GridRowsProp>([]);
   const [rowModesModel, setRowModesModel] = React.useState<GridRowModesModel>(
     {}
   );
+  const [alert, setAlert] = React.useState(false);
+  const [personnels, setPersonnels] = React.useState<
+    { value: number; label: string }[]
+  >([]);
+
+  React.useEffect(() => {
+    if (subRows.length > 0) {
+      setRows(subRows);
+    }
+
+    const fetchData = async () => {
+      try {
+        const response = await fetch("/api/personnel");
+        if (!response.ok) throw new Error("Failed to fetch personnel data");
+        const data = await response.json();
+        setPersonnels(
+          data.map((personnel: any) => ({
+            value: personnel.id,
+            label: `${personnel.firstName} ${personnel.lastName}`,
+          }))
+        );
+      } catch (error) {
+        console.error(error);
+        setAlert(true);
+      }
+    };
+
+    fetchData();
+  }, [refresh, subRows]);
+
+  React.useEffect(() => {
+    setSubRows(rows);
+  }, [rows, setSubRows]);
 
   const handleRowEditStop: GridEventListener<"rowEditStop"> = (
     params,
@@ -95,69 +124,25 @@ export default function Sheet(props: SheetProps) {
     }
   };
 
-  const handleEditClick = (id: GridRowId) => () => {
-    setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.Edit } });
-  };
-
-  const handleSaveClick = (id: GridRowId) => () => {
-    setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.View } });
-  };
-
-  const handleDeleteClick = (id: GridRowId) => () => {
-    setRows(rows.filter((row) => row.id !== id));
-  };
-
-  const handleCancelClick = (id: GridRowId) => () => {
-    setRowModesModel({
-      ...rowModesModel,
-      [id]: { mode: GridRowModes.View, ignoreModifications: true },
-    });
-
-    const editedRow = rows.find((row) => row.id === id);
-    if (editedRow!.isNew) {
-      setRows(rows.filter((row) => row.id !== id));
-    }
-  };
-
   const processRowUpdate = (newRow: GridRowModel) => {
     const updatedRow = { ...newRow, isNew: false };
-    setRows(rows.map((row) => (row?.id === newRow?.id ? updatedRow : row)));
+    setRows((oldRows) =>
+      oldRows.map((row) => (row.id === newRow.id ? updatedRow : row))
+    );
     return updatedRow;
   };
 
-  const handleRowModesModelChange = (newRowModesModel: GridRowModesModel) => {
-    setRowModesModel(newRowModesModel);
-  };
-
-  const [alert, setAlert] = React.useState(false);
-  const [personnels, setPersonnels] = React.useState<any[]>([]);
-  React.useEffect(() => {
-    if (subRows.length > 0) {
-      setRows(subRows);
-    }
-    const fetchData = async () => {
-      const response = await fetch("/api/personnel");
-      const data = await response.json();
-      setPersonnels(
-        data.map((personnel: any) => {
-          return {
-            value: personnel.id,
-            label: `${personnel.firstName} ${personnel.lastName}`,
-          };
-        })
-      );
-    };
-    fetchData();
-  }, [refresh]);
-
-  React.useEffect(() => {
-    setSubRows([...rows]);
-  }, [rows]);
+  const handleRowModesModelChange = React.useCallback(
+    (newRowModesModel: GridRowModesModel) => {
+      setRowModesModel(newRowModesModel);
+    },
+    []
+  );
 
   const columns: GridColDef[] = [
     {
       field: "personnelId",
-      headerName: "Oluşturan Personel",
+      headerName: "Okutulan Kişi",
       type: "singleSelect",
       editable: true,
       width: 150,
@@ -182,65 +167,66 @@ export default function Sheet(props: SheetProps) {
       type: "actions",
       headerName: "Düzenle",
       width: 100,
-      cellClassName: "actions",
       getActions: ({ id }) => {
         const isInEditMode = rowModesModel[id]?.mode === GridRowModes.Edit;
 
-        if (isInEditMode) {
-          return [
-            <GridActionsCellItem
-              icon={<SaveIcon />}
-              label="Save"
-              sx={{
-                color: "primary.main",
-              }}
-              onClick={handleSaveClick(id)}
-            />,
-            <GridActionsCellItem
-              icon={<CancelIcon />}
-              label="Cancel"
-              className="textPrimary"
-              onClick={handleCancelClick(id)}
-              color="inherit"
-            />,
-          ];
-        }
-
-        return [
-          <GridActionsCellItem
-            icon={<EditIcon />}
-            label="Edit"
-            className="textPrimary"
-            onClick={handleEditClick(id)}
-            color="inherit"
-          />,
-          <GridActionsCellItem
-            icon={<DeleteIcon />}
-            label="Delete"
-            onClick={
-              rows.length > 1 ? handleDeleteClick(id) : () => setAlert(true)
-            }
-            color="inherit"
-          />,
-        ];
+        return isInEditMode
+          ? [
+              <GridActionsCellItem
+                icon={<SaveIcon />}
+                label="Save"
+                onClick={() =>
+                  setRowModesModel({
+                    ...rowModesModel,
+                    [id]: { mode: GridRowModes.View },
+                  })
+                }
+              />,
+              <GridActionsCellItem
+                icon={<CancelIcon />}
+                label="Cancel"
+                onClick={() =>
+                  setRowModesModel({
+                    ...rowModesModel,
+                    [id]: {
+                      mode: GridRowModes.View,
+                      ignoreModifications: true,
+                    },
+                  })
+                }
+              />,
+            ]
+          : [
+              <GridActionsCellItem
+                icon={<EditIcon />}
+                label="Edit"
+                onClick={() =>
+                  setRowModesModel({
+                    ...rowModesModel,
+                    [id]: { mode: GridRowModes.Edit },
+                  })
+                }
+              />,
+              <GridActionsCellItem
+                icon={<DeleteIcon />}
+                label="Delete"
+                onClick={() => setRows(rows.filter((row) => row.id !== id))}
+              />,
+            ];
       },
     },
   ];
 
   return (
-    <>
-      <Box
-        sx={{
-          height: 500,
-          width: "100%",
-          "& .actions": {
-            color: "text.secondary",
-          },
-          "& .textPrimary": {
-            color: "text.primary",
-          },
-        }}
-      >
+    <Box
+      sx={{
+        height: 500,
+        width: "100%",
+        "& .actions": { color: "text.secondary" },
+        "& .textPrimary": { color: "text.primary" },
+      }}
+    >
+      {rows.length > 0 ? (
         <DataGrid
           rows={rows}
           columns={columns}
@@ -250,15 +236,25 @@ export default function Sheet(props: SheetProps) {
           onRowEditStop={handleRowEditStop}
           processRowUpdate={processRowUpdate}
           slots={{
-            toolbar: EditToolbar as GridSlots["toolbar"],
+            toolbar: EditToolbar as unknown as GridSlots["toolbar"],
+            noRowsOverlay: () => (
+              <Box sx={{ textAlign: "center", padding: 2 }}>
+                <Alert severity="info">No data available</Alert>
+              </Box>
+            ),
           }}
-          slotProps={{
-            toolbar: { setRows, setRowModesModel },
-          }}
+          slotProps={
+            {
+              toolbar: { setRows, setRowModesModel },
+            } as any
+          }
           localeText={trTR.components.MuiDataGrid.defaultProps.localeText}
         />
-      </Box>
-      {alert ? <Alert severity="error">En az 1 satır olmalıdır.</Alert> : null}
-    </>
+      ) : (
+        <Box sx={{ textAlign: "center", padding: 2 }}>
+          <Alert severity="info">No data available</Alert>
+        </Box>
+      )}
+    </Box>
   );
 }

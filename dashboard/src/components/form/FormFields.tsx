@@ -19,7 +19,7 @@ interface FormFieldProps {
   formFields: any[];
   formData: { [key: string]: any };
   handleChange: (event: any) => void;
-  togglePopup?: (table: string, column: string) => void;
+  togglePopup?: (table: string, column: string, on: boolean) => void;
   multiline?: boolean;
 }
 
@@ -67,7 +67,6 @@ export const NewCheckBox = ({
         control={
           <Checkbox
             checked={formData[keyProp] as boolean}
-            defaultChecked={false}
             onChange={(e) =>
               handleChange({
                 target: { name: keyProp, value: e.target.checked },
@@ -378,7 +377,7 @@ export const NewRelation = ({
           style={{ fontSize: "1rem" }}
           color="primary"
           onClick={() => {
-            togglePopup && togglePopup(field.table, keyProp);
+            togglePopup && togglePopup(field.table, keyProp, true);
           }}
         >
           Yeni {field.label} Ekle

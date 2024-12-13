@@ -246,10 +246,10 @@ export default function Machine(props: SheetProps) {
           onRowEditStop={handleRowEditStop}
           processRowUpdate={processRowUpdate}
           slots={{
-            toolbar: EditToolbar as GridSlots["toolbar"],
+            toolbar: EditToolbar as unknown as GridSlots["toolbar"],
           }}
           slotProps={{
-            toolbar: { setRows, setRowModesModel },
+            toolbar: { setRows, setRowModesModel } as any,
           }}
         />
       </Box>

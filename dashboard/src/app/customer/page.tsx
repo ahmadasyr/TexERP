@@ -11,7 +11,7 @@ const Page: React.FC = () => {
   return (
     <div>
       <EnhancedTable
-        title="Customers"
+        title="Müşteri Listesi"
         headCells={headCells}
         tableName={tableName}
         viewable={true}

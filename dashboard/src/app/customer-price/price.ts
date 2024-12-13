@@ -51,6 +51,18 @@ export const formFields = [
     required: true,
   }),
   createField({
+    name: "upfront",
+    label: "Peşinat",
+    type: "float",
+    required: true,
+  }),
+  createField({
+    name: "installment",
+    label: "Vadeli",
+    type: "float",
+    required: true,
+  }),
+  createField({
     name: "unit",
     label: "Birim",
     type: "select",
@@ -92,6 +104,18 @@ export const headCells: HeadCell[] = [
     disablePadding: false,
     label: "Fiyat",
     sum: true,
+  },
+  {
+    id: "upfront",
+    numeric: true,
+    disablePadding: false,
+    label: "Peşinat",
+  },
+  {
+    id: "installment",
+    numeric: true,
+    disablePadding: false,
+    label: "Vadeli",
   },
   {
     id: "unit",
