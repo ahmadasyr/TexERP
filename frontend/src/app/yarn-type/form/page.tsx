@@ -63,7 +63,7 @@ const Page: React.FC = ({ popupHandler, popupSetter }: PageProps) => {
 
         if (!response.ok) {
           // If the status is not in the range 200-299, handle it as an error
-          console.error("HTTP error:", response.status);
+
           setAlertValue(response.status);
         } else {
           const data = await response.json();
@@ -71,7 +71,6 @@ const Page: React.FC = ({ popupHandler, popupSetter }: PageProps) => {
           setAlertValue(200); // Set success status
         }
       } catch (error) {
-        console.error("Error:", error);
         setAlertValue(500); // Handle network or other fetch-related errors
       }
     } else {
@@ -86,7 +85,7 @@ const Page: React.FC = ({ popupHandler, popupSetter }: PageProps) => {
 
         if (!response.ok) {
           // If the status is not in the range 200-299, handle it as an error
-          console.error("HTTP error:", response.status);
+
           setAlertValue(response.status);
         } else {
           const data = await response.json();
@@ -101,7 +100,6 @@ const Page: React.FC = ({ popupHandler, popupSetter }: PageProps) => {
           setAlertValue(200); // Set success status
         }
       } catch (error) {
-        console.error("Error:", error);
         setAlertValue(500); // Handle network or other fetch-related errors
       }
     }

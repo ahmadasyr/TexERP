@@ -103,7 +103,6 @@ export default function Sheet({ refresh, subRows, setSubRows }: SheetProps) {
           }))
         );
       } catch (error) {
-        console.error(error);
         setAlert(true);
       }
     };

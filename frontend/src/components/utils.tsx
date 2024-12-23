@@ -5,6 +5,6 @@ export const fetchData = async (setRows: any, URI: string) => {
 
     setRows(data);
   } catch (error) {
-    console.error("Fetch error: ", error);
+    throw new Error("Failed to fetch");
   }
 };

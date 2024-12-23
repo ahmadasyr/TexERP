@@ -27,13 +27,11 @@ const handleLogin = async (email: string, password: string): Promise<void> => {
     if (response.ok) {
       setLocalStorageItem("token", data.token);
       setLocalStorageItem("personnel", data.personnel);
-      console.log("Logged in user:", data.personnel);
       window.dispatchEvent(new Event("login"));
     } else {
       alert(data.message);
     }
   } catch (error) {
-    console.error("Login error:", error);
     alert("An error occurred during login.");
   }
 };
@@ -64,12 +62,10 @@ const handleRegister = async (
     if (response.ok) {
       setLocalStorageItem("token", data.token);
       setLocalStorageItem("personnel", data.personnel);
-      console.log("Registered user:", data.personnel);
     } else {
       alert(data.message);
     }
   } catch (error) {
-    console.error("Registration error:", error);
     alert("An error occurred during registration.");
   }
 };
@@ -86,13 +82,9 @@ const fetchProtectedData = async (): Promise<void> => {
 
     if (response.ok) {
       const data = await response.json();
-      console.log("Protected data:", data);
     } else {
-      console.error("Unauthorized access.");
     }
-  } catch (error) {
-    console.error("Error fetching protected data:", error);
-  }
+  } catch (error) {}
 };
 
 // React state and hooks

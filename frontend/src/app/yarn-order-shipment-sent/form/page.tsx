@@ -45,9 +45,7 @@ const useFetchData = (id: string | null, handleChange: any) => {
               target: { name: key, value: data[key] },
             } as React.ChangeEvent<{ name: string; value: any }>)
           );
-        } catch (error) {
-          console.error("Error fetching data:", error);
-        }
+        } catch (error) {}
       })();
     }
   }, [id, handleChange]);
@@ -136,7 +134,6 @@ const Bank: React.FC = ({ popupHandler, popupSetter }: Props) => {
       popupHandler?.(data);
       popupSetter?.({ on: false, table: "" });
     } catch (error) {
-      console.error("Error:", error);
       setAlertValue(500);
     }
   };

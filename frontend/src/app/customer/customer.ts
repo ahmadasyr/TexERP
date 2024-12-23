@@ -451,7 +451,7 @@ export const fetchOrders = async (setRows: any) => {
     const data = await response.json();
     setRows(data);
   } catch (error) {
-    console.error("Fetch error: ", error);
+    throw new Error("Failed to fetch");
   }
 };
 

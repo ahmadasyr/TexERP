@@ -181,7 +181,6 @@ const ProductView = () => {
           );
         }
       } catch (error) {
-        console.error("Error fetching data:", error);
       } finally {
         setLoading(false);
       }
@@ -222,7 +221,7 @@ const ProductView = () => {
         setRefresh((prev) => !prev); // Refresh data
       }
     } catch (error) {
-      console.error("Error updating product price:", error);
+      throw new Error("Failed to save row.");
     }
   };
 
@@ -304,7 +303,6 @@ const ProductView = () => {
       setRefresh(!refresh);
       return updatedRow; // Necessary to update the DataGrid UI
     } catch (error) {
-      console.error("Error saving row:", error);
       return oldRow; // Rollback to old values in case of error
     }
   };
@@ -575,11 +573,8 @@ const ProductView = () => {
         });
         setProductPrice((prev) => prev.filter((row) => row.id !== rowId));
         if (!response.ok) {
-          console.error("HTTP error:", response.status);
         }
-      } catch (error) {
-        console.error("Error:", error);
-      }
+      } catch (error) {}
     };
     deleteRow();
     setRefresh(!refresh);

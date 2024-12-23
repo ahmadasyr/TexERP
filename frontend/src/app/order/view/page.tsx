@@ -169,7 +169,6 @@ const OrderView = () => {
           console.warn("Failed to fetch shipments.");
         }
       } catch (err) {
-        console.error(err);
         setError(err instanceof Error ? err.message : "An error occurred.");
       } finally {
         setLoading(false);

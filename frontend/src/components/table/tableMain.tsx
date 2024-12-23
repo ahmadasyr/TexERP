@@ -386,7 +386,7 @@ export default function EnhancedTable({
             initialState={{
               pagination: {
                 paginationModel: {
-                  pageSize: 25,
+                  pageSize: 100,
                 },
               },
 
@@ -404,6 +404,11 @@ export default function EnhancedTable({
             disableRowSelectionOnClick
             onRowSelectionModelChange={(newSelection) => {
               setSelected(newSelection);
+            }}
+            // scroll overflow
+            style={{
+              height: "75vh",
+              width: "100%",
             }}
           />
         </Paper>

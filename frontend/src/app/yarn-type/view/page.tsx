@@ -164,7 +164,6 @@ const YarnTypeView = () => {
           console.warn("Failed to fetch personnel.");
         }
       } catch (error) {
-        console.error("Error fetching data:", error);
       } finally {
         setLoading(false);
       }
@@ -362,7 +361,6 @@ const YarnTypeView = () => {
 
       return updatedRow; // Necessary to update the DataGrid UI
     } catch (error) {
-      console.error("Error saving row:", error);
       return oldRow; // Rollback to old values in case of error
     }
   };
@@ -451,9 +449,7 @@ const YarnTypeView = () => {
           return;
         }
         setYarnStockEntries((prev) => prev.filter((r) => r.no !== rowId));
-      } catch (err) {
-        console.error("Error deleting row:", err);
-      }
+      } catch (err) {}
     } else {
       if (yarnStockEntries.length === 1) {
         setYarnStockEntries([]);

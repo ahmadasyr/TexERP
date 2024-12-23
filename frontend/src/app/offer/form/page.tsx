@@ -174,14 +174,12 @@ const Page: React.FC = ({ popupHandler, popupSetter }: PageProps) => {
         });
 
         if (!response.ok) {
-          console.error("HTTP error:", response.status);
           setAlertValue(response.status);
         } else {
           const data = await response.json();
           setAlertValue(200);
         }
       } catch (error) {
-        console.error("Error:", error);
         setAlertValue(500);
       }
     } else {
@@ -195,7 +193,6 @@ const Page: React.FC = ({ popupHandler, popupSetter }: PageProps) => {
         });
 
         if (!response.ok) {
-          console.error("HTTP error:", response.status);
           setAlertValue(response.status);
         } else {
           const data = await response.json();
@@ -210,7 +207,6 @@ const Page: React.FC = ({ popupHandler, popupSetter }: PageProps) => {
           setAlertValue(200);
         }
       } catch (error) {
-        console.error("Error:", error);
         setAlertValue(500);
       }
     }

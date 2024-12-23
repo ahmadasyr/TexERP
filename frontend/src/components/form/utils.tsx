@@ -49,7 +49,6 @@ export const fetchData = async (
     setTableData(results);
   } catch (error) {
     setTableData([]);
-    console.error("Error fetching table data:", error);
   }
 };
 

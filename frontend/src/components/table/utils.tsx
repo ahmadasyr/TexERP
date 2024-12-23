@@ -166,7 +166,7 @@ export async function fetchExcelRows(
 
     setRows(mappedRows);
   } catch (error) {
-    console.error("Error fetching rows:", error);
+    throw new Error("Failed to fetch");
   }
 }
 
@@ -227,8 +227,7 @@ export function reverseMappedRows(
           : null;
 
         if (dateValue && !isNaN(dateValue.getTime())) {
-          const dateString = dateValue.toLocaleDateString("en-GB");
-          originalRow[col.name] = new Date(dateString);
+          originalRow[col.name] = dateValue;
         } else {
           originalRow[col.name] = null;
         }

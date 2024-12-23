@@ -35,7 +35,7 @@ export const FormModal: React.FC<FormModalProps> = ({
   return (
     <>
       <Dialog
-        open={alertValue === 200}
+        open={alertValue >= 200 && alertValue < 300}
         onClose={handleClose}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
@@ -76,13 +76,13 @@ export const FormModal: React.FC<FormModalProps> = ({
       </Dialog>
 
       <Dialog
-        open={alertValue === 500}
+        open={alertValue >= 400 && alertValue < 600}
         onClose={handleClose}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
       >
         <DialogTitle id="alert-dialog-title">
-          {"HATA"}
+          {"HATA!"}
           <IconButton
             onClick={handleClose}
             style={{ position: "absolute", right: 8, top: 8 }}
@@ -93,6 +93,9 @@ export const FormModal: React.FC<FormModalProps> = ({
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
             Formu gönderirken bir hata oluştu.
+          </DialogContentText>
+          <DialogContentText id="alert-dialog-description">
+            Verilerinizi kontrol edip tekrar deneyin.
           </DialogContentText>
         </DialogContent>
         <DialogActions>
@@ -115,7 +118,7 @@ export const FormModal: React.FC<FormModalProps> = ({
                 window.history.back();
               }}
             >
-              Geri dön
+              Formu kapat
             </Button>
           ) : null}
         </DialogActions>

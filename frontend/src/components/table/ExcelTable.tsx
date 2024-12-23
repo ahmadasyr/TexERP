@@ -59,9 +59,7 @@ export default function HandsontableEnhanced({
     const loadTableData = async () => {
       try {
         await fetchUtilsData(columnTypes, setTableData);
-      } catch (error) {
-        console.error("Error fetching table metadata:", error);
-      }
+      } catch (error) {}
     };
     loadTableData();
   }, [columnTypes]);
@@ -83,7 +81,6 @@ export default function HandsontableEnhanced({
       : undefined;
 
     if (!hot) {
-      console.error("Hot instance is not available");
       return;
     }
 
@@ -97,30 +94,45 @@ export default function HandsontableEnhanced({
 
       // Validate initialRows
       if (!Array.isArray(initialRows)) {
-        console.error("Initial rows are not valid");
         return;
       }
 
       // Filter rows that have been changed
       const changedRows = latestRows.filter((row) => {
         if (!row) {
-          console.error("Found undefined or null row in latestRows");
           return false;
         }
+
         const initialRow = initialRows.find((r) => r?.id === row?.id);
         if (!initialRow) {
           console.warn(`No matching initial row found for id: ${row?.id}`);
           return true; // Treat this as a change if no initial match
         }
-        return Object.keys(row).some((key) => row[key] !== initialRow[key]);
+
+        // Helper function to normalize values
+        const normalizeValue = (_key: string, value: any) => {
+          if (value instanceof Date) {
+            return value.getTime(); // Convert Date object to timestamp
+          } else if (typeof value === "string" && !isNaN(Date.parse(value))) {
+            return new Date(value).getTime(); // Convert date strings to timestamp
+          }
+          return value; // Return as-is for non-dates
+        };
+
+        // Compare values based only on keys in the latest row
+        return Object.keys(row).some((key) => {
+          const latestValue = normalizeValue(key, row[key]);
+          const initialValue = normalizeValue(key, initialRow[key]);
+          return latestValue !== initialValue;
+        });
       });
 
       console.log("Changed Rows:", changedRows);
+      console.log("Initial Rows:", initialRows);
 
       // Process changed rows
       const requests = changedRows.map(async (row: any, index) => {
         if (!row) {
-          console.error("Error: row is undefined or null.");
           return;
         }
 
@@ -138,7 +150,6 @@ export default function HandsontableEnhanced({
             throw new Error(`HTTP error: ${response.status}`);
           }
         } catch (error) {
-          console.error(`Error processing row ${id || "unknown"}:`, error);
           setErrorRows((prev) => [...prev, id || index]);
           errorStatus = true;
         }
@@ -147,13 +158,13 @@ export default function HandsontableEnhanced({
       // Wait for all requests to complete
       await Promise.all(requests);
     } catch (error) {
-      console.error("Error submitting changes:", error);
       errorStatus = true;
     }
 
     if (!errorStatus) {
       setUnsavedChanges([]);
       setRefresh((prev) => !prev);
+      handleClose();
     }
   };
 
@@ -272,7 +283,7 @@ export default function HandsontableEnhanced({
               stretchH="all"
               rowHeaders
               width="100%"
-              height="400px"
+              height="40rem"
               fixedColumnsStart={2}
             />
           </Paper>

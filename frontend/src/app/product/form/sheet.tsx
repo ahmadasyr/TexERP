@@ -91,9 +91,7 @@ export default function Sheet({
         if (!response.ok) throw new Error("Failed to fetch currencies");
         const data = await response.json();
         setCurrencies(data);
-      } catch (error) {
-        console.error(error);
-      }
+      } catch (error) {}
     };
     fetchCurrencies();
   }, []);
