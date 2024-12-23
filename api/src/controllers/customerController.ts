@@ -92,7 +92,7 @@ export const createCustomer = async (
         customer: {
           create: {
             name,
-            foreign,
+            foreign: Boolean(foreign),
             relatedPerson,
             title,
             email,
@@ -105,7 +105,7 @@ export const createCustomer = async (
             returnDate: returnDate ? new Date(returnDate) : null,
             salesOpinion,
             creditNote,
-            shippingMethod,
+            shippingMethod: shippingMethod || undefined,
             meterLimit,
             address,
             city,
@@ -173,7 +173,9 @@ export const updateCustomer = async (req: Request, res: Response) => {
         email,
         phoneNumber,
         firstOfferDate: firstOfferDate ? new Date(firstOfferDate) : undefined,
-        personnelId: personnelId || undefined,
+        personnel: {
+          connect: { id: personnelId },
+        },
         firstRegisterDate: firstRegisterDate
           ? new Date(firstRegisterDate)
           : undefined,
@@ -190,7 +192,7 @@ export const updateCustomer = async (req: Request, res: Response) => {
         paymentKind,
         note,
         bankId: bankId || undefined,
-        currencyId: currencyId || undefined,
+        currency: currencyId ? { connect: { id: currencyId } } : undefined,
         iban,
         swift,
         account: name
@@ -213,11 +215,42 @@ export const updateCustomer = async (req: Request, res: Response) => {
 export const deleteCustomer = async (req: Request, res: Response) => {
   const { id } = req.params;
   try {
+    const customer = await prisma.customer.findUnique({
+      where: { id: Number(id) },
+    });
+    if (!customer) {
+      res.status(404).json({ error: "Customer not found" });
+      return;
+    }
+    if (customer.accountId) {
+      await prisma.account.delete({
+        where: { id: customer.accountId },
+      });
+    }
     await prisma.customer.delete({
       where: { id: Number(id) },
     });
     res.status(204).send();
   } catch (error) {
     res.status(500).json({ error: "Failed to delete customer" });
+  }
+};
+
+export const getCustomerForSales = async (req: Request, res: Response) => {
+  try {
+    const customers = await prisma.customer.findMany({
+      select: {
+        id: true,
+        name: true,
+      },
+      where: {
+        status: {
+          not: "Kara Liste",
+        },
+      },
+    });
+    res.status(200).json(customers);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch customers" });
   }
 };

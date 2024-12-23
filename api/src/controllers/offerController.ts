@@ -7,7 +7,19 @@ export const getAllOffers = async (req: Request, res: Response) => {
   try {
     const offers = await prisma.offer.findMany({
       include: {
-        product: true,
+        product: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+        customer: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+        currency: true,
       },
     });
     res.status(200).json(offers);

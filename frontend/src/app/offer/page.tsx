@@ -15,7 +15,7 @@ const Page: React.FC = () => {
         title="Teklifler"
         headCells={headCells}
         tableName={tableName}
-        viewable={false}
+        // viewable={false}
         URI={"/offer"}
       />
     </div>

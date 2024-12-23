@@ -46,6 +46,8 @@ const Page: React.FC = () => {
       URI: "/customer-complaint/customer/" + id,
       viewable: false,
       tableName: "/customer-complaint",
+      customPath: "/customer-complaint/form/?customerId=" + id,
+      useTableName: true,
     },
     {
       title: "Müşteri fiyatları",
@@ -53,6 +55,8 @@ const Page: React.FC = () => {
       URI: "/customer-price/customer/" + id,
       viewable: false,
       tableName: "/customer-price",
+      customPath: "/customer-price/form/?customerId=" + id,
+      useTableName: true,
     },
     {
       title: "Müşteri teklifleri",
@@ -60,6 +64,8 @@ const Page: React.FC = () => {
       URI: "/offer/customer/" + id,
       viewable: false,
       tableName: "/offer",
+      customPath: "/offer/form/?customerId=" + id,
+      useTableName: true,
     },
     {
       title: "Müşteri siparişleri",
@@ -67,6 +73,8 @@ const Page: React.FC = () => {
       URI: "/order/customer/" + id,
       viewable: false,
       tableName: "/order",
+      customPath: "/order/form/?customerId=" + id,
+      useTableName: true,
     },
     {
       title: "Ürün fabilizme listesi",
@@ -74,6 +82,8 @@ const Page: React.FC = () => {
       URI: "/product-feasibility-form/customer/" + id,
       viewable: false,
       tableName: "/product-feasibility-form",
+      customPath: "/product-feasibility-form/form/?customerId=" + id,
+      useTableName: true,
     },
     {
       title: "Müşteri ziyaret planları",
@@ -81,6 +91,8 @@ const Page: React.FC = () => {
       URI: "/customer-meet-plan/customer/" + id,
       viewable: false,
       tableName: "/customer-meet-plan",
+      customPath: "/customer-meet-plan/form/?customerId=" + id,
+      useTableName: true,
     },
     {
       title: "Müşteri ziyaret raporları",
@@ -88,6 +100,8 @@ const Page: React.FC = () => {
       URI: "/customer-meet-report/customer/" + id,
       viewable: false,
       tableName: "/customer-meet-report",
+      customPath: "/customer-meet-report/form/?customerId=" + id,
+      useTableName: true,
     },
   ];
   useEffect(() => {
@@ -196,6 +210,8 @@ const Page: React.FC = () => {
           tableName={selectedPage.tableName}
           viewable={selectedPage.viewable}
           URI={selectedPage.URI}
+          customPath={selectedPage.customPath}
+          useTableName={selectedPage.useTableName}
         />
       </Grid>
     </Grid>

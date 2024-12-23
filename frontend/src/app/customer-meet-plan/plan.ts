@@ -18,6 +18,7 @@ export interface Data {
   foodExpense: number;
   giftExpense: number;
   officeExpense: number;
+  sampleExpense: number;
 }
 
 export const formFields = [
@@ -87,6 +88,11 @@ export const formFields = [
     label: "Basılı Doküman / Kartela Gideri",
     type: "float",
   }),
+  createField({
+    name: "sampleExpense",
+    label: "Numune Gideri",
+    type: "float",
+  }),
 ];
 
 export const columns = [
@@ -125,6 +131,11 @@ export const columns = [
   {
     name: "officeExpense",
     label: "Basılı Doküman / Kartela Gideri",
+    type: "float",
+  },
+  {
+    name: "sampleExpense",
+    label: "Numune Gideri",
     type: "float",
   },
 ];
@@ -207,6 +218,12 @@ export const headCells: HeadCell[] = [
     numeric: true,
     disablePadding: false,
     label: "Basılı Doküman / Kartela Gideri",
+  },
+  {
+    id: "sampleExpense",
+    numeric: true,
+    disablePadding: false,
+    label: "Numune Gideri",
   },
 ];
 

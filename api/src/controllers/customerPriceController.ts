@@ -110,9 +110,9 @@ export const updateCustomerPrice = async (req: Request, res: Response) => {
       data: {
         date: new Date(date),
         personnel: { connect: { id: personnelId } },
-        customerId,
-        productId,
-        currencyId,
+        customer: { connect: { id: customerId } },
+        currency: { connect: { id: currencyId } },
+        product: { connect: { id: productId } },
         price,
         upfront,
         installment,
@@ -121,6 +121,7 @@ export const updateCustomerPrice = async (req: Request, res: Response) => {
     });
     res.status(200).json(updatedCustomerPrice);
   } catch (error) {
+    console.log(error);
     res.status(500).json({ error: "Failed to update customer price" });
   }
 };

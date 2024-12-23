@@ -1,4 +1,5 @@
 import Handsontable from "handsontable";
+import { text } from "stream/consumers";
 const columnTypeMap = {
   number: Handsontable.cellTypes.numeric,
   text: "text",
@@ -7,10 +8,10 @@ const columnTypeMap = {
   relation: "autocomplete",
   boolean: "checkbox",
   datetime: "datetime",
+  select: "dropdown",
 };
 const validatorMap: Record<string, Handsontable.ValidatorType> = {
   number: "numeric",
-
   date: "date",
   float: "numeric",
   relation: "autocomplete",
@@ -27,6 +28,8 @@ export function getColumnConfig(columnTypes: any[], tableData: any[]) {
         disabled?: boolean;
         name: string;
         value: string;
+        options?: string[];
+        required?: boolean;
       }) => {
         if (cell.type === "relation") {
           const relatedTable =
@@ -42,6 +45,7 @@ export function getColumnConfig(columnTypes: any[], tableData: any[]) {
             strict: true,
             title: cell.label,
             key: cell.name,
+            allowEmpty: !cell.required || cell.disabled,
           };
         } else if (cell.type === "datetime") {
           return [
@@ -51,8 +55,9 @@ export function getColumnConfig(columnTypes: any[], tableData: any[]) {
               //   correctFormat: true,
               //   validator: "date",
               key: cell.name,
-              dateFormat: "MM/DD/YYYY",
+              dateFormat: "DD/MM/YYYY",
               correctFormat: true,
+              allowEmpty: !cell.required || cell.disabled,
             },
             {
               key: cell.name,
@@ -60,8 +65,17 @@ export function getColumnConfig(columnTypes: any[], tableData: any[]) {
               type: "time",
               timeFormat: "h:mm:ss a",
               correctFormat: true,
+              allowEmpty: !cell.required || cell.disabled,
             },
           ];
+        } else if (cell.type === "select") {
+          return {
+            type: columnTypeMap[cell.type],
+            title: cell.label,
+            source: cell.options,
+            key: cell.name,
+            allowEmpty: !cell.required || cell.disabled,
+          };
         } else {
           return {
             type: columnTypeMap[cell.type] || "text",
@@ -69,6 +83,9 @@ export function getColumnConfig(columnTypes: any[], tableData: any[]) {
             validator: validatorMap[cell.type],
             readOnly: cell?.disabled,
             key: cell.name,
+            strict: true,
+            dateFormat: "DD/MM/YYYY",
+            allowEmpty: !cell.required || cell.disabled,
           };
         }
       }

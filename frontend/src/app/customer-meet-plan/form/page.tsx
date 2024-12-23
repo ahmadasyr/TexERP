@@ -226,6 +226,9 @@ const Page: React.FC = ({ popupHandler, popupSetter }: PageProps) => {
             <Grid item xs={12} md={4}>
               <NewNumber {...allProps} keyProp="officeExpense" />
             </Grid>
+            <Grid item xs={12} md={4}>
+              <NewNumber {...allProps} keyProp="sampleExpense" />
+            </Grid>
           </Grid>
           <Button
             style={{ marginTop: "1rem" }}

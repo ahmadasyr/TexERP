@@ -42,7 +42,7 @@ export const NewTextField = ({
       type="text"
       label={field?.label}
       disabled={field?.disabled}
-      value={formData[keyProp]}
+      value={formData[keyProp] || ""}
       onChange={(e) =>
         handleChange({ target: { name: keyProp, value: e.target.value } })
       }
@@ -66,7 +66,7 @@ export const NewCheckBox = ({
         label={field?.label}
         control={
           <Checkbox
-            checked={formData[keyProp] as boolean}
+            checked={(formData[keyProp] as boolean) || false}
             onChange={(e) =>
               handleChange({
                 target: { name: keyProp, value: e.target.checked },
@@ -97,7 +97,7 @@ export const NewSelect = ({
         required={field?.required}
         labelId={`${keyProp}-label`}
         name={keyProp}
-        value={formData[keyProp] || ""} // Ensure value is valid
+        value={formData[keyProp] || ""}
         onChange={(e) =>
           handleChange({
             target: { name: keyProp, value: e.target.value },
@@ -168,7 +168,7 @@ export const NewPhone = ({
       /> */}
       <MuiTelInput
         defaultCountry={"TR"}
-        value={formData[keyProp]}
+        value={formData[keyProp] || ""}
         onChange={(e) => handleChange({ target: { name: keyProp, value: e } })}
         label={field?.label}
         fullWidth
@@ -192,7 +192,7 @@ export const NewEmail = ({
         name={keyProp as string}
         type="email"
         label={field?.label}
-        value={formData[keyProp]}
+        value={formData[keyProp] || ""}
         onChange={(e) =>
           handleChange({ target: { name: keyProp, value: e.target.value } })
         }
@@ -225,7 +225,7 @@ export const NewNumber = ({
       name={keyProp as string}
       type="number"
       label={field?.label}
-      value={formData[keyProp]}
+      value={formData[keyProp] || ""}
       disabled={field?.disabled}
       onChange={(e) =>
         handleChange({
@@ -269,7 +269,7 @@ export const NewDate = ({
           : formData[keyProp] && field.type === "datetime-local"
           ? formData[keyProp] &&
             formatDateForDateTimeLocal(new Date(formData[keyProp]))
-          : formData[keyProp]
+          : formData[keyProp] || ""
       }
       label={field?.label}
       InputLabelProps={{ shrink: true }}
@@ -426,7 +426,6 @@ export const NewMultiEntryField = ({
 
   return (
     <FormControl fullWidth required={field?.required}>
-      {/* MUI Table */}
       <TableContainer component={Paper} style={{ marginTop: "16px" }}>
         <Table>
           <TableHead>

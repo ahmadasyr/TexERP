@@ -4,100 +4,112 @@ export const tableName = "order";
 
 export interface Data {
   id: number;
-  orderNo: string;
-  customerId: number;
-  index: number;
-  productId: number;
-  quantity: number;
-  unit: string;
-  deliveryAddress: string;
-  acceptanceDate: Date;
-  specifications: string;
-  details: string;
+  createdAt: string;
+  type: string;
+  accountId: number;
+  description: string;
+  personnelId: number;
+  closed: boolean;
+  customerId?: number;
+  productId?: number;
 }
 
 export const formFields = [
-  createField({ name: "orderNo", label: "Sipariş No", type: "text" }),
   createField({
-    name: "customerId",
-    label: "Müşteri",
-    type: "number",
+    name: "accountId",
+    label: "Müşteri/Şirket",
+    type: "relation",
     relation: true,
-    table: "customer",
+    table: "account/properties/0/0/0/1",
     value: "id",
     displayValue: "name",
+    required: true,
   }),
-  createField({ name: "index", label: "Index", type: "number" }),
   createField({
-    name: "productId",
-    label: "Ürün",
-    type: "number",
+    name: "personnelId",
+    label: "Personnel",
+    type: "relation",
     relation: true,
-    table: "product",
+    table: "personnel",
     value: "id",
     displayValue: "name",
+    required: true,
   }),
-  createField({ name: "quantity", label: "Miktar", type: "number" }),
   createField({
-    name: "unit",
-    label: "Birim",
+    name: "type",
+    label: "Type",
     type: "select",
-    options: ["kg", "m"],
+    options: [
+      "Boyalı Kumaş Satışı",
+      "Ham Kumaş Satışı",
+      "Lamineli Kumaş Satışı",
+      "Örtü Satışı",
+      "Ön Fikseli Kumaş Satışı",
+    ],
+    required: true,
   }),
   createField({
-    name: "deliveryAddress",
-    label: "Teslimat Adresi",
+    name: "description",
+    label: "Açıklama",
     type: "text",
+    required: true,
   }),
-  createField({ name: "acceptanceDate", label: "Kabul Tarihi", type: "date" }),
-  createField({ name: "specifications", label: "Özellikler", type: "text" }),
-  createField({ name: "details", label: "Detaylar", type: "text" }),
+  createField({
+    name: "createdAt",
+    label: "Sipariş Tarihi",
+    type: "date",
+    required: true,
+  }),
+  createField({
+    name: "closed",
+    label: "Kapalı",
+    type: "checkbox",
+    required: true,
+  }),
 ];
 
 export const headCells: HeadCell[] = [
   { id: "id", numeric: true, disablePadding: true, label: "No" },
   {
-    id: "orderNo",
+    id: "createdAt",
     numeric: false,
     disablePadding: false,
-    label: "Sipariş No",
+    label: "Tarih",
+    date: true,
   },
   {
-    id: "customer",
+    id: "type",
     numeric: false,
     disablePadding: false,
-    label: "Müşteri",
+    label: "Type",
+  },
+  {
+    id: "account",
+    numeric: true,
+    disablePadding: false,
+    label: "Müşteri/Şirket",
     displayValue: ["name"],
   },
-  { id: "index", numeric: true, disablePadding: false, label: "Index" },
   {
-    id: "product",
-    numeric: false,
+    id: "personnel",
+    numeric: true,
     disablePadding: false,
-    label: "Ürün",
-    displayValue: ["name"],
-  },
-  { id: "quantity", numeric: true, disablePadding: false, label: "Miktar" },
-  { id: "unit", numeric: false, disablePadding: false, label: "Birim" },
-  {
-    id: "deliveryAddress",
-    numeric: false,
-    disablePadding: false,
-    label: "Teslimat Adresi",
+    label: "Oluşturan Kişi",
+    displayValue: ["firstName", "lastName"],
   },
   {
-    id: "acceptanceDate",
+    id: "description",
     numeric: false,
     disablePadding: false,
-    label: "Kabul Tarihi",
+    label: "Açıklama",
   },
   {
-    id: "specifications",
+    id: "closed",
     numeric: false,
     disablePadding: false,
-    label: "Özellikler",
+    label: "Kapalı",
+    boolean: true,
   },
-  { id: "details", numeric: false, disablePadding: false, label: "Detaylar" },
 ];
 
-export const title = "Müşteri Siparişleri";
+export const title = "Satış Siparişleri";

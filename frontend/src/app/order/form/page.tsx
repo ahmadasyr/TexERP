@@ -16,13 +16,15 @@ import { useFormData } from "@/components/form/utils";
 import { FormModal } from "@/components/form/modal";
 import Popup from "@/components/form/Popup";
 import { useSearchParams } from "next/navigation";
-interface BankProps {
+import Sheet from "./sheet";
+import { getPersonnelInfo, usePersonnelId } from "@/contexts/auth";
+interface Page {
   popupHandler?: (data: any) => void;
   popupSetter?: (data: any) => void;
   render?: any[];
 }
 
-const Bank: React.FC = ({ popupHandler, popupSetter }: BankProps) => {
+const Page: React.FC = ({ popupHandler, popupSetter }: Page) => {
   const searchParams = useSearchParams();
   const id = searchParams.get("id");
   const { formData, handleChange, tableData, runFetchData } =
@@ -33,22 +35,30 @@ const Bank: React.FC = ({ popupHandler, popupSetter }: BankProps) => {
     table: "",
     column: "",
   });
-
+  const [refresh, setRefresh] = React.useState<boolean>(false);
   useEffect(() => {
     if (id && !popupHandler) {
       fetch(`/api/${tableName}/${id}`)
         .then((response) => response.json())
         .then((data) => {
           Object.keys(data).forEach((key) => {
-            handleChange({
-              target: { name: key, value: data[key] },
-            } as React.ChangeEvent<{ name: string; value: any }>);
+            if (key !== "orderItem") {
+              handleChange({
+                target: { name: key, value: data[key] },
+              } as React.ChangeEvent<{ name: string; value: any }>);
+            }
           });
+          setSubRows(data.orderItem || []);
+          setRefresh(!refresh);
         });
     }
   }, [id]);
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    const rows = subRows.map((row) => {
+      const { isNew, orderId, ...rest } = row;
+      return rest;
+    });
     if (id) {
       try {
         const response = await fetch(`/api/${tableName}/${id}`, {
@@ -56,7 +66,10 @@ const Bank: React.FC = ({ popupHandler, popupSetter }: BankProps) => {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(formData),
+          body: JSON.stringify({
+            ...formData,
+            orderItem: rows,
+          }),
         });
 
         if (!response.ok) {
@@ -74,12 +87,17 @@ const Bank: React.FC = ({ popupHandler, popupSetter }: BankProps) => {
       }
     } else {
       try {
+        // add personnelId to formData
+        formData["personnelId"] = getPersonnelInfo().id;
         const response = await fetch(`/api/${tableName}`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(formData),
+          body: JSON.stringify({
+            ...formData,
+            orderItem: rows,
+          }),
         });
 
         if (!response.ok) {
@@ -113,7 +131,7 @@ const Bank: React.FC = ({ popupHandler, popupSetter }: BankProps) => {
 
   interface FieldProps {
     type: string;
-    keyProp: string;
+    field: string;
   }
   let allProps = {
     formFields,
@@ -131,6 +149,21 @@ const Bank: React.FC = ({ popupHandler, popupSetter }: BankProps) => {
     });
   }
 
+  const [oldFormData, setOldFormData] = React.useState<any>({});
+
+  useEffect(() => {
+    formFields.forEach((field) => {
+      if (
+        field.relation &&
+        oldFormData[field.name as keyof Data] !==
+          formData[field.name as keyof Data]
+      ) {
+        runFetchData();
+      }
+    });
+    setOldFormData(formData);
+  }, [formData]);
+  const [subRows, setSubRows] = React.useState<any[]>([]);
   return (
     <>
       <Popup
@@ -145,6 +178,7 @@ const Bank: React.FC = ({ popupHandler, popupSetter }: BankProps) => {
         alertValue={alertValue}
         setAlertValue={setAlertValue}
       />
+
       <form
         style={
           popupHandler
@@ -167,37 +201,34 @@ const Bank: React.FC = ({ popupHandler, popupSetter }: BankProps) => {
             {title}
           </Typography>
           <Grid container spacing={1}>
-            <Grid item xs={12} md={4}>
-              <NewRelation {...allProps} keyProp="customerId" />
+            <Grid container spacing={1}>
+              <Grid item xs={12} md={4}>
+                <NewRelation {...allProps} keyProp="accountId" />
+              </Grid>
+              <Grid item xs={12} md={4}>
+                <NewDate {...allProps} keyProp="createdAt" />
+              </Grid>
+              <Grid item xs={12} md={4}>
+                <NewTextField {...allProps} keyProp="description" />
+              </Grid>
+              <Grid item xs={12} md={4}>
+                <NewSelect {...allProps} keyProp="type" />
+              </Grid>
+              {id && (
+                <Grid item xs={12} md={4}>
+                  <NewCheckBox {...allProps} keyProp="closed" />
+                </Grid>
+              )}
             </Grid>
-            <Grid item xs={12} md={4}>
-              <NewRelation {...allProps} keyProp="productId" />
+            <Grid container spacing={1}>
+              <Grid item xs={12} md={12}>
+                <Sheet
+                  refresh={refresh}
+                  subRows={subRows}
+                  setSubRows={setSubRows}
+                />
+              </Grid>
             </Grid>
-            <Grid item xs={12} md={4}>
-              <NewTextField {...allProps} keyProp="orderNo" />
-            </Grid>
-            <Grid item xs={12} md={4}>
-              <NewNumber {...allProps} keyProp="index" />
-            </Grid>
-            <Grid item xs={12} md={4}>
-              <NewNumber {...allProps} keyProp="quantity" />
-            </Grid>
-            <Grid item xs={12} md={4}>
-              <NewSelect {...allProps} keyProp="unit" />
-            </Grid>
-            <Grid item xs={12} md={4}>
-              <NewTextField {...allProps} keyProp="deliveryAddress" />
-            </Grid>
-            <Grid item xs={12} md={4}>
-              <NewDate {...allProps} keyProp="acceptanceDate" />
-            </Grid>
-            <Grid item xs={12} md={4}>
-              <NewTextField {...allProps} keyProp="specifications" />
-            </Grid>
-            <Grid item xs={12} md={4}>
-              <NewTextField {...allProps} keyProp="details" />
-            </Grid>
-
             <Button
               style={{ marginTop: "1rem" }}
               type="submit"
@@ -213,4 +244,4 @@ const Bank: React.FC = ({ popupHandler, popupSetter }: BankProps) => {
   );
 };
 
-export default Bank;
+export default Page;

@@ -160,9 +160,22 @@ export default function PrimaryAppBar({
         </IconButton>
         <p>Profile</p>
       </MenuItem>
+      <MenuItem
+        onClick={() => {
+          handleLogout();
+          router.push("/");
+        }}
+      >
+        <IconButton size="large" color="inherit">
+          <AccountCircle />
+        </IconButton>
+        <p>Logout</p>
+      </MenuItem>
     </Menu>
   );
+
   const personnel = getPersonnelInfo();
+
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="sticky" color="primary">
@@ -192,7 +205,6 @@ export default function PrimaryAppBar({
             </IconButton>
             <IconButton
               size="large"
-              // edge="end"
               color="inherit"
               onClick={handleProfileMenuOpen}
             >
@@ -222,6 +234,8 @@ export default function PrimaryAppBar({
           />
         </Toolbar>
       </AppBar>
+      {renderMenu}
+      {renderMobileMenu}
     </Box>
   );
 }

@@ -36,6 +36,7 @@ const CustomerComplaint: React.FC = ({
 }: CustomerComplaintProps) => {
   const searchParams = useSearchParams();
   const id = searchParams.get("id");
+  const customerId = searchParams.get("customerId");
   const { formData, handleChange, tableData, runFetchData } =
     useFormData<Data>(formFields);
   const [alertValue, setAlertValue] = React.useState<number>(0);
@@ -47,6 +48,7 @@ const CustomerComplaint: React.FC = ({
 
   useEffect(() => {
     if (id && !popupHandler) {
+      console.log(id);
       fetch(`/api/${tableName}/${id}`)
         .then((response) => response.json())
         .then((data) => {
@@ -57,7 +59,12 @@ const CustomerComplaint: React.FC = ({
           });
         });
     }
-  }, [id]);
+    if (customerId) {
+      handleChange({
+        target: { name: "customerId", value: Number(customerId) },
+      } as React.ChangeEvent<{ name: string; value: any }>);
+    }
+  }, [id, customerId]);
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (id) {

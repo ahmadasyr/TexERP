@@ -12,9 +12,9 @@ const Page: React.FC = () => {
   return (
     <div>
       <EnhancedTable
-        title="Müşteri Siparişleri"
+        title="Satış Siparişleri"
         headCells={headCells}
-        tableName={tableName}
+        tableName={"order"}
         viewable={false}
         URI={"/order"}
       />

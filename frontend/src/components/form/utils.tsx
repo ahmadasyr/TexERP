@@ -73,7 +73,7 @@ export const useFormData = <Data extends {}>(formFields: any[]) => {
 
   useEffect(() => {
     runFetchData();
-  }, []);
+  }, [formData]);
 
   const handleChange = (
     event: React.ChangeEvent<

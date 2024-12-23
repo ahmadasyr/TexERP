@@ -3,12 +3,10 @@ import * as orderController from "../controllers/orderController";
 
 const router = express.Router();
 
-router.post("/", orderController.createOrder);
-router.get("/", orderController.getAllOrders);
-router.get("/:id", orderController.getOrderById);
-router.get("/customer/:id", orderController.getOrderByCustomerId);
-router.get("/product/:id", orderController.getOrderByProductId);
-router.put("/:id", orderController.updateOrder);
-router.delete("/:id", orderController.deleteOrder);
+router.post("/", orderController.createOrderController);
+router.get("/:id", orderController.getOrderController);
+router.get("/", orderController.getOrdersController);
+router.put("/:id", orderController.updateOrderController);
+router.delete("/:id", orderController.deleteOrderController);
 
 export default router;

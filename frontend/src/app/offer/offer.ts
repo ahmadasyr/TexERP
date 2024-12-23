@@ -302,16 +302,23 @@ export const formFields = [
 
 export const headCells: HeadCell[] = [
   {
-    id: "customerId",
+    id: "customer",
     numeric: false,
     disablePadding: true,
     label: "Müşteri Adı",
+    displayValue: ["name"],
   },
   {
     id: "offerNo",
     numeric: true,
     disablePadding: false,
     label: "Teklif No",
+  },
+  {
+    id: "status",
+    numeric: false,
+    disablePadding: false,
+    label: "Durum",
   },
   {
     id: "saleNo",
@@ -324,12 +331,14 @@ export const headCells: HeadCell[] = [
     numeric: false,
     disablePadding: false,
     label: "Teklif Tarihi",
+    date: true,
   },
   {
     id: "date",
     numeric: false,
     disablePadding: false,
-    label: "Tarih",
+    label: " Oluşturulma Tarihi",
+    date: true,
   },
   {
     id: "proformaNo",
@@ -348,12 +357,14 @@ export const headCells: HeadCell[] = [
     numeric: false,
     disablePadding: false,
     label: "Talep Tarihi",
+    date: true,
   },
   {
     id: "requestDeadline",
     numeric: false,
     disablePadding: false,
     label: "Talep Son Tarihi",
+    date: true,
   },
   {
     id: "requestBudget",
@@ -362,10 +373,11 @@ export const headCells: HeadCell[] = [
     label: "Talep Bütçesi",
   },
   {
-    id: "productId",
+    id: "product",
     numeric: true,
     disablePadding: false,
     label: "Ürün",
+    displayValue: ["name"],
   },
   {
     id: "specification",
@@ -398,10 +410,11 @@ export const headCells: HeadCell[] = [
     label: "Fiyat",
   },
   {
-    id: "currencyId",
+    id: "currency",
     numeric: true,
     disablePadding: false,
     label: "Para Birimi",
+    displayValue: ["name"],
   },
   {
     id: "vat",
@@ -432,6 +445,7 @@ export const headCells: HeadCell[] = [
     numeric: false,
     disablePadding: false,
     label: "Son Tarih",
+    date: true,
   },
   {
     id: "specialRequirement",
@@ -492,12 +506,14 @@ export const headCells: HeadCell[] = [
     numeric: false,
     disablePadding: false,
     label: "Son Geçerlilik Tarihi",
+    date: true,
   },
   {
     id: "acceptanceDate",
     numeric: false,
     disablePadding: false,
     label: "Kabul Tarihi",
+    date: true,
   },
   {
     id: "rejectionDate",
@@ -505,12 +521,7 @@ export const headCells: HeadCell[] = [
     disablePadding: false,
     label: "Red Tarihi",
   },
-  {
-    id: "status",
-    numeric: false,
-    disablePadding: false,
-    label: "Durum",
-  },
+
   {
     id: "meetNote",
     numeric: false,
@@ -522,6 +533,7 @@ export const headCells: HeadCell[] = [
     numeric: false,
     disablePadding: false,
     label: "Son Görüşme Tarihi",
+    date: true,
   },
   {
     id: "meetStatement",

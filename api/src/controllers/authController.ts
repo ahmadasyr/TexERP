@@ -28,6 +28,7 @@ export const register: RequestHandler = async (req, res) => {
     const token = generateToken(personnel);
     res.status(201).json({ token, personnel });
   } catch (error) {
+    console.log(error);
     res.status(500).json({ message: "Error creating personnel", error });
   }
 };

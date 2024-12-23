@@ -1,14 +1,9 @@
 "use client";
-import React, { useState, useCallback, useEffect } from "react";
-import {
-  Calendar,
-  momentLocalizer,
-  Event as BigCalendarEvent,
-} from "react-big-calendar";
+import React, { useState, useCallback, useEffect, useMemo } from "react";
+import { Calendar, momentLocalizer, Views } from "react-big-calendar";
 import moment from "moment";
 import "moment/locale/tr"; // Import Turkish locale
 import withDragAndDrop from "react-big-calendar/lib/addons/dragAndDrop";
-
 import "react-big-calendar/lib/addons/dragAndDrop/styles.css";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import { Box, Button, Modal, Paper, Typography } from "@mui/material";
@@ -31,10 +26,10 @@ interface Event {
 }
 
 const App: React.FC = () => {
-  // Use state hook to manage the events
   const [plans, setPlans] = useState<any[]>([]);
   const [events, setEvents] = useState<Event[]>([]);
   const router = useRouter();
+
   useEffect(() => {
     const fetchData = async () => {
       const response = await fetch("/api/customer-meet-plan");
@@ -52,9 +47,8 @@ const App: React.FC = () => {
     fetchData();
   }, []);
 
-  // Handle resizing event
   const onEventResize = useCallback(
-    (data: { start: Date; end: Date; event: BigCalendarEvent }) => {
+    (data: { start: Date; end: Date; event: any }) => {
       const { start, end, event } = data;
       setEvents((prevEvents) =>
         prevEvents.map((e) =>
@@ -65,10 +59,8 @@ const App: React.FC = () => {
     []
   );
 
-  // Handle dragging event
   const onEventDrop = useCallback(
-    (data: { start: Date; end: Date; event: BigCalendarEvent }) => {
-      console.log(data);
+    (data: { start: Date; end: Date; event: any }) => {
       const { start, end, event } = data;
       setEvents((prevEvents) =>
         prevEvents.map((e) =>
@@ -78,15 +70,22 @@ const App: React.FC = () => {
     },
     []
   );
+
   const [open, setOpen] = useState(false);
   const [popupEvent, setPopupEvent] = useState<any>({});
+
+  const views = useMemo(
+    () => ({
+      month: true,
+      week: true,
+      day: true,
+      agenda: true,
+    }),
+    []
+  );
+
   return (
-    <div
-      style={{
-        padding: "2rem",
-        width: "100%",
-      }}
-    >
+    <div style={{ padding: "2rem", width: "100%" }}>
       <Modal
         open={open}
         onClose={() => setOpen(false)}
@@ -153,6 +152,7 @@ const App: React.FC = () => {
           </Box>
         </Paper>
       </Modal>
+
       <Button
         variant="contained"
         onClick={() => {
@@ -162,9 +162,10 @@ const App: React.FC = () => {
       >
         Yeni Ziyaret Planı Ekle
       </Button>
-      <DnDCalendar
+
+      <Calendar
         defaultDate={moment().toDate()}
-        defaultView="month"
+        defaultView="month" // Or Views.MONTH
         onDoubleClickEvent={(event: any) => {
           setOpen(true);
           setPopupEvent(plans.find((plan) => plan.id === event?.id));
@@ -172,6 +173,7 @@ const App: React.FC = () => {
         events={events}
         localizer={localizer}
         style={{ maxHeight: "100vh", height: "100vh" }}
+        views={views} // Correctly formatted views object
         messages={{
           today: "Bugün",
           previous: "Geri",

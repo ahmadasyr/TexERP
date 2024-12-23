@@ -41,7 +41,10 @@ import shippingCarrierRoutes from "./routes/shippingCarrierRoutes";
 import shippingCarRoutes from "./routes/shippingCarRoutes";
 import authRoutes from "./routes/authRoutes";
 import productPriceRoutes from "./routes/productPriceRoutes";
-
+import dyeColorRoutes from "./routes/dyeColorRoutes";
+import outsourceTypeRoutes from "./routes/outsourceTypeRoutes";
+import laminationColorRoutes from "./routes/laminationColorRoutes";
+import itemTypeRoutes from "./routes/itemTypeRoutes";
 const cors = require("cors");
 
 const app = express();
@@ -128,4 +131,13 @@ app.use("/shipping-car", shippingCarRoutes);
 app.use("/auth", authRoutes);
 // Use productPrice routes
 app.use("/product-price", productPriceRoutes);
+// Use dyeColor routes
+app.use("/dye-color", dyeColorRoutes);
+// Use outsourceType routes
+app.use("/outsource-type", outsourceTypeRoutes);
+// Use laminationColor routes
+app.use("/lamination-color", laminationColorRoutes);
+// Use itemType routes
+app.use("/item-type", itemTypeRoutes);
+
 export default app;

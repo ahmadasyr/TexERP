@@ -150,7 +150,9 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                       overflow: "auto", // Prevent content spill
                       width: "100%",
                       boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.2)",
-                      height: "100vh",
+                      height: "100vh", // Ensure the drawer takes full viewport height
+                      position: "sticky", // Make the drawer sticky on scroll
+                      top: 0, // Keep it at the top of the viewport
                       "&::-webkit-scrollbar": {
                         width: "0.4em",
                       },
@@ -175,7 +177,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                 PaperProps={{
                   style: {
                     transition: "all 0.3s ease",
-                    overflowY: "auto", // Enable smooth scrolling
+                    overflowY: "auto", // Enable smooth scrolling for drawer content
                     width: "inherit", // Inherit the width of the parent drawer
                     display: isMobile ? "block" : "contents",
                   },

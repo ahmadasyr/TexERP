@@ -16,6 +16,11 @@ import {
 } from "../../components/table/utils";
 import {
   Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
   Divider,
   IconButton,
   Link,
@@ -50,6 +55,8 @@ type EnhancedTableProps = {
   tableName: string;
   viewable?: boolean;
   URI: string;
+  customPath?: string;
+  useTableName?: boolean;
 };
 
 export default function EnhancedTable({
@@ -58,6 +65,8 @@ export default function EnhancedTable({
   tableName,
   viewable,
   URI,
+  customPath,
+  useTableName,
 }: EnhancedTableProps): JSX.Element {
   const router = useRouter();
   const [rows, setRows] = React.useState<Data[]>([]);
@@ -139,21 +148,22 @@ export default function EnhancedTable({
         headerName: cell.label,
         width: cell.width || 130,
         hide: !cell.visible,
-        type: cell.numeric ? "number" : cell.boolean ? "boolean" : "string",
+        type: cell.numeric ? "number" : "string",
 
         renderCell: (params: any) => {
           const value = params.value;
           if (cell.boolean) {
             // Render a Checkbox for boolean values
             return (
-              <Checkbox
-                checked={Boolean(value)} // Ensures proper boolean type
-                style={{
-                  textDecoration: "none",
-                  cursor: "default",
-                }}
-                inputProps={{ "aria-label": "boolean value" }}
-              />
+              // <Checkbox
+              //   checked={Boolean(value)} // Ensures proper boolean type
+              //   style={{
+              //     textDecoration: "none",
+              //     cursor: "default",
+              //   }}
+              //   inputProps={{ "aria-label": "boolean value" }}
+              // />
+              Boolean(value) ? "Evet" : "Hayır"
             );
           }
           if (typeof value === "object" && value !== null) {
@@ -193,7 +203,11 @@ export default function EnhancedTable({
               {viewable && (
                 <IconButton
                   onClick={() => {
-                    router.push(`${URI}/view/?id=${params.row.id}`);
+                    router.push(
+                      `${useTableName ? tableName : currentURI}/view/?id=${
+                        params.row.id
+                      }`
+                    );
                   }}
                 >
                   <Visibility />
@@ -201,7 +215,11 @@ export default function EnhancedTable({
               )}
               <IconButton
                 onClick={() => {
-                  router.push(`${URI}/form/?id=${params.row.id}`);
+                  router.push(
+                    `${useTableName ? tableName : currentURI}/form/?id=${
+                      params.row.id
+                    }`
+                  );
                 }}
               >
                 <Edit />
@@ -214,7 +232,14 @@ export default function EnhancedTable({
     console.log("newHeadCells", newHeadCells);
     setSkeleton(false);
   }, [URI, headCells, rows]);
+  const currentURI = window.location.pathname;
 
+  const handleClose = () => {
+    setDeleteDialog(false);
+  };
+  const [deleteDialog, setDeleteDialog] = React.useState(false);
+  const [selections, setSelections] = React.useState<number[]>([]);
+  const [result, setResult] = React.useState<any>({});
   function CustomToolbar() {
     return (
       <>
@@ -235,7 +260,7 @@ export default function EnhancedTable({
             style={{ marginLeft: "auto" }}
             variant="contained"
             onClick={() => {
-              router.push(`${URI}/form`);
+              router.push(customPath ? customPath : `${currentURI}/form`);
             }}
           >
             Yeni Oluştur
@@ -257,7 +282,8 @@ export default function EnhancedTable({
               color="error"
               onClick={() => {
                 const selections = selected.map((id) => id as number);
-                handleDelete(tableName, selections);
+                setSelections(selections);
+                setDeleteDialog(true);
                 setRefresh(!refresh);
               }}
             >
@@ -269,63 +295,119 @@ export default function EnhancedTable({
     );
   }
   return (
-    <Box
-      style={{
-        maxWidth: "130%",
-        minWidth: "90%",
-      }}
-      className="enhanced-table"
-    >
-      <Paper className="table-paper">
-        <Typography fontWeight={500} mb={1} variant="h5" component="h5">
-          {title}
-        </Typography>
-        <Divider />
-        <br />
-        <DataGrid
-          ignoreDiacritics={true}
-          loading={skeleton}
-          {...rows}
-          rows={rows}
-          getRowClassName={(params) =>
-            params.indexRelativeToCurrentPage % 2 === 0 ? "even" : "odd"
-          }
-          // when rows are empty, no rows
-
-          disableColumnSorting={false}
-          columns={newHeadCells}
-          localeText={trTR.components.MuiDataGrid.defaultProps.localeText}
-          slots={{ toolbar: CustomToolbar }}
-          slotProps={{
-            toolbar: {
-              showQuickFilter: true,
-            },
-            loadingOverlay: {
-              variant: "skeleton",
-              noRowsVariant: "skeleton",
-            },
-          }}
-          initialState={{
-            pagination: {
-              rowCount: 5,
-            },
-            sorting: {
-              sortModel: [
-                {
-                  field: "id",
-                  sort: "desc",
+    <>
+      <Dialog open={deleteDialog} onClose={handleClose}>
+        <DialogTitle>Veriyi Sil</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Seçilen veriyi silmek istediğinize emin misiniz?
+            <Typography>
+              <strong>ID:</strong>
+              {selections.map((id, index) => (
+                <React.Fragment key={id}>
+                  {id}
+                  {index < selections.length - 1 && ", "}
+                </React.Fragment>
+              ))}
+            </Typography>
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose}>İptal</Button>
+          <Button
+            onClick={async () => {
+              const result = await handleDelete(tableName, selections);
+              setResult(result);
+              setDeleteDialog(false);
+              setRefresh(!refresh);
+            }}
+          >
+            Sil
+          </Button>
+        </DialogActions>
+      </Dialog>
+      <Dialog open={Boolean(result.code)} onClose={() => setResult({})}>
+        <DialogTitle>
+          {result.code === 200
+            ? "Başarılı"
+            : result.code === 500
+            ? "Hata"
+            : "Başarısız"}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            {result.code === 200
+              ? "Silme işlemi başarılı"
+              : result.code === 500
+              ? "Silme işlemi başarısız"
+              : "Silme işlemi kısmen başarısız"}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setResult({})}>Kapat</Button>
+        </DialogActions>
+      </Dialog>
+      <Box
+        style={{
+          maxWidth: "130%",
+          minWidth: "90%",
+        }}
+        className="enhanced-table"
+      >
+        <Paper className="table-paper">
+          <Typography fontWeight={500} mb={1} variant="h5" component="h5">
+            {title}
+          </Typography>
+          <Divider />
+          <br />
+          <DataGrid
+            ignoreDiacritics={true}
+            loading={skeleton}
+            {...rows}
+            rows={rows}
+            getRowClassName={(params) =>
+              params.indexRelativeToCurrentPage % 2 === 0 ? "even" : "odd"
+            }
+            // when rows are empty, no rows
+            pageSizeOptions={[25, 50, 100]}
+            disableColumnSorting={false}
+            columns={newHeadCells}
+            localeText={trTR.components.MuiDataGrid.defaultProps.localeText}
+            slots={{ toolbar: CustomToolbar }}
+            slotProps={{
+              toolbar: {
+                showQuickFilter: true,
+              },
+              loadingOverlay: {
+                variant: "skeleton",
+                noRowsVariant: "skeleton",
+              },
+            }}
+            initialState={{
+              pagination: {
+                paginationModel: {
+                  pageSize: 25,
                 },
-              ],
-            },
-          }}
-          // add row selection and deletion
-          checkboxSelection
-          disableRowSelectionOnClick
-          onRowSelectionModelChange={(newSelection) => {
-            setSelected(newSelection);
-          }}
-        />
-      </Paper>
-    </Box>
+              },
+
+              sorting: {
+                sortModel: [
+                  {
+                    field: "id",
+                    sort: "desc",
+                  },
+                ],
+              },
+            }}
+            // add row selection and deletion
+            checkboxSelection
+            disableRowSelectionOnClick
+            onRowSelectionModelChange={(newSelection) => {
+              setSelected(newSelection);
+            }}
+          />
+        </Paper>
+      </Box>
+    </>
   );
 }

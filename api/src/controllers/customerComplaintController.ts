@@ -22,8 +22,8 @@ export const getAllCustomerComplaints = async (req: Request, res: Response) => {
 export const getCustomerComplaintById = async (req: Request, res: Response) => {
   const { id } = req.params;
   try {
-    const complaint = await prisma.customerComplaint.findMany({
-      where: { customerId: Number(id) },
+    const complaint = await prisma.customerComplaint.findUnique({
+      where: { id: Number(id) },
       include: {
         product: true,
         dealingPersonnel: true,

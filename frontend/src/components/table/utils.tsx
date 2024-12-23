@@ -1,3 +1,5 @@
+import { Autocomplete, TextField } from "@mui/material";
+
 export function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
   if (b[orderBy] < a[orderBy]) return -1;
   if (b[orderBy] > a[orderBy]) return 1;
@@ -78,7 +80,27 @@ export const handleDelete = async (tableName: string, selected: number[]) => {
     };
   }
 };
+function parseDate(input: string): Date {
+  const [date, time, period] = input.split(" ");
+  const [day, month, year] = date.split("/").map(Number);
+  let [hours, minutes, seconds] = time.split(":").map(Number);
 
+  // Convert to 24-hour format if needed
+  if (period.toLowerCase() === "pm" && hours !== 12) {
+    hours += 12;
+  } else if (period.toLowerCase() === "am" && hours === 12) {
+    hours = 0;
+  }
+
+  // Create the ISO 8601 formatted string
+  const isoString = `${year}-${String(month).padStart(2, "0")}-${String(
+    day
+  ).padStart(2, "0")}T${String(hours).padStart(2, "0")}:${String(
+    minutes
+  ).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+
+  return new Date(isoString);
+}
 export async function fetchExcelRows(
   URI: string,
   columnTypes: any[],
@@ -94,18 +116,41 @@ export async function fetchExcelRows(
       columnTypes.forEach((col) => {
         if (col.type === "relation" && row[col.value]) {
           mappedRow.push(
-            `${row[col.valueItem]?.[col.value]} - ${
-              col.displayValue
-                ? col.displayValue
-                    .map((field: string) => row[col.valueItem]?.[field] || "")
-                    .join(", ")
-                : ""
-            }`
+            row[col.valueItem]?.[col.value]
+              ? `${row[col.valueItem]?.[col.value]} - ${
+                  col.displayValue
+                    ? col.displayValue
+                        .map(
+                          (field: string) => row[col.valueItem]?.[field] || ""
+                        )
+                        .join(", ")
+                    : ""
+                }`
+              : ""
           );
+        } else if (col.type === "date") {
+          if (row[col.name]) {
+            const date = new Date(row[col.name]);
+            mappedRow.push(
+              date.toLocaleDateString("en-GB", {
+                day: "2-digit",
+                month: "2-digit",
+                year: "numeric",
+              })
+            );
+          } else {
+            mappedRow.push("");
+          }
         } else if (col.type === "datetime") {
           if (row[col.name]) {
             const date = new Date(row[col.name]);
-            mappedRow.push(date.toLocaleDateString());
+            mappedRow.push(
+              date.toLocaleDateString("en-GB", {
+                day: "2-digit",
+                month: "2-digit",
+                year: "numeric",
+              })
+            );
             mappedRow.push(date.toLocaleTimeString());
           } else {
             mappedRow.push("");
@@ -139,7 +184,6 @@ export function reverseMappedRows(
         const displayValue = mappedRow[currentIndex];
         if (displayValue && col.displayValue) {
           // example value 2 - Super, admin
-          // take only the first part (2)
           const relationValue = displayValue.split(" - ")[0];
           originalRow[col.name] = Number(relationValue);
         } else {
@@ -149,28 +193,46 @@ export function reverseMappedRows(
       } else if (col.type === "datetime") {
         // Recombine datetime
         const dateValue = mappedRow[currentIndex]
-          ? new Date(mappedRow[currentIndex])
+          ? new Date(mappedRow[currentIndex].split("/").reverse().join("-"))
           : null;
         const timeValue = mappedRow[currentIndex + 1]
           ? mappedRow[currentIndex + 1]
           : null;
+
         if (dateValue && timeValue) {
-          const dateString = dateValue.toLocaleDateString();
-          let timeString = timeValue;
+          const dateString = dateValue.toLocaleDateString("en-GB"); // Ensure consistent date format
+          let timeString = timeValue.trim().toLowerCase();
+
+          // Handle AM/PM adjustment
           if (timeString.endsWith("öö")) {
             timeString = timeString.slice(0, -2) + "am";
           }
           if (timeString.endsWith("ös")) {
             timeString = timeString.slice(0, -2) + "pm";
           }
-          console.log(dateString, timeString);
-          originalRow[col.name] = new Date(
-            `${dateString} ${timeString}`
-          ).toISOString();
+
+          const dateTimeString = `${dateString} ${timeString}`;
+          console.log(parseDate(dateTimeString));
+
+          // correct format for datetime-local input: "2021-08-25T16:30"
+          originalRow[col.name] = parseDate(dateTimeString).toISOString();
         } else {
           originalRow[col.name] = null;
         }
         currentIndex += 2;
+      } else if (col.type === "date") {
+        // Handle date type
+        const dateValue = mappedRow[currentIndex]
+          ? new Date(mappedRow[currentIndex].split("/").reverse().join("-"))
+          : null;
+
+        if (dateValue && !isNaN(dateValue.getTime())) {
+          const dateString = dateValue.toLocaleDateString("en-GB");
+          originalRow[col.name] = new Date(dateString);
+        } else {
+          originalRow[col.name] = null;
+        }
+        currentIndex += 1;
       } else {
         // Handle regular columns
         const value = mappedRow[currentIndex];
@@ -181,4 +243,36 @@ export function reverseMappedRows(
 
     return originalRow;
   });
+}
+
+export function CustomAutocomplete(props: any) {
+  const { value, onChange, valueKey, displayValueKey, values, label } = props;
+
+  const handleOnChange = (event: any, newValue: string | null) => {
+    const selectedValue = values.find(
+      (item: any) => item[displayValueKey] === newValue
+    )?.[valueKey];
+    onChange(selectedValue);
+  };
+
+  const selectedOption = values.find((item: any) => item[valueKey] === value)?.[
+    displayValueKey
+  ];
+
+  return (
+    <Autocomplete
+      style={{
+        width: "100%",
+        border: "none",
+        borderRadius: "0",
+      }}
+      disablePortal
+      id="values-id"
+      options={values.map((item: any) => item[displayValueKey])}
+      getOptionLabel={(option: any) => option}
+      value={selectedOption || ""} // Ensure value matches the options
+      onChange={handleOnChange}
+      renderInput={(params) => <TextField {...params} />}
+    />
+  );
 }

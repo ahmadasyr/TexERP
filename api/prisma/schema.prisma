@@ -122,6 +122,7 @@ model taxOffice {
   name     String
   city     String
   customer customer[]
+  account  account[]
 }
 
 model bank {
@@ -143,6 +144,7 @@ model currency {
   yarnType        yarnType[]
   yarnOrderItem   yarnOrderItem[]
   productPrice    productPrice[]
+  account         account[]
 }
 
 // SALES SECTION
@@ -394,18 +396,24 @@ model productFeasibilityForm {
 }
 
 model account {
-  id        Int       @id @default(autoincrement())
-  name      String
-  outsource Boolean   @default(false)
-  dye       Boolean   @default(false)
-  yarn      Boolean   @default(false)
-  buys      Boolean   @default(false)
-  debit     Float     @default(0)
-  credit    Float     @default(0)
-  createdAt DateTime  @default(now())
-  updatedAt DateTime? @updatedAt
+  id          Int       @id @default(autoincrement())
+  name        String    @unique
+  outsource   Boolean   @default(false)
+  dye         Boolean   @default(false)
+  yarn        Boolean   @default(false)
+  buys        Boolean   @default(false)
+  taxOfficeId Int?
+  taxNumber   String?
+  currencyId  Int?
+  debit       Float     @default(0)
+  credit      Float     @default(0)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime? @updatedAt
 
   // Relations
+  taxOffice taxOffice? @relation(fields: [taxOfficeId], references: [id])
+  currency  currency?  @relation(fields: [currencyId], references: [id])
+
   customer       customer[]
   dyeOrder       dyeOrder[]
   outsourceOrder outsourceOrder[]
@@ -1073,13 +1081,19 @@ model order {
   orderShipment orderShipment[]
 }
 
+model itemType {
+  id        Int         @id @default(autoincrement())
+  name      String
+  orderItem orderItem[]
+}
+
 model orderItem {
   id                Int    @id @default(autoincrement())
   orderId           Int
   productId         Int
   dyeColorId        Int?
   lot               String
-  outsourceTypeId   Int?
+  itemTypeId        Int?
   laminationColorId Int?
   quantity          Float
   unit              unit
@@ -1093,8 +1107,10 @@ model orderItem {
   product           product             @relation(fields: [productId], references: [id])
   dyeColor          dyeColor?           @relation(fields: [dyeColorId], references: [id])
   laminationColor   laminationColor?    @relation(fields: [laminationColorId], references: [id])
-  outsourceType     outsourceType?      @relation(fields: [outsourceTypeId], references: [id])
+  itemType          itemType?           @relation(fields: [itemTypeId], references: [id])
   orderShipmentItem orderShipmentItem[]
+  outsourceType     outsourceType?      @relation(fields: [outsourceTypeId], references: [id])
+  outsourceTypeId   Int?
 }
 
 model shippingCompany {
