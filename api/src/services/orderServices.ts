@@ -3,29 +3,39 @@ import { PrismaClient, unit } from "@prisma/client";
 const prisma = new PrismaClient();
 
 export const createOrder = async (data: {
-  accountId: number;
-  type: string;
+  customerId: number;
   description: string;
   personnelId: number;
   orderItem: {
     productId: number;
-    dyeColorId: number;
-    itemTypeId: number;
-    laminationColorId: number;
-    lot: string;
-    quantity: number;
-    unit: unit;
-    description: string;
+    dyeColorId?: number;
+    itemTypeId?: number;
+    laminationColorId?: number;
+    meter: number;
+    kg: number;
+    description?: string;
     personnelId: number;
+    orderItemSpecification?: number[];
   }[];
 }) => {
+  // Update customer status to "Mevcut"
+  await prisma.customer.update({
+    where: {
+      id: data.customerId,
+    },
+    data: {
+      status: "Mevcut",
+    },
+  });
+
+  // Create order with related items and orderItemSpecification
   return await prisma.order.create({
     data: {
-      type: data.type,
       description: data.description,
-      account: {
+      closed: false,
+      customer: {
         connect: {
-          id: data.accountId,
+          id: data.customerId,
         },
       },
       personnel: {
@@ -34,19 +44,22 @@ export const createOrder = async (data: {
         },
       },
       orderItem: {
-        createMany: {
-          data: data.orderItem.map((item) => ({
-            productId: item.productId,
-            dyeColorId: item.dyeColorId,
-            itemTypeId: item.itemTypeId,
-            laminationColorId: item.laminationColorId,
-            lot: item.lot,
-            quantity: item.quantity,
-            unit: item.unit,
-            description: item.description,
-            personnelId: item.personnelId,
-          })),
-        },
+        create: data.orderItem.map((item) => ({
+          productId: item.productId,
+          dyeColorId: item.dyeColorId || null,
+          itemTypeId: item.itemTypeId || null,
+          laminationColorId: item.laminationColorId || null,
+          meter: item.meter,
+          kg: item.kg,
+          description: item.description || null,
+          personnelId: item.personnelId,
+          orderItemSpecification: {
+            create:
+              item.orderItemSpecification?.map((spec) => ({
+                outsourceTypeId: spec,
+              })) || [],
+          },
+        })),
       },
     },
   });
@@ -58,9 +71,53 @@ export const getOrder = async (id: number) => {
       id,
     },
     include: {
-      account: true,
-      personnel: true,
-      orderItem: true,
+      customer: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+      personnel: {
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+        },
+      },
+      orderItem: {
+        include: {
+          product: {
+            select: {
+              name: true,
+            },
+          },
+          dyeColor: {
+            select: {
+              name: true,
+            },
+          },
+          itemType: {
+            select: {
+              name: true,
+            },
+          },
+          laminationColor: {
+            select: {
+              name: true,
+            },
+          },
+
+          orderItemSpecification: {
+            include: {
+              outsourceType: {
+                select: {
+                  name: true,
+                },
+              },
+            },
+          },
+        },
+      },
     },
   });
 };
@@ -68,8 +125,24 @@ export const getOrder = async (id: number) => {
 export const getOrders = async () => {
   return await prisma.order.findMany({
     include: {
-      account: true,
-      personnel: true,
+      customer: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+      personnel: {
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+        },
+      },
+      orderItem: {
+        include: {
+          product: true,
+        },
+      },
     },
   });
 };
@@ -77,22 +150,21 @@ export const getOrders = async () => {
 export const updateOrder = async (
   id: number,
   data: {
-    accountId: number;
-    type: string;
+    customerId: number;
     description: string;
     personnelId: number;
     closed: boolean;
     orderItem: {
-      id: number;
+      id?: number; // `id` is optional for new items
       productId: number;
-      dyeColorId: number;
-      itemTypeId: number;
-      laminationColorId: number;
-      lot: string;
-      quantity: number;
-      unit: unit;
-      description: string;
+      dyeColorId?: number;
+      itemTypeId?: number;
+      laminationColorId?: number;
+      meter: number;
+      kg: number;
+      description?: string;
       personnelId: number;
+      orderItemSpecification?: number[];
     }[];
   }
 ) => {
@@ -101,12 +173,11 @@ export const updateOrder = async (
       id,
     },
     data: {
-      type: data.type,
       description: data.description,
       closed: data.closed,
-      account: {
+      customer: {
         connect: {
-          id: data.accountId,
+          id: data.customerId,
         },
       },
       personnel: {
@@ -117,42 +188,74 @@ export const updateOrder = async (
       orderItem: {
         deleteMany: {
           id: {
-            notIn: data.orderItem.map((item) => item.id),
+            notIn: data.orderItem
+              .filter((item) => item.id !== undefined)
+              .map((item) => item.id!),
           },
         },
-        upsert: data.orderItem.map((item) => {
-          return {
-            where: { id: item.id },
-            update: {
-              productId: item.productId,
-              dyeColorId: item.dyeColorId,
-              itemTypeId: item.itemTypeId,
-              laminationColorId: item.laminationColorId,
-              lot: item.lot,
-              quantity: item.quantity,
-              unit: item.unit,
-              description: item.description,
-              personnelId: item.personnelId,
+        upsert: data.orderItem.map((item) => ({
+          where: { id: item.id || 0 }, // Use `0` for non-existing items to ensure creation
+          update: {
+            productId: item.productId,
+            dyeColorId: item.dyeColorId || null,
+            itemTypeId: item.itemTypeId || null,
+            laminationColorId: item.laminationColorId || null,
+            meter: item.meter,
+            kg: item.kg,
+            description: item.description || null,
+            personnelId: item.personnelId,
+            orderItemSpecification: {
+              deleteMany: {
+                outsourceTypeId: {
+                  notIn: item.orderItemSpecification?.map((spec) => spec) || [],
+                },
+              },
+              create:
+                item.orderItemSpecification?.map((spec) => ({
+                  outsourceTypeId: spec,
+                })) || [],
             },
-            create: {
-              productId: item.productId,
-              dyeColorId: item.dyeColorId,
-              itemTypeId: item.itemTypeId,
-              laminationColorId: item.laminationColorId,
-              lot: item.lot,
-              quantity: item.quantity,
-              unit: item.unit,
-              description: item.description,
-              personnelId: item.personnelId,
+          },
+          create: {
+            productId: item.productId,
+            dyeColorId: item.dyeColorId || null,
+            itemTypeId: item.itemTypeId || null,
+            laminationColorId: item.laminationColorId || null,
+            meter: item.meter,
+            kg: item.kg,
+            description: item.description || null,
+            personnelId: item.personnelId,
+            orderItemSpecification: {
+              create:
+                item.orderItemSpecification?.map((spec) => ({
+                  outsourceTypeId: spec,
+                })) || [],
             },
-          };
-        }),
+          },
+        })),
       },
     },
   });
 };
 
 export const deleteOrder = async (id: number) => {
+  await prisma.orderItemSpecification.deleteMany({
+    where: {
+      orderItemId: {
+        in: (
+          await prisma.orderItem.findMany({
+            where: {
+              orderId: id,
+            },
+            select: {
+              id: true,
+            },
+          })
+        ).map((orderItem) => orderItem.id),
+      },
+    },
+  });
+
   await prisma.orderItem.deleteMany({
     where: {
       orderId: id,
@@ -162,6 +265,23 @@ export const deleteOrder = async (id: number) => {
   return await prisma.order.delete({
     where: {
       id,
+    },
+  });
+};
+
+export const getOrderByCustomerId = async (customerId: number) => {
+  return await prisma.order.findMany({
+    where: {
+      customerId,
+    },
+    include: {
+      customer: true,
+      personnel: true,
+      orderItem: {
+        include: {
+          product: true,
+        },
+      },
     },
   });
 };

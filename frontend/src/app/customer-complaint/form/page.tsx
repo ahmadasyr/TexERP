@@ -195,6 +195,12 @@ const CustomerComplaint: React.FC = ({
             <Grid item xs={12} md={4}>
               <NewRelation {...allProps} keyProp="productId" />
             </Grid>
+            <Grid item xs={12} md={4}>
+              <NewRelation {...allProps} keyProp="orderId" />
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <NewTextField {...allProps} keyProp="lot" />
+            </Grid>
           </Grid>
           <Divider
             style={{
@@ -223,13 +229,40 @@ const CustomerComplaint: React.FC = ({
             <Grid item xs={12} md={4}>
               <NewTextField {...allProps} keyProp="actionTaken" />
             </Grid>
-            <Grid item xs={12} md={4}>
-              <NewNumber {...allProps} keyProp="dofNo" />
-            </Grid>
+
             <Grid item xs={12} md={4}>
               <NewTextField {...allProps} keyProp="result" />
             </Grid>
+            <Grid item xs={12} md={4}>
+              <NewCheckBox {...allProps} keyProp="openDof" />
+            </Grid>
           </Grid>
+          {formData?.openDof && !id && (
+            <>
+              <Divider
+                style={{
+                  marginBottom: "1rem",
+                  marginTop: "1rem",
+                }}
+              />
+              <Typography variant="h5" gutterBottom>
+                DÖF Bilgileri
+              </Typography>
+              <Grid container spacing={1}>
+                <Grid item xs={12} md={4}>
+                  <NewRelation {...allProps} keyProp="dofTo" />
+                </Grid>
+                <Grid item xs={12} md={4}>
+                  <NewTextField
+                    multiline={true}
+                    {...allProps}
+                    keyProp="nonconformityDescription"
+                  />
+                </Grid>
+              </Grid>
+            </>
+          )}
+
           <Button
             style={{ marginTop: "1rem" }}
             type="submit"

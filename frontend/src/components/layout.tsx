@@ -17,6 +17,7 @@ import {
   Grid,
   Box,
   useMediaQuery,
+  Paper,
 } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
 import MenuIcon from "@mui/icons-material/Menu";
@@ -26,7 +27,6 @@ import { lightPalette, darkPalette } from "./theme";
 import PrimarySearchAppBar from "./navbar";
 import Login from "../app/login/page";
 const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [open, setOpen] = useState(true);
   const [darkMode, setDarkMode] = useState(false);
   const [token, setToken] = useState<string | null>(null);
   useEffect(() => {
@@ -102,6 +102,13 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       },
     },
     components: {
+      MuiCssBaseline: {
+        styleOverrides: (theme) => ({
+          form: {
+            backgroundColor: theme.palette.background.paper,
+          },
+        }),
+      },
       MuiCard: {
         styleOverrides: {
           root: {
@@ -130,8 +137,9 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       },
     },
   });
-
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const [open, setOpen] = useState(isMobile ? false : true);
+
   return (
     <EmotionThemeProvider theme={theme}>
       <ThemeProvider theme={theme} defaultMode="dark">
@@ -139,6 +147,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         {token ? (
           <Grid container>
             {/* Drawer Section */}
+
             <Grid
               item
               xs={open ? 12 : 0}
@@ -147,6 +156,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
               sx={
                 open
                   ? {
+                      backgroundColor: theme.palette.background.paper,
                       overflow: "auto", // Prevent content spill
                       width: "100%",
                       boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.2)",
@@ -209,7 +219,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                     }}
                   />
                 </Box>
-                <Menu />
+                <Menu setOpen={setOpen} />
               </Drawer>
             </Grid>
 

@@ -17,7 +17,7 @@ import PhoneIcon from "@mui/icons-material/Phone";
 import HomeIcon from "@mui/icons-material/Home";
 import BadgeIcon from "@mui/icons-material/Badge";
 
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import EnhancedTable from "@/components/table/tableMain";
 import { Data } from "../customer";
 
@@ -36,6 +36,7 @@ import { headCells as meetPlanHeadCells } from "../../customer-meet-plan/plan";
 import { headCells as meetReportHeadCells } from "../../customer-meet-report/report";
 
 const Page: React.FC = () => {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const [custInfo, setCustInfo] = useState<Data | null>(null);
   const id = searchParams.get("id");
@@ -127,11 +128,11 @@ const Page: React.FC = () => {
         margin: "0 auto",
       }}
       container
-      spacing={2}
+      // spacing={2}
     >
       <Grid item xs={12} md={3}>
         {custInfo ? (
-          <Card sx={{ borderRadius: 2, boxShadow: 3 }}>
+          <Card sx={{ borderRadius: 2, boxShadow: 3, margin: "1rem" }}>
             <CardContent>
               <Typography variant="h4" component="div" gutterBottom>
                 {custInfo.name}
@@ -141,7 +142,7 @@ const Page: React.FC = () => {
               >
                 <EmailIcon sx={{ mr: 1, color: "primary.main" }} />
                 <Typography variant="body1" color="text.secondary">
-                  <strong>Email:</strong> {custInfo.email}
+                  <strong>E-posta:</strong> {custInfo.email}
                 </Typography>
               </Paper>
               <Paper
@@ -149,7 +150,7 @@ const Page: React.FC = () => {
               >
                 <PersonIcon sx={{ mr: 1, color: "primary.main" }} />
                 <Typography variant="body1" color="text.secondary">
-                  <strong>Related Person:</strong> {custInfo.relatedPerson}
+                  <strong>İlgili kişi:</strong> {custInfo.relatedPerson}
                 </Typography>
               </Paper>
               <Paper
@@ -157,11 +158,11 @@ const Page: React.FC = () => {
               >
                 <TitleIcon sx={{ mr: 1, color: "primary.main" }} />
                 <Typography variant="body1" color="text.secondary">
-                  <strong>Title:</strong> {custInfo.title}
+                  <strong>Unvan:</strong> {custInfo.title}
                 </Typography>
                 <PhoneIcon sx={{ ml: 3, mr: 1, color: "primary.main" }} />
                 <Typography variant="body1" color="text.secondary">
-                  <strong>Phone:</strong> {custInfo.phoneNumber}
+                  <strong>Telefon:</strong> {custInfo.phoneNumber}
                 </Typography>
               </Paper>
               <Paper
@@ -169,7 +170,7 @@ const Page: React.FC = () => {
               >
                 <BadgeIcon sx={{ mr: 1, color: "primary.main" }} />
                 <Typography variant="body1" color="text.secondary">
-                  <strong>Status:</strong> {custInfo.status}
+                  <strong>Durum:</strong> {custInfo.status}
                 </Typography>
               </Paper>
               <Paper
@@ -177,7 +178,9 @@ const Page: React.FC = () => {
               >
                 <HomeIcon sx={{ mr: 1, color: "primary.main" }} />
                 <Typography variant="body1" color="text.secondary">
-                  <strong>Address:</strong> {custInfo.address}, {custInfo.city}
+                  <strong>Adres:</strong>{" "}
+                  {custInfo.address ? custInfo.address + "," : null}{" "}
+                  {custInfo.city}
                 </Typography>
               </Paper>
             </CardContent>
@@ -188,7 +191,7 @@ const Page: React.FC = () => {
       </Grid>
       <Grid item xs={12} md={9}>
         {/* Pagination title buttons */}
-        <Grid container spacing={1} justifyContent="center">
+        <Grid container spacing={1} mb={1} justifyContent="center">
           {pages ? (
             pages.map((page) => (
               <Grid item key={page.title}>
@@ -204,6 +207,12 @@ const Page: React.FC = () => {
             <Skeleton variant="rectangular" width={200} height={50} />
           )}
         </Grid>
+        <Button
+          variant="contained"
+          onClick={() => router.push(`/order/form/?customerId=${id}`)}
+        >
+          Sipariş ekle
+        </Button>
         <EnhancedTable
           title={selectedPage.title}
           headCells={selectedPage.headCells}

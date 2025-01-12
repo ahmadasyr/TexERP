@@ -306,7 +306,7 @@ export const NewRelation = ({
       )
     : null;
 
-  const filteredOptions = field.relationDependancy
+  const filteredOptions: string[] = field.relationDependancy
     ? tableData
         .find((table) => table.name === field.table)
         ?.values?.filter((value: any) =>

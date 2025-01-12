@@ -77,29 +77,51 @@ export const createCustomerComplaint = async (req: Request, res: Response) => {
     dealingDate,
     evaluatingPersonnelId,
     actionTaken,
-    dofNo,
     result,
+    orderId,
+    lot,
+    openDof,
+    dofTo,
+    nonconformityDescription,
   } = req.body;
 
   try {
+    let newDof;
+    if (openDof) {
+      newDof = await prisma.dofiRequest.create({
+        data: {
+          date: date ? new Date(date) : new Date(),
+          fromPersonnel: { connect: { id: dealingPersonnelId } },
+          toPersonnel: { connect: { id: dofTo } },
+          nonconformityDescription,
+          reason: "Müşteri",
+        },
+      });
+    }
+
     const newComplaint = await prisma.customerComplaint.create({
       data: {
         date: new Date(date),
         subject,
-        productId,
-        customerId,
-        packagingDate: new Date(packagingDate),
+        product: { connect: { id: productId } },
+        customer: { connect: { id: customerId } },
+        packagingDate: packagingDate ? new Date(packagingDate) : null,
         complaintDetails,
-        dealingPersonnelId,
+        dealingPersonnel: { connect: { id: dealingPersonnelId } },
         dealingDate: new Date(dealingDate),
-        evaluatingPersonnelId,
+        evaluatingPersonnel: evaluatingPersonnelId
+          ? { connect: { id: evaluatingPersonnelId } }
+          : undefined,
         actionTaken,
-        dofNo,
+        dofNo: newDof ? newDof.id : null,
         result,
+        order: orderId ? { connect: { id: orderId } } : undefined,
+        lot,
       },
     });
     res.status(201).json(newComplaint);
   } catch (error) {
+    console.log(error);
     res.status(500).json({ error: "Failed to create customer complaint" });
   }
 };
@@ -110,14 +132,19 @@ export const updateCustomerComplaint = async (req: Request, res: Response) => {
     date,
     subject,
     productId,
+    customerId,
     packagingDate,
     complaintDetails,
     dealingPersonnelId,
     dealingDate,
     evaluatingPersonnelId,
     actionTaken,
-    dofNo,
     result,
+    orderId,
+    lot,
+    openDof,
+    dofTo,
+    nonconformityDescription,
   } = req.body;
 
   try {
@@ -126,15 +153,19 @@ export const updateCustomerComplaint = async (req: Request, res: Response) => {
       data: {
         date: new Date(date),
         subject,
-        productId,
-        packagingDate: new Date(packagingDate),
+        product: { connect: { id: productId } },
+        customer: { connect: { id: customerId } },
+        packagingDate: packagingDate ? new Date(packagingDate) : null,
         complaintDetails,
-        dealingPersonnelId,
+        dealingPersonnel: { connect: { id: dealingPersonnelId } },
         dealingDate: new Date(dealingDate),
-        evaluatingPersonnelId,
+        evaluatingPersonnel: evaluatingPersonnelId
+          ? { connect: { id: evaluatingPersonnelId } }
+          : undefined,
         actionTaken,
-        dofNo,
         result,
+        order: orderId ? { connect: { id: orderId } } : undefined,
+        lot,
       },
     });
     res.status(200).json(updatedComplaint);

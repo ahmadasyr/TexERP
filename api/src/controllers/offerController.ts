@@ -7,19 +7,8 @@ export const getAllOffers = async (req: Request, res: Response) => {
   try {
     const offers = await prisma.offer.findMany({
       include: {
-        product: {
-          select: {
-            id: true,
-            name: true,
-          },
-        },
-        customer: {
-          select: {
-            id: true,
-            name: true,
-          },
-        },
-        currency: true,
+        order: true,
+        personnel: true,
       },
     });
     res.status(200).json(offers);
@@ -33,6 +22,11 @@ export const getOfferById = async (req: Request, res: Response) => {
   try {
     const offer = await prisma.offer.findUnique({
       where: { id: Number(id) },
+      include: {
+        order: true,
+        personnel: true,
+        offerItem: true,
+      },
     });
     if (offer) {
       res.status(200).json(offer);
@@ -48,7 +42,11 @@ export const getOfferByCustomer = async (req: Request, res: Response) => {
   const { id } = req.params;
   try {
     const offer = await prisma.offer.findMany({
-      where: { customerId: Number(id) },
+      where: {
+        order: {
+          customerId: Number(id),
+        },
+      },
     });
     if (offer) {
       res.status(200).json(offer);
@@ -63,9 +61,7 @@ export const getOfferByCustomer = async (req: Request, res: Response) => {
 export const getOfferByProduct = async (req: Request, res: Response) => {
   const { id } = req.params;
   try {
-    const offer = await prisma.offer.findMany({
-      where: { productId: Number(id) },
-    });
+    const offer = await prisma.offer.findMany();
     if (offer) {
       res.status(200).json(offer);
     } else {
@@ -81,113 +77,130 @@ export const createOffer = async (
   res: Response
 ): Promise<void> => {
   const {
-    offerNo,
-    saleNo,
-    offerDate,
-    customerId,
-    date,
-    proformaNo,
-    requestNo,
-    requestDate,
-    requestDeadline,
-    requestBudget,
-    productId,
-    specification,
-    detail,
-    quantity,
-    unit,
-    price,
-    currencyId,
-    vat,
-    total,
-    maturity,
-    daysDue,
-    deadlineDate,
-    specialRequirement,
-    deliveryAddress,
-    shippingMethod,
-    proformaDetails,
-    packingListNo,
-    additionalTerms,
+    personnelId,
+    paymentDue,
+    deliveryDeadlineDate,
     validPeriod,
     validPeriodType,
-    conditions,
     lastValidityDate,
-    acceptanceDate,
-    rejectionDate,
-    status,
-    meetNote,
-    lastMeetDate,
-    meetStatement,
+    additionalTerms,
+    conditions,
+    total,
     totalKDV,
+    responseDate,
+    detail,
+    meetStatement,
+    meetNote,
+    status,
+    customerTargetPrice,
+    orderId,
+    offerItems, // Array of offer items [{ orderItemId, price, vatRate, total, totalVat, vade }]
   } = req.body;
+
   try {
+    // Create the offer
     const newOffer = await prisma.offer.create({
       data: {
-        offerNo,
-        saleNo,
-        offerDate: new Date(offerDate),
-        date: date ? new Date(date) : undefined,
-        proformaNo,
-        requestNo,
-        requestDate: new Date(requestDate),
-        requestDeadline: requestDeadline
-          ? new Date(requestDeadline)
-          : undefined,
-        requestBudget,
-        specification,
-        detail,
-        quantity,
-        unit,
-        price,
-        vat,
-        total,
-        maturity,
-        daysDue,
-        deadlineDate: new Date(deadlineDate),
-        specialRequirement,
-        deliveryAddress,
-        shippingMethod,
-        proformaDetails,
-        packingListNo,
-        additionalTerms,
+        personnelId,
+        paymentDue,
+        deliveryDeadlineDate: new Date(deliveryDeadlineDate),
         validPeriod,
         validPeriodType,
-        conditions,
         lastValidityDate: new Date(lastValidityDate),
-        acceptanceDate: acceptanceDate ? new Date(acceptanceDate) : undefined,
-        rejectionDate: rejectionDate ? new Date(rejectionDate) : undefined,
-        status,
-        meetNote,
-        lastMeetDate: lastMeetDate ? new Date(lastMeetDate) : undefined,
-        meetStatement,
+        additionalTerms,
+        conditions,
+        total,
         totalKDV,
-        customer: {
-          connect: { id: customerId },
-        },
-        product: {
-          connect: { id: productId },
-        },
-        currency: {
-          connect: { id: currencyId },
+        responseDate: responseDate ? new Date(responseDate) : undefined,
+        detail,
+        meetStatement,
+        meetNote,
+        status,
+        customerTargetPrice,
+        orderId,
+        // Create related offer items
+        offerItem: {
+          create: offerItems.map((item: any) => ({
+            orderItemId: item.orderItemId,
+            price: item.price,
+            vatRate: item.vatRate,
+            total: item.total,
+            totalVat: item.totalVat,
+            vade: item.vade,
+          })),
         },
       },
     });
+
     res.status(201).json(newOffer);
   } catch (error) {
-    console.log(error);
+    console.error(error);
     res.status(500).json({ error: "Failed to create offer" });
   }
 };
+
 export const updateOffer = async (req: Request, res: Response) => {
   const { id } = req.params;
+  const {
+    personnelId,
+    paymentDue,
+    deliveryDeadlineDate,
+    validPeriod,
+    validPeriodType,
+    lastValidityDate,
+    additionalTerms,
+    conditions,
+    total,
+    totalKDV,
+    responseDate,
+    detail,
+    meetStatement,
+    meetNote,
+    status,
+    customerTargetPrice,
+    orderId,
+    offerItems, // Array of offer items [{ orderItemId, price, vatRate, total, totalVat, vade }]
+  } = req.body;
   try {
+    // Update the offer
     const updatedOffer = await prisma.offer.update({
       where: { id: Number(id) },
-      data: req.body,
+      data: {
+        personnelId,
+        paymentDue,
+        deliveryDeadlineDate: new Date(deliveryDeadlineDate),
+        validPeriod,
+        validPeriodType,
+        lastValidityDate: new Date(lastValidityDate),
+        additionalTerms,
+        conditions,
+        total,
+        totalKDV,
+        responseDate: responseDate ? new Date(responseDate) : undefined,
+        detail,
+        meetStatement,
+        meetNote,
+        status,
+        customerTargetPrice,
+        orderId,
+        // Update related offer items
+        offerItem: {
+          deleteMany: {}, // Delete existing offer items
+          create: offerItems.map((item: any) => ({
+            orderItemId: item.orderItemId,
+            price: item.price,
+            vatRate: item.vatRate,
+            total: item.total,
+            totalVat: item.totalVat,
+            vade: item.vade,
+          })),
+        },
+      },
     });
+
     res.status(200).json(updatedOffer);
   } catch (error) {
+    console.error(error);
     res.status(500).json({ error: "Failed to update offer" });
   }
 };

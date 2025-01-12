@@ -4,7 +4,5 @@ export const fetchData = async (setRows: any, URI: string) => {
     const data = await response.json();
 
     setRows(data);
-  } catch (error) {
-    throw new Error("Failed to fetch");
-  }
+  } catch (error) {}
 };

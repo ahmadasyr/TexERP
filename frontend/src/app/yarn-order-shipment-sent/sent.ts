@@ -20,7 +20,7 @@ export const formFields = [
     relation: true,
     table: "yarn-order-shipment",
     value: "id",
-    displayValue: ["id"],
+    displayValue: "id",
     required: true,
   }),
   createField({
@@ -44,7 +44,7 @@ export const formFields = [
     relation: true,
     table: "yarn",
     value: "id",
-    displayValue: "id",
+    displayValue: "lot",
     required: true,
   }),
   createField({
@@ -66,7 +66,7 @@ export const formFields = [
     relation: true,
     table: "personnel",
     value: "id",
-    displayValue: "name",
+    displayValue: ["firstName", "lastName"],
     required: true,
   }),
 ];

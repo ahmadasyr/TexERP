@@ -21,37 +21,43 @@ import {
   GridRowEditStopReasons,
   GridSlots,
   GridRenderEditCellParams,
-  useGridApiContext,
 } from "@mui/x-data-grid";
 import {
-  Alert,
   Autocomplete,
-  AutocompleteValue,
   FormControl,
+  FormControlLabel,
+  Grid,
+  InputLabel,
+  MenuItem,
+  Select,
+  Switch,
   TextField,
+  Typography,
   UseAutocompleteProps,
 } from "@mui/material";
 import { trTR } from "@/components/trTrGrid";
 import { getPersonnelInfo, usePersonnelId } from "@/contexts/auth";
-import { CustomAutocomplete } from "@/components/table/utils";
+import {
+  CustomAutocomplete,
+  CustomChipSelect,
+  CustomChipSelectWithGroups,
+} from "@/components/table/utils";
+import { Delete } from "@mui/icons-material";
 
-const initialRows: GridRowsProp = [
-  {
-    id: 0,
-    orderId: 0,
-    productId: 0,
-    dyeColorId: null,
-    lot: "",
-    outsourceTypeId: null,
-    laminationColorId: null,
-    quantity: 0,
-    unit: "unit",
-    description: "",
-    personnelId: getPersonnelInfo().id,
-    sentMeter: 0,
-    sentKg: 0,
-  },
-];
+interface orderItem {
+  id: number;
+  orderId: number;
+  productId: number;
+  dyeColorId?: number | null;
+  laminationColorId?: number | null;
+  itemTypeId?: number | null;
+  description?: string | null;
+  personnelId: number;
+  meter: number;
+  kg: number;
+  orderItemSpecification: number[];
+}
+const initialRows: GridRowsProp = [];
 
 interface EditToolbarProps {
   setRows: (newRows: (oldRows: GridRowsProp) => GridRowsProp) => void;
@@ -71,16 +77,14 @@ function EditToolbar(props: EditToolbarProps) {
         id,
         orderId: 0,
         productId: 0,
-        dyeColorId: null,
-        lot: "",
-        outsourceTypeId: null,
-        laminationColorId: null,
-        quantity: 0,
-        unit: "unit",
+        dyeColorId: 0,
+        laminationColorId: 0,
+        itemTypeId: 0,
         description: "",
         personnelId: getPersonnelInfo().id,
-        sentMeter: 0,
-        sentKg: 0,
+        meter: 0,
+        kg: 0,
+        orderItemSpecification: [],
       },
     ]);
     setRowModesModel((oldModel) => ({
@@ -115,6 +119,7 @@ export default function Sheet(props: SheetProps) {
   const [itemTypes, setItemTypes] = React.useState<any[]>([]);
   const [laminationColors, setLaminationColors] = React.useState<any[]>([]);
   const [personnels, setPersonnels] = React.useState<any[]>([]);
+  const [outsourceTypes, setOutsourceTypes] = React.useState<any[]>([]);
   const handleRowEditStop: GridEventListener<"rowEditStop"> = (
     params,
     event
@@ -209,14 +214,25 @@ export default function Sheet(props: SheetProps) {
           }))
         );
       });
+    fetch("/api/outsource-type")
+      .then((response) => response.json())
+      .then((data) => {
+        setOutsourceTypes(
+          data.map((value: any) => ({
+            value: value.id,
+            label: value.name,
+            group: value?.outsourceGroup?.name || "",
+            parent: value?.parentOutsourceType?.name || "",
+          }))
+        );
+      });
   }, []);
 
   const columns: GridColDef[] = [
     {
       field: "productId",
       headerName: "Ürün",
-      width: 250,
-      minWidth: 250,
+      width: 150,
       editable: true,
       type: "singleSelect",
       valueOptions: products,
@@ -243,7 +259,7 @@ export default function Sheet(props: SheetProps) {
       type: "singleSelect",
       valueOptions: dyeColors,
       editable: true,
-      width: 150,
+      width: 120,
 
       renderEditCell: (params: GridRenderEditCellParams) => (
         <CustomAutocomplete
@@ -263,19 +279,28 @@ export default function Sheet(props: SheetProps) {
       ),
     },
     {
-      field: "lot",
-      headerName: "Lot",
-      type: "string",
-      editable: true,
-      width: 150,
-    },
-    {
       field: "itemTypeId",
       headerName: "Kumaş Türü",
       type: "singleSelect",
       valueOptions: itemTypes,
       editable: true,
-      width: 150,
+      width: 120,
+      renderEditCell: (params: GridRenderEditCellParams) => (
+        <CustomAutocomplete
+          values={itemTypes}
+          valueKey="value"
+          displayValueKey="label"
+          value={params.value}
+          onChange={(newValue: any) => {
+            params.api.setEditCellValue({
+              id: params.id,
+              field: "itemTypeId",
+              value: newValue,
+            });
+          }}
+          label="Kumaş Türü"
+        />
+      ),
     },
     {
       field: "laminationColorId",
@@ -283,58 +308,89 @@ export default function Sheet(props: SheetProps) {
       type: "singleSelect",
       valueOptions: laminationColors,
       editable: true,
-      width: 150,
+      width: 120,
+      renderEditCell: (params: GridRenderEditCellParams) => (
+        <CustomAutocomplete
+          values={laminationColors}
+          valueKey="value"
+          displayValueKey="label"
+          value={params.value}
+          onChange={(newValue: any) => {
+            params.api.setEditCellValue({
+              id: params.id,
+              field: "laminationColorId",
+              value: newValue,
+            });
+          }}
+          label="Lamine Rengi"
+        />
+      ),
     },
     {
-      field: "quantity",
-      headerName: "Miktar",
+      field: "meter",
+      headerName: "Metre",
       type: "number",
       editable: true,
-      width: 150,
+      width: 120,
     },
     {
-      field: "unit",
-      headerName: "Birim",
-      type: "singleSelect",
+      field: "kg",
+      headerName: "Kg",
+      type: "number",
       editable: true,
-      width: 150,
-      valueOptions: [
-        { value: "kg", label: "Kg" },
-        { value: "m", label: "Metre" },
-      ],
+    },
+    {
+      field: "orderItemSpecification",
+      headerName: "Özellikler",
+      width: 250,
+      minWidth: 250,
+      editable: true,
+      renderEditCell: (params: GridRenderEditCellParams) => (
+        <CustomChipSelectWithGroups
+          values={outsourceTypes}
+          valueKey="value"
+          displayValueKey="label"
+          value={params.value}
+          onChange={(newValue: any) => {
+            params.api.setEditCellValue({
+              id: params.id,
+              field: "orderItemSpecification",
+              value: newValue,
+            });
+          }}
+          label="Özellikler"
+        />
+      ),
+      renderCell(params) {
+        return params.value
+          ? params.value
+              .map(
+                (value: any) =>
+                  outsourceTypes.find((type) => type.value === value)?.label
+              )
+              .join(", ")
+          : null;
+      },
     },
     {
       field: "description",
       headerName: "Açıklama",
       type: "string",
       editable: true,
-      width: 150,
-    },
-    {
-      field: "sentMeter",
-      headerName: "Giden Metre",
-      type: "number",
-
-      width: 150,
-    },
-    {
-      field: "sentKg",
-      headerName: "Giden Kg",
-      type: "number",
-      width: 150,
+      width: 120,
     },
     {
       field: "personnelId",
       headerName: "Personel",
       type: "singleSelect",
-      width: 150,
+      width: 120,
       valueOptions: personnels,
     },
     {
       field: "actions",
       type: "actions",
       headerName: "Düzenle",
-      width: 100,
+      width: 120,
       cellClassName: "actions",
       getActions: ({ id }) => {
         const isInEditMode = rowModesModel[id]?.mode === GridRowModes.Edit;
@@ -370,9 +426,7 @@ export default function Sheet(props: SheetProps) {
           <GridActionsCellItem
             icon={<DeleteIcon />}
             label="Delete"
-            onClick={
-              rows.length > 1 ? handleDeleteClick(id) : () => setAlert(true)
-            }
+            onClick={handleDeleteClick(id)}
             color="inherit"
           />,
         ];
@@ -380,21 +434,102 @@ export default function Sheet(props: SheetProps) {
     },
   ];
 
+  const [isTop, setIsTop] = React.useState(true);
+  const [topCount, setTopCount] = React.useState(0);
+  const [isPerTop, setIsPerTop] = React.useState(false);
+  const [topQuantity, setTopQuantity] = React.useState(0);
+  const [tempValues, setTempValues] = React.useState<any>({});
+  const [meter, setMeter] = React.useState(0);
+  const [kg, setKg] = React.useState(0);
+  const [description, setDescription] = React.useState("");
+
+  const handleOnChange = (
+    newValue: any,
+    updatedValues: any,
+    nextFieldId: string
+  ) => {
+    setTempValues((prevValues: any) => ({
+      ...prevValues,
+      ...updatedValues,
+    }));
+    if (nextFieldId) {
+      document.getElementById(nextFieldId)?.focus();
+    }
+  };
+  const handleAddRow = () => {
+    const id = Math.floor(Math.random() * 1200000) + 1;
+    setRows((oldRows) => [
+      ...oldRows,
+      {
+        id,
+        orderId: 0,
+        productId: tempValues.productId || 0,
+        dyeColorId: tempValues.dyeColorId || null,
+        laminationColorId: tempValues.laminationColorId || null,
+        itemTypeId: tempValues.itemTypeId || null,
+        description: tempValues.description || "",
+        personnelId: getPersonnelInfo().id,
+        meter: tempValues.meter || 0,
+        kg: tempValues.kg || 0,
+        orderItemSpecification: tempValues.orderItemSpecification || [],
+      },
+    ]);
+    setTempValues({});
+    setMeter(0);
+    setKg(0);
+    setDescription("");
+    setTopCount(0);
+    setIsPerTop(false);
+    setTopQuantity(0);
+
+    const inputs = document.querySelectorAll("input, textarea, select");
+    inputs.forEach((input: any) => (input.value = ""));
+  };
+
+  const calculateMeter = () => {
+    if (isTop && isPerTop) {
+      return topCount * topQuantity;
+    }
+    return meter;
+  };
+
+  const handleTopCountChange = (value: string) => {
+    const newTopCount = Number(value);
+    setTopCount(newTopCount);
+    if (isPerTop) {
+      const newMeter = newTopCount * topQuantity;
+      setMeter(newMeter);
+      updateTempValues({ meter: newMeter, description: `${newMeter} Top` });
+    } else {
+      updateTempValues({ description: `${newTopCount} Top` });
+    }
+  };
+
+  const handleIsPerTopChange = (value: string) => {
+    const newIsPerTop = value === "true";
+    setIsPerTop(newIsPerTop);
+    if (newIsPerTop) {
+      const newMeter = topCount * topQuantity;
+      setMeter(newMeter);
+      updateTempValues({ meter: newMeter, description: `${newMeter} Top` });
+    } else {
+      setMeter(0);
+      updateTempValues({ description: "" });
+    }
+  };
+
+  const updateTempValues = (updatedValues: any) => {
+    setTempValues((prevValues: any) => ({ ...prevValues, ...updatedValues }));
+  };
+
   return (
     <>
-      <Box
-        sx={{
-          height: 500,
-          width: "100%",
-          "& .actions": {
-            color: "text.secondary",
-          },
-          "& .textPrimary": {
-            color: "text.primary",
-          },
-        }}
-      >
+      {window.innerWidth > 600 ? (
         <DataGrid
+          style={{
+            width: "100%",
+            height: 500,
+          }}
           rows={rows}
           columns={columns}
           editMode="row"
@@ -410,8 +545,237 @@ export default function Sheet(props: SheetProps) {
           }}
           localeText={trTR.components.MuiDataGrid.defaultProps.localeText}
         />
-      </Box>
-      {alert ? <Alert severity="error">En az 1 satır olmalıdır.</Alert> : null}
+      ) : (
+        <Grid container spacing={2}>
+          <Grid item xs={12} md={4}>
+            <FormControl
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: "1rem",
+                padding: "1rem",
+              }}
+              fullWidth
+            >
+              <Typography variant="h5" gutterBottom>
+                Ürün Ekle
+              </Typography>
+              <Autocomplete
+                id="productId"
+                options={products}
+                getOptionLabel={(option) => option.label}
+                onChange={(event, newValue) =>
+                  updateTempValues(
+                    newValue ? { productId: newValue.value } : {}
+                  )
+                }
+                renderInput={(params) => <TextField {...params} label="Ürün" />}
+              />
+              <Autocomplete
+                id="dyeColorId"
+                options={dyeColors}
+                getOptionLabel={(option) => option.label}
+                onChange={(event, newValue) =>
+                  updateTempValues(
+                    newValue ? { dyeColorId: newValue.value } : {}
+                  )
+                }
+                renderInput={(params) => (
+                  <TextField {...params} label="Boya Rengi" />
+                )}
+              />
+              <Autocomplete
+                id="itemTypeId"
+                options={itemTypes}
+                getOptionLabel={(option) => option.label}
+                onChange={(event, newValue) =>
+                  updateTempValues(
+                    newValue ? { itemTypeId: newValue.value } : {}
+                  )
+                }
+                renderInput={(params) => (
+                  <TextField {...params} label="Kumaş Türü" />
+                )}
+              />
+              <Autocomplete
+                id="laminationColorId"
+                options={laminationColors}
+                getOptionLabel={(option) => option.label}
+                onChange={(event, newValue) =>
+                  updateTempValues(
+                    newValue ? { laminationColorId: newValue.value } : {}
+                  )
+                }
+                renderInput={(params) => (
+                  <TextField {...params} label="Lamine Rengi" />
+                )}
+              />
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={isTop}
+                    id="isTop"
+                    onChange={() => setIsTop(!isTop)}
+                  />
+                }
+                label="Top Sayı Var"
+              />
+              {isTop && (
+                <>
+                  <TextField
+                    id="topCount"
+                    label="Top Adedi"
+                    type="number"
+                    onChange={(e) => handleTopCountChange(e.target.value)}
+                  />
+                  <FormControl>
+                    <InputLabel id="demo-simple-select-label">
+                      Miktar Tipi
+                    </InputLabel>
+                    <Select
+                      labelId="demo-simple-select-label"
+                      id="isPerTop"
+                      value={isPerTop ? "true" : "false"}
+                      onChange={(e) => handleIsPerTopChange(e.target.value)}
+                    >
+                      <MenuItem value="true">Top Başına</MenuItem>
+                      <MenuItem value="false">Toplam</MenuItem>
+                    </Select>
+                  </FormControl>
+                  {isPerTop && (
+                    <TextField
+                      id="topQuantity"
+                      label="Top Metre"
+                      type="number"
+                      onChange={(e) => {
+                        setTopQuantity(Number(e.target.value));
+                        const newMeter = topCount * Number(e.target.value);
+                        setMeter(newMeter);
+                        updateTempValues({
+                          meter: newMeter,
+                          description: `${newMeter} Top`,
+                        });
+                      }}
+                    />
+                  )}
+                </>
+              )}
+              <TextField
+                id="meter"
+                label="Metre"
+                type="number"
+                value={meter}
+                disabled={isPerTop}
+                onChange={(e) =>
+                  updateTempValues({ meter: Number(e.target.value) })
+                }
+              />
+              <TextField
+                id="kg"
+                label="Kg"
+                type="number"
+                onChange={(e) =>
+                  updateTempValues({ kg: Number(e.target.value) })
+                }
+              />
+              <Autocomplete
+                id="orderItemSpecification"
+                multiple
+                options={outsourceTypes}
+                getOptionLabel={(option) => option.label}
+                onChange={(event, newValue) =>
+                  updateTempValues({
+                    orderItemSpecification: newValue.map((v) => v.value),
+                  })
+                }
+                renderInput={(params) => (
+                  <TextField {...params} label="Özellikler" />
+                )}
+              />
+              <TextField
+                id="description"
+                label="Açıklama"
+                onChange={(e) =>
+                  updateTempValues({ description: e.target.value })
+                }
+              />
+              <Button variant="contained" onClick={handleAddRow}>
+                Ekle
+              </Button>
+            </FormControl>
+          </Grid>
+        </Grid>
+      )}
+      {rows.length > 0 && window.innerWidth < 600 && (
+        <Box sx={{ height: 500, width: "100%", mt: 2, position: "relative" }}>
+          {rows.map((row) => (
+            <Box
+              key={row.id}
+              sx={{
+                mb: 2,
+                p: 2,
+                border: "1px solid #ccc",
+                borderRadius: 2,
+                maxWidth: "100%",
+              }}
+            >
+              <Typography variant="h6">
+                Ürün:{" "}
+                {
+                  products.find((product) => product.value === row.productId)
+                    ?.label
+                }
+              </Typography>
+              <Typography variant="body1">
+                Boya Rengi:{" "}
+                {
+                  dyeColors.find((color) => color.value === row.dyeColorId)
+                    ?.label
+                }
+              </Typography>
+              <Typography variant="body1">
+                Kumaş Türü:{" "}
+                {itemTypes.find((type) => type.value === row.itemTypeId)?.label}
+              </Typography>
+              <Typography variant="body1">
+                Lamine Rengi:{" "}
+                {
+                  laminationColors.find(
+                    (color) => color.value === row.laminationColorId
+                  )?.label
+                }
+              </Typography>
+              <Typography variant="body1">Metre: {row.meter}</Typography>
+              <Typography variant="body1">Kg: {row.kg}</Typography>
+              <Typography variant="body1">
+                Özellikler:{" "}
+                <b>
+                  {row.orderItemSpecification
+                    .map(
+                      (spec: any) =>
+                        outsourceTypes.find((type) => type.value === spec)
+                          ?.label
+                    )
+                    .join(", ")}
+                </b>
+              </Typography>
+              <Typography variant="body1">
+                Açıklama: {row.description}
+              </Typography>
+              <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 2 }}>
+                <Button
+                  variant="contained"
+                  color="error"
+                  startIcon={<DeleteIcon />}
+                  onClick={handleDeleteClick(row.id)}
+                >
+                  Sil
+                </Button>
+              </Box>
+            </Box>
+          ))}
+        </Box>
+      )}
     </>
   );
 }

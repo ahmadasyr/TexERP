@@ -45,6 +45,9 @@ import dyeColorRoutes from "./routes/dyeColorRoutes";
 import outsourceTypeRoutes from "./routes/outsourceTypeRoutes";
 import laminationColorRoutes from "./routes/laminationColorRoutes";
 import itemTypeRoutes from "./routes/itemTypeRoutes";
+import dofRoutes from "./routes/dofRoutes";
+import laminationTypeRoutes from "./routes/laminationTypeRoutes";
+import outsourceGroupRoutes from "./routes/outsourceGroupRoutes";
 const cors = require("cors");
 
 const app = express();
@@ -139,5 +142,11 @@ app.use("/outsource-type", outsourceTypeRoutes);
 app.use("/lamination-color", laminationColorRoutes);
 // Use itemType routes
 app.use("/item-type", itemTypeRoutes);
+// Use dof routes
+app.use("/dof", dofRoutes);
+// Use laminationType routes
+app.use("/lamination-type", laminationTypeRoutes);
+// Use outsourceGroup routes
+app.use("/outsource-group", outsourceGroupRoutes);
 
 export default app;

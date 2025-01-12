@@ -12,16 +12,27 @@ export const getAccountTypeById = async (id: number) => {
   });
 };
 
-export const createAccountType = async (name: string) => {
+export const createAccountType = async (body: {
+  name: string;
+  code: string;
+}) => {
+  const { name, code } = body;
   return await prisma.accountType.create({
-    data: { name },
+    data: { name, code },
   });
 };
 
-export const updateAccountType = async (id: number, name: string) => {
+export const updateAccountType = async (
+  id: number,
+  body: {
+    name: string;
+    code: string;
+  }
+) => {
+  const { name, code } = body;
   return await prisma.accountType.update({
     where: { id },
-    data: { name },
+    data: { name, code },
   });
 };
 

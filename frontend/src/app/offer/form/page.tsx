@@ -1,19 +1,8 @@
 "use client";
+import { Stepper, Step, StepLabel, StepContent, Paper } from "@mui/material";
 import { Data, formFields, tableName, title } from "../offer";
-import React, { useEffect, useRef, useState } from "react";
-import {
-  Alert,
-  Box,
-  Button,
-  Divider,
-  Grid,
-  Modal,
-  Step,
-  StepButton,
-  StepLabel,
-  Stepper,
-  Typography,
-} from "@mui/material";
+import React, { useEffect } from "react";
+import { Alert, Box, Button, Grid, Modal, Typography } from "@mui/material";
 import {
   NewTextField,
   NewSelect,
@@ -29,115 +18,19 @@ import { useFormData } from "@/components/form/utils";
 import { FormModal } from "@/components/form/modal";
 import Popup from "@/components/form/Popup";
 import { useSearchParams } from "next/navigation";
-interface PageProps {
+import Sheet from "./sheet";
+import { usePersonnelId } from "@/contexts/auth";
+interface Page {
   popupHandler?: (data: any) => void;
   popupSetter?: (data: any) => void;
   render?: any[];
 }
 
-const formSteps = [
-  {
-    label: "Muşteri ve Teklif Bilgileri",
-    fields: [
-      { component: NewRelation, keyProp: "customerId" },
-      { component: NewNumber, keyProp: "offerNo" },
-      { component: NewNumber, keyProp: "saleNo" },
-      { component: NewDate, keyProp: "offerDate" },
-      { component: NewDate, keyProp: "date" },
-      { component: NewNumber, keyProp: "proformaNo" },
-      { component: NewTextField, keyProp: "proformaDetails" },
-      { component: NewNumber, keyProp: "requestNo" },
-      { component: NewDate, keyProp: "lastMeetDate" },
-      { component: NewTextField, keyProp: "meetStatement" },
-    ],
-  },
-  {
-    label: "Ürün ve İstek Bilgileri",
-    fields: [
-      { component: NewRelation, keyProp: "productId" },
-      { component: NewNumber, keyProp: "requestBudget" },
-      { component: NewTextField, keyProp: "specification" },
-      { component: NewTextField, keyProp: "detail" },
-      { component: NewNumber, keyProp: "quantity" },
-      { component: NewSelect, keyProp: "unit" },
-    ],
-  },
-  {
-    label: "Fiyat ve KDV Bilgileri",
-    fields: [
-      { component: NewNumber, keyProp: "price" },
-      { component: NewRelation, keyProp: "currencyId" },
-      { component: NewNumber, keyProp: "vat" },
-      { component: NewNumber, keyProp: "total" },
-      { component: NewNumber, keyProp: "maturity" },
-      { component: NewNumber, keyProp: "totalKDV" },
-    ],
-  },
-  {
-    label: "Teslimat Bilgileri",
-    fields: [
-      { component: NewTextField, keyProp: "specialRequirement" },
-      { component: NewTextField, keyProp: "deliveryAddress" },
-      { component: NewSelect, keyProp: "shippingMethod" },
-      { component: NewNumber, keyProp: "packingListNo" },
-    ],
-  },
-  {
-    label: "Termin ve Süre Bilgileri",
-    fields: [
-      { component: NewDate, keyProp: "requestDate" },
-      { component: NewDate, keyProp: "requestDeadline" },
-      { component: NewNumber, keyProp: "daysDue" },
-      { component: NewDate, keyProp: "deadlineDate" },
-      { component: NewNumber, keyProp: "validPeriod" },
-      { component: NewSelect, keyProp: "validPeriodType" },
-      { component: NewDate, keyProp: "lastValidityDate" },
-    ],
-  },
-  {
-    label: "Özel Koşullar",
-    fields: [
-      { component: NewMultiEntryField, keyProp: "conditions" },
-      { component: NewMultiEntryField, keyProp: "additionalTerms" },
-    ],
-  },
-  {
-    label: "Durum ve Onay Bilgileri",
-    fields: [
-      { component: NewSelect, keyProp: "status" },
-      { component: NewDate, keyProp: "acceptanceDate" },
-      { component: NewDate, keyProp: "rejectionDate" },
-      { component: NewTextField, keyProp: "meetNote" },
-    ],
-  },
-];
-
-const Page: React.FC = ({ popupHandler, popupSetter }: PageProps) => {
-  const [activeStep, setActiveStep] = useState(0);
-  const [completedSteps, setCompletedSteps] = useState<boolean[]>([]);
-
-  const handleNext = () => {
-    if (canProceedToNextStep()) {
-      setCompletedSteps((prev) => {
-        const newCompletedSteps = [...prev];
-        newCompletedSteps[activeStep] = true;
-        return newCompletedSteps;
-      });
-      setActiveStep((prev) => prev + 1);
-    } else {
-      if (formRef.current) {
-        formRef.current.reportValidity();
-      }
-    }
-  };
-  const handleStep = (step: number) => () => setActiveStep(step);
-
-  const handleBack = () => setActiveStep((prev) => prev - 1);
-  const formRef = useRef<HTMLFormElement>(null);
-
-  const isLastStep = activeStep === formSteps.length - 1;
+const Page: React.FC = ({ popupHandler, popupSetter }: Page) => {
   const searchParams = useSearchParams();
   const id = searchParams.get("id");
+  const orderId = searchParams.get("orderId");
+  const [orderData, setOrderData] = React.useState<any>({});
   const { formData, handleChange, tableData, runFetchData } =
     useFormData<Data>(formFields);
   const [alertValue, setAlertValue] = React.useState<number>(0);
@@ -146,23 +39,55 @@ const Page: React.FC = ({ popupHandler, popupSetter }: PageProps) => {
     table: "",
     column: "",
   });
-
+  const [refresh, setRefresh] = React.useState<boolean>(false);
   useEffect(() => {
     if (id && !popupHandler) {
       fetch(`/api/${tableName}/${id}`)
         .then((response) => response.json())
         .then((data) => {
           Object.keys(data).forEach((key) => {
-            handleChange({
-              target: { name: key, value: data[key] },
-            } as React.ChangeEvent<{ name: string; value: any }>);
+            if (key !== "offerItem") {
+              handleChange({
+                target: { name: key, value: data[key] },
+              } as React.ChangeEvent<{ name: string; value: any }>);
+            }
           });
+          setSubRows(data.offerItem || []);
+          setRefresh(!refresh);
         });
     }
-  }, [id]);
-
+    if (orderId && !popupHandler) {
+      fetch(`/api/${tableName}/order/${orderId}`)
+        .then((response) => response.json())
+        .then((data) => {
+          handleChange({
+            target: { name: "orderId", value: data.id },
+          } as React.ChangeEvent<{ name: string; value: any }>);
+          setOrderData(data || []);
+          setSubRows(
+            data.orderItems.map((item: any) => {
+              return {
+                id: Math.random(),
+                productName: item.product?.name,
+                orderItemId: item.id,
+                price: 0,
+                vatRate: 0,
+                total: 0,
+                totalVat: 0,
+                vade: null,
+              };
+            })
+          );
+        });
+      setRefresh(!refresh);
+    }
+  }, [id, orderId]);
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    const rows = subRows.map((row) => {
+      const { isNew, yarnOrderId, ...rest } = row;
+      return rest;
+    });
     if (id) {
       try {
         const response = await fetch(`/api/${tableName}/${id}`, {
@@ -170,29 +95,42 @@ const Page: React.FC = ({ popupHandler, popupSetter }: PageProps) => {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(formData),
+          body: JSON.stringify({
+            ...formData,
+            offerItem: rows,
+          }),
         });
 
         if (!response.ok) {
+          // If the status is not in the range 200-299, handle it as an error
+
           setAlertValue(response.status);
         } else {
           const data = await response.json();
-          setAlertValue(200);
+
+          setAlertValue(200); // Set success status
         }
       } catch (error) {
-        setAlertValue(500);
+        setAlertValue(500); // Handle network or other fetch-related errors
       }
     } else {
       try {
+        // add personnelId to formData
+        formData["personnelId"] = usePersonnelId();
         const response = await fetch(`/api/${tableName}`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(formData),
+          body: JSON.stringify({
+            ...formData,
+            offerItem: rows,
+          }),
         });
 
         if (!response.ok) {
+          // If the status is not in the range 200-299, handle it as an error
+
           setAlertValue(response.status);
         } else {
           const data = await response.json();
@@ -204,23 +142,12 @@ const Page: React.FC = ({ popupHandler, popupSetter }: PageProps) => {
             }
             return;
           }
-          setAlertValue(200);
+          setAlertValue(200); // Set success status
         }
       } catch (error) {
-        setAlertValue(500);
+        setAlertValue(500); // Handle network or other fetch-related errors
       }
     }
-  };
-
-  const canProceedToNextStep = () => {
-    const currentStepFields = formSteps[activeStep].fields;
-    return currentStepFields.every(({ keyProp }) => {
-      const field = formFields.find((f) => f.name === keyProp);
-      return (
-        !field?.required ||
-        (keyProp in formData && formData[keyProp as keyof Data])
-      );
-    });
   };
 
   const popUpDataParser = (data: any) => {
@@ -249,140 +176,178 @@ const Page: React.FC = ({ popupHandler, popupSetter }: PageProps) => {
     });
   }
 
+  const [oldFormData, setOldFormData] = React.useState<any>({});
+
   useEffect(() => {
-    // Check if necessary form data fields are present
-    const { validPeriod, validPeriodType, requestDate } = formData;
-    if (validPeriod && validPeriodType && requestDate) {
-      // Initialize dates
-      const startDate = new Date(requestDate);
-      const adjustedDate = new Date(startDate);
-
-      // Adjust 'adjustedDate' based on 'validPeriodType' and 'validPeriod'
-      switch (validPeriodType) {
-        case "ay": // Months
-          adjustedDate.setMonth(adjustedDate.getMonth() + validPeriod);
-          break;
-        case "hafta": // Weeks
-          adjustedDate.setDate(adjustedDate.getDate() + validPeriod * 7);
-          break;
-        case "gün": // Days
-          adjustedDate.setDate(adjustedDate.getDate() + validPeriod);
-          break;
-        default:
-          console.warn(`Unexpected validPeriodType: ${validPeriodType}`);
-          return; // Exit if the validPeriodType is unexpected
-      }
-
-      // Convert the calculated date to the ISO format (YYYY-MM-DD)
-      const calculatedValidityDate = adjustedDate.toISOString().split("T")[0];
-
-      // Only trigger handleChange if the new date differs from the current one
+    formFields.forEach((field) => {
       if (
-        new Date(formData.lastValidityDate).toISOString().split("T")[0] !==
-        calculatedValidityDate
+        field.relation &&
+        oldFormData[field.name as keyof Data] !==
+          formData[field.name as keyof Data]
       ) {
-        handleChange({
-          target: {
-            name: "lastValidityDate",
-            value: calculatedValidityDate,
-          },
-        } as React.ChangeEvent<HTMLInputElement>);
+        runFetchData();
       }
-    }
-  }, [formData, handleChange]);
+    });
+    setOldFormData(formData);
+  }, [formData]);
+  const [subRows, setSubRows] = React.useState<any[]>([]);
 
-  return (
-    <>
-      <Popup
-        open={popup.on}
-        table={popup.table}
-        togglePopup={togglePopup}
-        popupHandler={popUpDataParser}
-        popupSetter={setPopup}
-      ></Popup>
-      <FormModal
-        isPopup={popupHandler ? true : false}
-        alertValue={alertValue}
-        setAlertValue={setAlertValue}
-      />
-      <form
-        ref={formRef}
-        style={
-          popupHandler
-            ? {}
-            : {
-                marginTop: "5%",
-                margin: "5% auto 5% auto",
-                width: "90%",
-                display: "flex",
-                padding: "5%",
-                justifyContent: "center",
-                boxShadow: "0 0 20px rgba(0,0,0,0.15)",
-                borderRadius: ".5rem",
-              }
-        }
-        onSubmit={handleSubmit}
-      >
-        <Box width="100%">
-          <Typography variant="h4" gutterBottom>
-            {title}
-          </Typography>
-
-          <Stepper
-            nonLinear
-            style={{ marginBottom: "1rem" }}
-            activeStep={activeStep}
-            alternativeLabel
-          >
-            {formSteps.map((step, index) => (
-              <Step completed={completedSteps[index]} key={index}>
-                <StepButton onClick={handleStep(index)}>
-                  {step.label}
-                </StepButton>
-              </Step>
-            ))}
-          </Stepper>
-
-          <Grid container spacing={1}>
-            {formSteps[activeStep].fields.map(
-              ({ component: Component, keyProp }) => (
-                <Grid item xs={12} md={4} key={keyProp}>
-                  <Component {...allProps} keyProp={keyProp} />
-                </Grid>
-              )
-            )}
+  const steps = [
+    {
+      label: "Önemli Tarihler",
+      content: (
+        <Grid container spacing={1}>
+          <Grid item xs={12} md={4}>
+            <NewNumber {...allProps} keyProp="paymentDue" />
           </Grid>
+          <Grid item xs={12} md={4}>
+            <NewDate {...allProps} keyProp="deliveryDeadlineDate" />
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <NewNumber {...allProps} keyProp="validPeriod" />
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <NewSelect {...allProps} keyProp="validPeriodType" />
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <NewDate {...allProps} keyProp="lastValidityDate" />
+          </Grid>
+        </Grid>
+      ),
+    },
+    {
+      label: "Ek Şartlar ve Koşullar",
+      content: (
+        <Grid container spacing={1}>
+          <Grid item xs={12} md={4}>
+            <NewMultiEntryField {...allProps} keyProp="additionalTerms" />
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <NewMultiEntryField {...allProps} keyProp="conditions" />
+          </Grid>
+        </Grid>
+      ),
+    },
+    {
+      label: "Fiyat Bilgileri",
+      content: (
+        <Grid container spacing={1}>
+          <Grid item xs={12} md={4}>
+            <NewNumber {...allProps} keyProp="total" />
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <NewNumber {...allProps} keyProp="totalKDV" />
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <NewNumber {...allProps} keyProp="customerTargetPrice" />
+          </Grid>
+        </Grid>
+      ),
+    },
+    {
+      label: "Diğer Bilgiler",
+      content: (
+        <Grid container spacing={1}>
+          <Grid item xs={12} md={4}>
+            <NewTextField {...allProps} keyProp="detail" />
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <NewTextField {...allProps} keyProp="meetStatement" />
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <NewTextField {...allProps} keyProp="meetNote" />
+          </Grid>
+        </Grid>
+      ),
+    },
+    {
+      label: "Durum ve Yanıt Tarihi",
+      content: (
+        <Grid container spacing={1}>
+          <Grid item xs={12} md={4}>
+            <NewSelect {...allProps} keyProp="status" />
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <NewDate {...allProps} keyProp="responseDate" />
+          </Grid>
+        </Grid>
+      ),
+    },
+  ];
 
-          <Divider style={{ marginBottom: "1rem", marginTop: "1rem" }} />
+  const [activeStep, setActiveStep] = React.useState(0);
 
-          <Box display="flex" justifyContent="space-between" mt={2}>
-            <Button
-              disabled={activeStep === 0}
-              onClick={handleBack}
-              variant="contained"
-            >
-              Geri
-            </Button>
-            {!isLastStep ? (
-              <Button
-                onClick={(e) => {
-                  e.preventDefault();
-                  handleNext();
-                }}
-                variant="contained"
-                color="primary"
-              >
-                Adımı tamamla
-              </Button>
-            ) : (
-              <Button type="submit" variant="contained" color="primary">
-                Kaydet
-              </Button>
-            )}
-          </Box>
-        </Box>
-      </form>
-    </>
+  const handleNext = () => {
+    setActiveStep((prevActiveStep) => prevActiveStep + 1);
+  };
+
+  const handleBack = () => {
+    setActiveStep((prevActiveStep) => prevActiveStep - 1);
+  };
+
+  const handleReset = () => {
+    setActiveStep(0);
+  };
+  return (
+    <Box width={"100%"}>
+      <Typography variant="h4" gutterBottom>
+        {title}
+      </Typography>
+      <Stepper activeStep={activeStep} orientation="vertical">
+        {steps.map((step, index) => (
+          <Step key={step.label}>
+            <StepLabel>{step.label}</StepLabel>
+            <StepContent>
+              {step.content}
+              <Box sx={{ mb: 2 }}>
+                <div>
+                  <Button
+                    variant="contained"
+                    onClick={handleNext}
+                    sx={{ mt: 1, mr: 1 }}
+                  >
+                    {index === steps.length - 1 ? "Bitir" : "İleri"}
+                  </Button>
+                  <Button
+                    disabled={index === 0}
+                    onClick={handleBack}
+                    sx={{ mt: 1, mr: 1 }}
+                  >
+                    Geri
+                  </Button>
+                </div>
+              </Box>
+            </StepContent>
+          </Step>
+        ))}
+      </Stepper>
+      {activeStep === steps.length && (
+        <Paper square elevation={0} sx={{ p: 3 }}>
+          <Typography>All steps completed - you&apos;re finished</Typography>
+          <Button onClick={handleReset} sx={{ mt: 1, mr: 1 }}>
+            Sıfırla
+          </Button>
+        </Paper>
+      )}
+      <Grid container spacing={1}>
+        <Grid item xs={12} md={12}>
+          <Sheet
+            items={orderData.orderItems}
+            refresh={refresh}
+            subRows={subRows}
+            setSubRows={setSubRows}
+          />
+        </Grid>
+      </Grid>
+      <Button
+        style={{ marginTop: "1rem" }}
+        type="submit"
+        variant="contained"
+        color="primary"
+      >
+        Kaydet
+      </Button>
+    </Box>
   );
 };
 

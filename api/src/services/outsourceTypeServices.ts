@@ -2,10 +2,22 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-export const createOutsourceType = async (data: { name: string }) => {
+export const createOutsourceType = async (data: {
+  name: string;
+  outsourceGroupId: number;
+  parentOutsourceTypeId: number;
+}) => {
   return await prisma.outsourceType.create({
     data: {
       name: data.name,
+      outsourceGroup: {
+        connect: { id: data.outsourceGroupId },
+      },
+      parentOutsourceType: {
+        connect: data.parentOutsourceTypeId
+          ? { id: data.parentOutsourceTypeId }
+          : undefined,
+      },
     },
   });
 };
@@ -17,16 +29,32 @@ export const getOutsourceTypeById = async (id: number) => {
 };
 
 export const getAllOutsourceTypes = async () => {
-  return await prisma.outsourceType.findMany();
+  return await prisma.outsourceType.findMany({
+    include: { outsourceGroup: true, parentOutsourceType: true },
+  });
 };
 
 export const updateOutsourceType = async (
   id: number,
-  data: { name: string }
+  data: {
+    name: string;
+    outsourceGroupId: number;
+    parentOutsourceTypeId: number;
+  }
 ) => {
   return await prisma.outsourceType.update({
     where: { id },
-    data: { name: data.name },
+    data: {
+      name: data.name,
+      outsourceGroup: {
+        connect: { id: data.outsourceGroupId },
+      },
+      parentOutsourceType: {
+        connect: data.parentOutsourceTypeId
+          ? { id: data.parentOutsourceTypeId }
+          : undefined,
+      },
+    },
   });
 };
 

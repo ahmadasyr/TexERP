@@ -4,15 +4,17 @@ const prisma = new PrismaClient();
 
 export const createAccount = async (data: {
   name: string;
-  debit: number;
-  credit: number;
-  outsource: boolean;
-  dye: boolean;
-  yarn: boolean;
-  buys: boolean;
+  accountTypeId: number;
 }) => {
   return await prisma.account.create({
-    data,
+    data: {
+      name: data.name,
+      accountType: {
+        connect: {
+          id: data.accountTypeId,
+        },
+      },
+    },
   });
 };
 
@@ -22,41 +24,41 @@ export const getAccountById = async (id: number) => {
   });
 };
 
-export const getAccountByProperties = async (
-  outsource: boolean,
-  dye: boolean,
-  yarn: boolean,
-  buys: boolean
-) => {
+export const getAccountByProperties = async (code: string) => {
   return await prisma.account.findMany({
     where: {
-      outsource,
-      dye,
-      yarn,
-      buys,
+      accountType: {
+        code,
+      },
     },
   });
 };
 
 export const getAllAccounts = async () => {
-  return await prisma.account.findMany();
+  return await prisma.account.findMany({
+    include: {
+      accountType: true,
+    },
+  });
 };
 
 export const updateAccount = async (
   id: number,
   data: {
     name?: string;
-    debit?: number;
-    credit?: number;
-    outsource: boolean;
-    dye: boolean;
-    yarn: boolean;
-    buys: boolean;
+    accountTypeId?: number;
   }
 ) => {
   return await prisma.account.update({
     where: { id },
-    data,
+    data: {
+      name: data.name,
+      accountType: {
+        connect: {
+          id: data.accountTypeId,
+        },
+      },
+    },
   });
 };
 

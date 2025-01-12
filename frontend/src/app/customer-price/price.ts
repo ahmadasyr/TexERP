@@ -10,6 +10,8 @@ export interface Data {
   price: number;
   unit: string;
   date: Date;
+  upfront: number;
+  installment: number;
 }
 
 export const formFields = [

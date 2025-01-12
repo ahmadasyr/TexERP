@@ -1,4 +1,16 @@
-import { Autocomplete, TextField } from "@mui/material";
+import {
+  Autocomplete,
+  Box,
+  Chip,
+  InputLabel,
+  ListSubheader,
+  Menu,
+  MenuItem,
+  OutlinedInput,
+  Select,
+  TextField,
+} from "@mui/material";
+import React from "react";
 
 export function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
   if (b[orderBy] < a[orderBy]) return -1;
@@ -165,9 +177,7 @@ export async function fetchExcelRows(
     });
 
     setRows(mappedRows);
-  } catch (error) {
-    throw new Error("Failed to fetch");
-  }
+  } catch (error) {}
 }
 
 export function reverseMappedRows(
@@ -262,7 +272,7 @@ export function CustomAutocomplete(props: any) {
     <Autocomplete
       style={{
         width: "100%",
-        border: "none",
+        border: "none !important",
         borderRadius: "0",
       }}
       disablePortal
@@ -271,7 +281,119 @@ export function CustomAutocomplete(props: any) {
       getOptionLabel={(option: any) => option}
       value={selectedOption || ""} // Ensure value matches the options
       onChange={handleOnChange}
-      renderInput={(params) => <TextField {...params} />}
+      renderInput={(params) => (
+        <TextField
+          style={{ border: "none !important", borderRadius: "0" }}
+          {...params}
+        />
+      )}
     />
   );
+}
+
+export function CustomChipSelect(props: any) {
+  const { value, onChange, valueKey, displayValueKey, values, label } = props;
+
+  const handleChange = (event: any) => {
+    const selectedValues = event.target.value.map(
+      (selectedDisplayValue: string) =>
+        values.find(
+          (item: any) => item[displayValueKey] === selectedDisplayValue
+        )?.[valueKey]
+    );
+    onChange(selectedValues);
+  };
+
+  const selectedDisplayValues = values
+    .filter(
+      (item: any) => Array.isArray(value) && value.includes(item[valueKey])
+    )
+    .map((item: any) => item[displayValueKey]);
+
+  return (
+    <>
+      <Select
+        style={{
+          width: "100%",
+          border: "none !important",
+          borderRadius: "0",
+        }}
+        labelId="custom-chip-select-label"
+        id="custom-chip-select"
+        multiple
+        value={selectedDisplayValues}
+        onChange={handleChange}
+        input={<OutlinedInput id="select-multiple-chip" label={label} />}
+        renderValue={(selected) => (
+          <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+            {selected.map((value: string) => (
+              <Chip key={value} label={value} />
+            ))}
+          </Box>
+        )}
+      >
+        {values.map((item: any) => (
+          <MenuItem key={item[valueKey]} value={item[displayValueKey]}>
+            {item[displayValueKey]}
+          </MenuItem>
+        ))}
+      </Select>
+    </>
+  );
+}
+export function CustomChipSelectWithGroups(props: any) {
+  const { value, onChange, valueKey, displayValueKey, values, label } = props;
+
+  const handleChange = (event: any) => {
+    const selectedValues = event.target.value.map(
+      (selectedDisplayValue: string) =>
+        values.find(
+          (item: any) => item[displayValueKey] === selectedDisplayValue
+        )?.[valueKey]
+    );
+    onChange(selectedValues);
+  };
+
+  const selectedDisplayValues = values
+    .filter(
+      (item: any) => Array.isArray(value) && value.includes(item[valueKey])
+    )
+    .map((item: any) => item[displayValueKey]);
+
+  return (
+    <>
+      <Select
+        style={{
+          width: "100%",
+          border: "none !important",
+          borderRadius: "0",
+        }}
+        labelId="custom-chip-select-label"
+        id="custom-chip-select"
+        multiple
+        value={selectedDisplayValues}
+        onChange={handleChange}
+        input={<OutlinedInput id="select-multiple-chip" label={label} />}
+        renderValue={(selected) => (
+          <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+            {selected.map((value: string) => (
+              <Chip key={value} label={value} />
+            ))}
+          </Box>
+        )}
+      >
+        {values.map((item: any) => (
+          <MenuItem key={item[valueKey]} value={item[displayValueKey]}>
+            {item[displayValueKey]}
+          </MenuItem>
+        ))}
+      </Select>
+    </>
+  );
+}
+
+{
+  /* <MenuItem key={item[valueKey]} value={item[displayValueKey]}>
+              {item[displayValueKey]}
+            </MenuItem> */
 }

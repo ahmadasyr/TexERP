@@ -15,12 +15,39 @@ const removeLocalStorageItem = (key: string) => {
 };
 
 // Authentication handlers
-const handleLogin = async (email: string, password: string): Promise<void> => {
+const handleLogin = async (
+  username: string,
+  password: string
+): Promise<void> => {
   try {
     const response = await fetch("/api/auth/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
+      body: JSON.stringify({ username, password }),
+    });
+
+    const data = await response.json();
+    if (response.ok) {
+      setLocalStorageItem("token", data.token);
+      setLocalStorageItem("personnel", data.personnel);
+      window.dispatchEvent(new Event("login"));
+    } else {
+      alert(data.message);
+    }
+  } catch (error) {
+    alert("An error occurred during login.");
+  }
+};
+
+const handleReset = async (
+  username: string,
+  password: string
+): Promise<void> => {
+  try {
+    const response = await fetch("/api/auth/reset", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username, password }),
     });
 
     const data = await response.json();
@@ -103,4 +130,5 @@ export {
   handleRegister,
   fetchProtectedData,
   getPersonnelInfo,
+  handleReset,
 };

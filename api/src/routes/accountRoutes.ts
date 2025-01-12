@@ -16,8 +16,5 @@ router.get("/:id", getAccountByIdController);
 router.get("/", getAllAccountsController);
 router.put("/:id", updateAccountController);
 router.delete("/:id", deleteAccountController);
-router.get(
-  "/properties/:outsource/:dye/:yarn/:buys",
-  getAccountByPropertiesController
-);
+router.get("/code/:code", getAccountByPropertiesController);
 export default router;

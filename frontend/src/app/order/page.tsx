@@ -15,7 +15,7 @@ const Page: React.FC = () => {
         title="Satış Siparişleri"
         headCells={headCells}
         tableName={"order"}
-        viewable={false}
+        viewable={true}
         URI={"/order"}
       />
     </div>

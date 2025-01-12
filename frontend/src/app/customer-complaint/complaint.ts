@@ -1,5 +1,6 @@
 import { HeadCell } from "../../components/table/utils";
 import { createField } from "../../components/form/utils";
+import { create } from "domain";
 export const tableName = "customer-complaint";
 
 export interface Data {
@@ -16,6 +17,9 @@ export interface Data {
   actionTaken: string;
   dofNo: number;
   result: string;
+  openDof: boolean;
+  dofTo: number;
+  nonconformityDescription: string;
 }
 
 export const formFields = [
@@ -94,6 +98,39 @@ export const formFields = [
   }),
   createField({ name: "dofNo", label: "DÖF Açıldıysa No", type: "number" }),
   createField({ name: "result", label: "Sonuç", type: "text" }),
+  createField({
+    name: "orderId",
+    label: "Sipariş No",
+    type: "relation",
+    relation: true,
+    table: "order",
+    value: "id",
+    displayValue: ["id", "description"],
+    relationDependancy: {
+      field: "customerId",
+      value: "customerId",
+    },
+  }),
+  createField({ name: "lot", label: "Lot", type: "text" }),
+  createField({
+    name: "openDof",
+    label: "DÖF Açılsın mı?",
+    type: "checkbox",
+  }),
+  createField({
+    name: "dofTo",
+    label: "Kime Açılsın?",
+    type: "relation",
+    relation: true,
+    table: "personnel",
+    value: "id",
+    displayValue: ["firstName", "lastName"],
+  }),
+  createField({
+    name: "nonconformityDescription",
+    label: "Uygunsuzluk Açıklaması",
+    type: "text",
+  }),
 ];
 
 export const headCells: HeadCell[] = [
@@ -167,9 +204,11 @@ export const headCells: HeadCell[] = [
   },
   {
     id: "dofNo",
-    numeric: true,
+    numeric: false,
     disablePadding: false,
     label: "DÖF  Açıldıysa No",
+    uri: "/dof/view/?id=",
+    clickable: true,
   },
   { id: "result", numeric: false, disablePadding: false, label: "Sonuç" },
 ];

@@ -8,5 +8,6 @@ router.get("/:id", orderController.getOrderController);
 router.get("/", orderController.getOrdersController);
 router.put("/:id", orderController.updateOrderController);
 router.delete("/:id", orderController.deleteOrderController);
+router.get("/customer/:id", orderController.getOrderByCustomerIdController);
 
 export default router;

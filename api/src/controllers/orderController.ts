@@ -4,6 +4,7 @@ import {
   getOrders,
   updateOrder,
   deleteOrder,
+  getOrderByCustomerId,
 } from "../services/orderServices";
 import { Request, Response } from "express";
 
@@ -50,6 +51,19 @@ export const updateOrderController = async (req: Request, res: Response) => {
 export const deleteOrderController = async (req: Request, res: Response) => {
   try {
     const order = await deleteOrder(Number(req.params.id));
+    res.status(200).json(order);
+  } catch (error) {
+    console.log(error);
+    res.status(400).json({ message: error });
+  }
+};
+
+export const getOrderByCustomerIdController = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const order = await getOrderByCustomerId(Number(req.params.id));
     res.status(200).json(order);
   } catch (error) {
     console.log(error);

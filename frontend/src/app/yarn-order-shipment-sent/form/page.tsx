@@ -290,7 +290,7 @@ const Bank: React.FC = ({ popupHandler, popupSetter }: Props) => {
           <Typography variant="h4" gutterBottom>
             {title}
           </Typography>
-          {
+          {id === null ? (
             <>
               <Box>
                 {orderedItems.length === 0 ? (
@@ -341,7 +341,28 @@ const Bank: React.FC = ({ popupHandler, popupSetter }: Props) => {
                 )}
               </Box>
             </>
-          }
+          ) : (
+            <Grid container spacing={1}>
+              <Grid item xs={12} md={4}>
+                <NewRelation {...allProps} keyProp="yarnOrderShipmentId" />
+              </Grid>
+              <Grid item xs={12} md={4}>
+                <NewRelation {...allProps} keyProp="yarnOrderItemId" />
+              </Grid>
+              <Grid item xs={12} md={4}>
+                <NewRelation {...allProps} keyProp="yarnStockEntryId" />
+              </Grid>
+              <Grid item xs={12} md={4}>
+                <NewNumber {...allProps} keyProp="sentKg" />
+              </Grid>
+              <Grid item xs={12} md={4}>
+                <NewNumber {...allProps} keyProp="sentCount" />
+              </Grid>
+              <Grid item xs={12} md={4}>
+                <NewRelation {...allProps} keyProp="personnelId" />
+              </Grid>
+            </Grid>
+          )}
           <Button
             style={{ marginTop: "1rem" }}
             type="submit"

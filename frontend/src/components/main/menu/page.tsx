@@ -17,17 +17,23 @@ interface MenuItem {
   link?: string;
   icon?: string;
   desc?: string;
+  allowedDepartments?: string[];
   subItems?: MenuItem[];
 }
 
-export default function Menu() {
+interface MenuProps {
+  setOpen: (open: boolean) => void;
+}
+
+export default function Menu(props: MenuProps) {
+  const { setOpen } = props;
   const pathname = usePathname();
   const router = useRouter();
   const [openItems, setOpenItems] = React.useState<{ [key: string]: boolean }>(
     {}
   );
 
-  // Load collapsed state from localStorage
+  // Load open items state from localStorage on mount
   React.useEffect(() => {
     const savedState = localStorage.getItem("openItems");
     if (savedState) {
@@ -35,7 +41,7 @@ export default function Menu() {
     }
   }, []);
 
-  // Update localStorage whenever openItems changes
+  // Save open items state to localStorage on change
   React.useEffect(() => {
     localStorage.setItem("openItems", JSON.stringify(openItems));
   }, [openItems]);
@@ -47,8 +53,29 @@ export default function Menu() {
     }));
   };
 
-  const handleNavigation = (link: string) => {
-    router.push(link);
+  const handleNavigation = (link?: string) => {
+    if (link) {
+      if (window.innerWidth < 600) {
+        setOpen(false);
+      }
+      router.push(link);
+    }
+  };
+
+  const personnel = JSON.parse(localStorage.getItem("personnel") || "{}");
+  const userDepartment = personnel.department;
+
+  const filterMenuItems = (items: MenuItem[]): MenuItem[] => {
+    return items
+      .filter(
+        (item) =>
+          !item.allowedDepartments ||
+          item.allowedDepartments.includes(userDepartment)
+      )
+      .map((item) => ({
+        ...item,
+        subItems: item.subItems ? filterMenuItems(item.subItems) : undefined,
+      }));
   };
 
   const renderMenuItems = (
@@ -58,6 +85,8 @@ export default function Menu() {
   ) => {
     return items.map((item) => {
       const key = parentKey ? `${parentKey}-${item.title}` : item.title;
+      const isOpen = openItems[key];
+
       return (
         <React.Fragment key={key}>
           {item.subItems ? (
@@ -66,29 +95,15 @@ export default function Menu() {
                 selected={pathname === item.link}
                 title={item.desc}
                 onClick={() => handleClick(key)}
-                sx={{
-                  pl: level * 2 + 2, // Add padding based on the level
-                  position: "relative", // For line positioning
-                  maxWidth: "100%",
-                  "&:before": {
-                    content: '""',
-                    position: "absolute",
-                    left: `${level * 16}px`, // Position line to the left based on level
-                    top: 0,
-                    bottom: 0,
-                    width: "2px",
-                    backgroundColor: "grey.400", // Level line color
-                  },
-                }}
+                sx={{ pl: level * 2 + 2 }}
               >
                 <ListItemIcon sx={{ minWidth: 36 }}>
-                  <Icon fontSize="small">{item.icon}</Icon>{" "}
-                  {/* Adjust icon size */}
+                  <Icon fontSize="small">{item.icon}</Icon>
                 </ListItemIcon>
                 <ListItemText primary={item.title} />
-                {openItems[key] ? <ExpandLess /> : <ExpandMore />}
+                {isOpen ? <ExpandLess /> : <ExpandMore />}
               </ListItemButton>
-              <Collapse in={openItems[key]} timeout="auto" unmountOnExit>
+              <Collapse in={isOpen} timeout="auto" unmountOnExit>
                 <List component="div" disablePadding>
                   {renderMenuItems(item.subItems, key, level + 1)}
                 </List>
@@ -97,22 +112,9 @@ export default function Menu() {
           ) : (
             <ListItemButton
               title={item.desc}
-              onClick={() => handleNavigation(item.link!)}
+              onClick={() => handleNavigation(item.link)}
               selected={pathname === item.link}
-              sx={{
-                pl: level * 2 + 2,
-                position: "relative",
-                maxWidth: "100%",
-                "&:before": {
-                  content: '""',
-                  position: "absolute",
-                  left: `${level * 16}px`, // Adjust based on level for each item
-                  top: 0,
-                  bottom: 0,
-                  width: "2px",
-                  backgroundColor: "grey.400",
-                },
-              }}
+              sx={{ pl: level * 2 + 2 }}
             >
               <ListItemIcon sx={{ minWidth: 36 }}>
                 <Icon fontSize="small">{item.icon}</Icon>
@@ -125,5 +127,57 @@ export default function Menu() {
     });
   };
 
-  return <List component="nav">{renderMenuItems(menuItems)}</List>;
+  const renderMobileSettings = () => {
+    return (
+      <>
+        <ListItemButton
+          title="Kullanıcı Ayarları"
+          onClick={() => handleClick("user-settings")}
+          sx={{ pl: 2 }}
+        >
+          <ListItemIcon sx={{ minWidth: 36 }}>
+            <Icon fontSize="small">settings</Icon>
+          </ListItemIcon>
+          <ListItemText primary="Kullanıcı Ayarları" />
+          {openItems["user-settings"] ? <ExpandLess /> : <ExpandMore />}
+        </ListItemButton>
+        <Collapse in={openItems["user-settings"]} timeout="auto" unmountOnExit>
+          <List component="div" disablePadding>
+            <ListItemButton
+              title="Profil"
+              onClick={() => handleNavigation("/profile")}
+              selected={pathname === "/profile"}
+              sx={{ pl: 4 }}
+            >
+              <ListItemIcon sx={{ minWidth: 36 }}>
+                <Icon fontSize="small">person</Icon>
+              </ListItemIcon>
+              <ListItemText primary="Profil" />
+            </ListItemButton>
+            <ListItemButton
+              title="Çıkış Yap"
+              onClick={() => handleNavigation("/logout")}
+              selected={pathname === "/logout"}
+              sx={{ pl: 4 }}
+            >
+              <ListItemIcon sx={{ minWidth: 36 }}>
+                <Icon fontSize="small">logout</Icon>
+              </ListItemIcon>
+              <ListItemText primary="Çıkış Yap" />
+            </ListItemButton>
+          </List>
+        </Collapse>
+      </>
+    );
+  };
+
+  const filteredMenuItems = filterMenuItems(menuItems);
+  const isMobile = window.innerWidth < 600;
+
+  return (
+    <List component="nav">
+      {renderMenuItems(filteredMenuItems)}
+      {isMobile && renderMobileSettings()}
+    </List>
+  );
 }

@@ -15,16 +15,23 @@ import NotificationsIcon from "@mui/icons-material/Notifications";
 import MoreIcon from "@mui/icons-material/MoreVert";
 import Brightness4Icon from "@mui/icons-material/Brightness4";
 import Brightness7Icon from "@mui/icons-material/Brightness7";
-import { Switch } from "@mui/material";
+import {
+  Switch,
+  InputBase,
+  Autocomplete,
+  TextField,
+  Grid,
+} from "@mui/material";
 import { handleLogout, getPersonnelInfo } from "@/contexts/auth";
 import { useRouter } from "next/navigation";
-
+import SearchIcon from "@mui/icons-material/Search";
+import menuItems from "./main/menu/menuItems.json";
 interface PrimaryAppBarProps {
   toggleDrawer: () => void;
   toggleTheme: () => void;
   open: boolean;
-  theme: any;
-  setTheme: any;
+  theme: boolean;
+  setTheme: React.Dispatch<React.SetStateAction<true | false>>;
 }
 
 const ThemeSwitch = styled(Switch)(({ theme }) => ({
@@ -40,7 +47,7 @@ const ThemeSwitch = styled(Switch)(({ theme }) => ({
       color: "#fff",
       transform: "translateX(22px)",
       "& .MuiSwitch-thumb:before": {
-        content: "'🌙'",
+        content: '"🌙"',
       },
       "& + .MuiSwitch-track": {
         opacity: 1,
@@ -53,7 +60,7 @@ const ThemeSwitch = styled(Switch)(({ theme }) => ({
     width: 32,
     height: 32,
     "&:before": {
-      content: "'☀️'",
+      content: '"☀️"',
       position: "absolute",
       width: "100%",
       height: "100%",
@@ -71,6 +78,21 @@ const ThemeSwitch = styled(Switch)(({ theme }) => ({
   },
 }));
 
+const SearchWrapper = styled("div")(({ theme }) => ({
+  position: "relative",
+  borderRadius: theme.shape.borderRadius,
+  backgroundColor: theme.palette.common.white,
+  "&:hover": {
+    backgroundColor: theme.palette.grey[200],
+  },
+  marginLeft: theme.spacing(2),
+  marginRight: theme.spacing(2),
+  width: "100%",
+  [theme.breakpoints.up("sm")]: {
+    width: "auto",
+  },
+}));
+
 export default function PrimaryAppBar({
   toggleDrawer,
   toggleTheme,
@@ -79,163 +101,241 @@ export default function PrimaryAppBar({
   setTheme,
 }: PrimaryAppBarProps) {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] =
     React.useState<null | HTMLElement>(null);
+  const [customers, setCustomers] = React.useState<
+    { id: string; name: string }[]
+  >([]);
   const router = useRouter();
-  const isMenuOpen = Boolean(anchorEl);
-  const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
+
+  const personnel = getPersonnelInfo();
+  React.useEffect(() => {
+    fetch("/api/customer")
+      .then((res) => res.json())
+      .then((data) => {
+        setCustomers(data || []);
+      })
+      .catch((err) => console.error("Error fetching customers:", err));
+  }, []);
 
   const handleProfileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
 
-  const handleMobileMenuClose = () => setMobileMoreAnchorEl(null);
   const handleMenuClose = () => {
     setAnchorEl(null);
-    handleMobileMenuClose();
-  };
-
-  const handleMobileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
-    setMobileMoreAnchorEl(event.currentTarget);
+    setMobileMoreAnchorEl(null);
   };
 
   const toggleThemeWithStorage = () => {
-    const newTheme = theme === "light" ? "dark" : "light";
+    const newTheme = theme === true ? false : true;
     setTheme(newTheme);
     toggleTheme();
-    if (typeof window !== "undefined") {
-      localStorage.setItem("theme", newTheme);
+    localStorage.setItem("darkMode", JSON.stringify(newTheme));
+  };
+
+  const handleCustomerSelect = (event: any, value: { id: string } | null) => {
+    if (value) {
+      router.push(`/customer/view/?id=${value.id}`);
     }
   };
-  const menuId = "primary-account-menu";
+
+  const isMenuOpen = Boolean(anchorEl);
+  const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
+  const Searcher = () => {
+    type OptionType =
+      | { name: string; group: string }
+      | {
+          title: string;
+          group: string;
+          link: string;
+          allowedDepartments?: string[];
+        };
+
+    const getSearchOptions = () => {
+      // Customer options
+      const customerOptions = customers.map((customer) => ({
+        ...customer,
+        group: "Müşteriler", // Static group for all customers
+      }));
+
+      // Menu items
+      const groupedSubItems = menuItems
+        .map((item) =>
+          item.allowedDepartments?.includes(personnel?.department) === true
+            ? (item.subItems || [])
+                .filter(
+                  (subItem: any) =>
+                    !subItem?.allowedDepartments ||
+                    subItem?.allowedDepartments.includes(personnel?.department)
+                )
+                .flatMap((subItem) =>
+                  (subItem.subItems || [])
+                    .filter(
+                      (deepSubItem: any) =>
+                        !deepSubItem?.allowedDepartments ||
+                        deepSubItem?.allowedDepartments.includes(
+                          personnel?.department
+                        )
+                    )
+                    .map((deepSubItem) => ({
+                      ...deepSubItem,
+                      group: `${item.title} > ${subItem.title}`, // Group by parent and subItem title
+                    }))
+                )
+            : []
+        )
+        .flat();
+
+      // Combine customer options with menu items
+      const combinedOptions = [...customerOptions, ...groupedSubItems];
+
+      return {
+        label: "Ara",
+        options: combinedOptions,
+        getLabel: (option: OptionType) =>
+          "name" in option
+            ? option.name
+            : "title" in option
+            ? option.title
+            : "",
+        groupBy: (option: OptionType) => option.group, // Group by the "group" property
+      };
+    };
+
+    const { label, options, getLabel, groupBy } = getSearchOptions();
+
+    return (
+      <Autocomplete
+        style={
+          theme ? { backgroundColor: "#2C2C2C" } : { backgroundColor: "white" }
+        }
+        popupIcon={null}
+        options={options}
+        getOptionLabel={getLabel}
+        groupBy={groupBy} // Use groupBy for grouping
+        onChange={(event, value) => {
+          if (!value) return; // Handle case where value might be null or undefined
+          if ("link" in value) {
+            router.push(value.link); // Navigate to the link if available
+          } else if ("name" in value) {
+            handleCustomerSelect(event, value); // Handle customer selection
+          }
+        }}
+        renderInput={(params) => (
+          <>
+            <TextField
+              {...params}
+              // label={label}
+              size="small"
+              InputProps={{
+                ...params.InputProps,
+                startAdornment: (
+                  <>
+                    <SearchIcon sx={{ color: "action.active", mr: 1 }} />
+                    {params.InputProps.startAdornment}
+                  </>
+                ),
+              }}
+            />
+          </>
+        )}
+        sx={{ width: 300 }}
+      />
+    );
+  };
+
   const renderMenu = (
     <Menu
       anchorEl={anchorEl}
       anchorOrigin={{ vertical: "top", horizontal: "right" }}
-      id={menuId}
       keepMounted
-      transformOrigin={{ vertical: "top", horizontal: "right" }}
       open={isMenuOpen}
       onClose={handleMenuClose}
     >
-      <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
-      <MenuItem onClick={handleMenuClose}>My account</MenuItem>
       <MenuItem
         onClick={() => {
-          handleLogout();
-          router.push("/");
+          router.push("/profile");
+          handleMenuClose();
         }}
       >
-        Logout
-      </MenuItem>
-    </Menu>
-  );
-
-  const mobileMenuId = "primary-account-menu-mobile";
-  const renderMobileMenu = (
-    <Menu
-      anchorEl={mobileMoreAnchorEl}
-      anchorOrigin={{ vertical: "top", horizontal: "right" }}
-      id={mobileMenuId}
-      keepMounted
-      transformOrigin={{ vertical: "top", horizontal: "right" }}
-      open={isMobileMenuOpen}
-      onClose={handleMobileMenuClose}
-    >
-      <MenuItem>
-        <IconButton size="large" color="inherit">
-          <MailIcon />
-        </IconButton>
-        <p>Messages</p>
-      </MenuItem>
-      <MenuItem>
-        <IconButton size="large" color="inherit">
-          <NotificationsIcon />
-        </IconButton>
-        <p>Notifications</p>
-      </MenuItem>
-      <MenuItem onClick={handleProfileMenuOpen}>
-        <IconButton size="large" color="inherit">
-          <AccountCircle />
-        </IconButton>
-        <p>Profile</p>
+        Profil
       </MenuItem>
       <MenuItem
         onClick={() => {
-          handleLogout();
-          router.push("/");
+          router.push("/logout");
         }}
       >
-        <IconButton size="large" color="inherit">
-          <AccountCircle />
-        </IconButton>
-        <p>Logout</p>
+        Çıkış Yap
       </MenuItem>
     </Menu>
   );
-
-  const personnel = getPersonnelInfo();
-
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="sticky" color="primary">
         <Toolbar>
-          <IconButton
-            edge="start"
-            color="inherit"
-            aria-label="open drawer"
-            onClick={toggleDrawer}
-            sx={{ mr: 2 }}
-            style={open ? { display: "none" } : { display: "block" }}
-          >
-            <MenuIcon />
-          </IconButton>
-          <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
-            Dokumaş Fabric
-          </Typography>
-          <p style={{ display: "flex", alignItems: "center" }}>
-            Merhaba, {personnel?.firstName + " " + personnel?.lastName}
-          </p>
-          <Box sx={{ display: { xs: "none", md: "flex" } }}>
-            <IconButton size="large" color="inherit">
-              <MailIcon />
-            </IconButton>
-            <IconButton size="large" color="inherit">
-              <NotificationsIcon />
-            </IconButton>
-            <IconButton
-              size="large"
-              color="inherit"
-              onClick={handleProfileMenuOpen}
-            >
-              {personnel?.avatar ? (
-                <img
-                  src={personnel.avatar}
-                  alt="avatar"
-                  style={{ borderRadius: "50%", width: "30px" }}
+          {
+            // on mobile mode
+            window.innerWidth < 600 ? (
+              <>
+                <IconButton
+                  edge="start"
+                  color="inherit"
+                  aria-label="open drawer"
+                  onClick={toggleDrawer}
+                  sx={{ mr: 2, display: open ? "none" : "block" }}
+                >
+                  <MenuIcon />
+                </IconButton>
+
+                <Searcher />
+              </>
+            ) : (
+              <>
+                <IconButton
+                  edge="start"
+                  color="inherit"
+                  aria-label="open drawer"
+                  onClick={toggleDrawer}
+                  sx={{ mr: 2, display: open ? "none" : "block" }}
+                >
+                  <MenuIcon />
+                </IconButton>
+                <Typography variant="h6" noWrap sx={{ flexGrow: 1 }}>
+                  {(() => {
+                    const hour = new Date().getHours();
+                    if (hour < 12)
+                      return `🌅 Günaydın, ${personnel?.firstName} ${personnel?.lastName} `;
+                    if (hour < 18)
+                      return `🌞 İyi günler, ${personnel?.firstName} ${personnel?.lastName}`;
+                    return `🌜 İyi akşamlar, ${personnel?.firstName} ${personnel?.lastName}`;
+                  })()}
+                </Typography>
+
+                <Searcher />
+
+                <IconButton color="inherit" onClick={handleProfileMenuOpen}>
+                  {personnel?.avatar ? (
+                    <img
+                      src={personnel.avatar}
+                      alt="avatar"
+                      style={{ borderRadius: "50%", width: "30px" }}
+                    />
+                  ) : (
+                    <AccountCircle />
+                  )}
+                </IconButton>
+                <ThemeSwitch
+                  checked={theme}
+                  onChange={toggleThemeWithStorage}
                 />
-              ) : (
-                <AccountCircle />
-              )}
-            </IconButton>
-          </Box>
-          <Box sx={{ display: { xs: "flex", md: "none" } }}>
-            <IconButton
-              size="large"
-              color="inherit"
-              onClick={handleMobileMenuOpen}
-            >
-              <MoreIcon />
-            </IconButton>
-          </Box>
-          <ThemeSwitch
-            checked={theme === "dark"}
-            onChange={toggleThemeWithStorage}
-          />
+              </>
+            )
+          }
         </Toolbar>
       </AppBar>
       {renderMenu}
-      {renderMobileMenu}
     </Box>
   );
 }

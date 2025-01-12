@@ -22,6 +22,7 @@ import {
   DialogContentText,
   DialogTitle,
   Divider,
+  Grid,
   IconButton,
   Link,
   TableCell,
@@ -43,6 +44,9 @@ import {
   GridToolbarDensitySelector,
   GridToolbarExport,
   GridToolbarFilterButton,
+  GridToolbarQuickFilter,
+  useGridApiContext,
+  useGridApiRef,
 } from "@mui/x-data-grid";
 import { trTR } from "../trTrGrid";
 type Data = {
@@ -106,9 +110,7 @@ export default function EnhancedTable({
                 })
               : "";
           } else if (cell.displayValue && Array.isArray(cell.displayValue)) {
-            newRow[cell.id] = cell.displayValue
-              .map((key: string) => row[cell.id]?.[key] || "")
-              .join(" ");
+            newRow[cell.id] = row[cell.id];
           }
         });
         return newRow;
@@ -149,6 +151,15 @@ export default function EnhancedTable({
         width: cell.width || 130,
         hide: !cell.visible,
         type: cell.numeric ? "number" : "string",
+        valueGetter: (params: any, row: any) => {
+          if (typeof row === "object" && cell.displayValue) {
+            return `${row[cell.id]?.id} - ${cell.displayValue
+              .map((key: string) => row[cell.id]?.[key])
+              .join(" ")}`;
+          } else {
+            return row[cell.id];
+          }
+        },
 
         renderCell: (params: any) => {
           const value = params.value;
@@ -166,25 +177,45 @@ export default function EnhancedTable({
               Boolean(value) ? "Evet" : "Hayır"
             );
           }
-          if (typeof value === "object" && value !== null) {
-            return JSON.stringify(value);
+          if (cell.clickable && cell.displayValue) {
+            return (
+              <span
+                style={{
+                  cursor: "pointer",
+                  textDecoration: "underline",
+                  fontWeight: "bold",
+                }}
+                onClick={() => {
+                  router.push(`${cell.uri}${value.split(" - ")[0]}`);
+                }}
+              >
+                {
+                  // example value "3 - Customer Name"
+                  // display only "Customer Name"
+                  value.split(" - ")[1]
+                }
+              </span>
+            );
           }
-          return cell.clickable ? (
-            <span
-              style={{
-                cursor: "pointer",
-                textDecoration: "underline",
-                fontWeight: "bold",
-              }}
-              onClick={() => {
-                router.push(`${cell.uri}${params.row[cell.id]}`);
-              }}
-            >
-              {value}
-            </span>
-          ) : (
-            value
-          );
+          if (cell.clickable && !cell.displayValue) {
+            return (
+              <span
+                style={{
+                  cursor: "pointer",
+                  textDecoration: "underline",
+                  fontWeight: "bold",
+                }}
+                onClick={() => {
+                  router.push(`${cell.uri}${value}`);
+                }}
+              >
+                {value}
+              </span>
+            );
+          }
+          if (cell.displayValue && value !== null) {
+            return value.split(" - ")[1];
+          } else return value;
         },
       };
     });
@@ -229,7 +260,6 @@ export default function EnhancedTable({
         },
       },
     ]);
-    console.log("newHeadCells", newHeadCells);
     setSkeleton(false);
   }, [URI, headCells, rows]);
   const currentURI = window.location.pathname;
@@ -244,18 +274,22 @@ export default function EnhancedTable({
     return (
       <>
         <GridToolbarContainer>
-          <GridToolbarColumnsButton />
-          <GridToolbarFilterButton />
-          <GridToolbarDensitySelector />
-          <GridToolbarExport
-            csvOptions={{
-              fileName: `${title}-${new Date().toLocaleDateString()}`,
-            }}
-            printOptions={{
-              hideFooter: true,
-              hideToolbar: true,
-            }}
-          />
+          <Grid item xs={12}>
+            <GridToolbarColumnsButton />
+            <GridToolbarFilterButton />
+            <GridToolbarDensitySelector />
+            <GridToolbarExport
+              csvOptions={{
+                fileName: `${title}-${new Date().toLocaleDateString()}`,
+              }}
+              printOptions={{
+                hideFooter: true,
+                hideToolbar: true,
+              }}
+            />
+          </Grid>
+          <GridToolbarQuickFilter />
+
           <Button
             style={{ marginLeft: "auto" }}
             variant="contained"
@@ -266,16 +300,18 @@ export default function EnhancedTable({
             Yeni Oluştur
             <Add />
           </Button>
-          <Button
-            variant="outlined"
-            color="secondary"
-            onClick={() => {
-              setRefresh(!refresh);
-            }}
-          >
-            Yenile
-            <Refresh />
-          </Button>
+          {selected.length === 0 && (
+            <Button
+              variant="outlined"
+              color="secondary"
+              onClick={() => {
+                setRefresh(!refresh);
+              }}
+            >
+              Yenile
+              <Refresh />
+            </Button>
+          )}
           {selected.length > 0 && (
             <Button
               variant="outlined"
@@ -290,6 +326,38 @@ export default function EnhancedTable({
               <Delete />
             </Button>
           )}
+          {selected.length === 1 && (
+            <>
+              {viewable && (
+                <Button
+                  variant="contained"
+                  color="info"
+                  onClick={() => {
+                    router.push(
+                      `${useTableName ? tableName : currentURI}/view/?id=${
+                        selected[0]
+                      }`
+                    );
+                  }}
+                >
+                  <Visibility />
+                </Button>
+              )}
+              <Button
+                variant="contained"
+                color="info"
+                onClick={() => {
+                  router.push(
+                    `${useTableName ? tableName : currentURI}/form/?id=${
+                      selected[0]
+                    }`
+                  );
+                }}
+              >
+                <Edit />
+              </Button>
+            </>
+          )}
         </GridToolbarContainer>
       </>
     );
@@ -299,17 +367,20 @@ export default function EnhancedTable({
       <Dialog open={deleteDialog} onClose={handleClose}>
         <DialogTitle>Veriyi Sil</DialogTitle>
         <DialogContent>
-          <DialogContentText>
-            Seçilen veriyi silmek istediğinize emin misiniz?
-            <Typography>
-              <strong>ID:</strong>
+          <DialogContentText component="div">
+            <p>
+              Seçilen {title.toLocaleLowerCase()} silmek istediğinize emin
+              misiniz?
+            </p>
+            <div>
+              <strong>No:</strong>{" "}
               {selections.map((id, index) => (
                 <React.Fragment key={id}>
                   {id}
                   {index < selections.length - 1 && ", "}
                 </React.Fragment>
               ))}
-            </Typography>
+            </div>
           </DialogContentText>
         </DialogContent>
         <DialogActions>
@@ -326,6 +397,7 @@ export default function EnhancedTable({
           </Button>
         </DialogActions>
       </Dialog>
+
       <Dialog open={Boolean(result.code)} onClose={() => setResult({})}>
         <DialogTitle>
           {result.code === 200
@@ -407,7 +479,7 @@ export default function EnhancedTable({
             }}
             // scroll overflow
             style={{
-              height: "75vh",
+              height: "40rem",
               width: "100%",
             }}
           />

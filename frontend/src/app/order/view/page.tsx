@@ -12,14 +12,14 @@ import {
   Typography,
   Button,
   Grid,
-  Checkbox,
   Paper,
   TextField,
+  LinearProgress,
 } from "@mui/material";
 import SaveIcon from "@mui/icons-material/Save";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { trTR } from "@/components/trTrGrid";
-import { Close, Edit, LocalShipping } from "@mui/icons-material";
+import { Close, Edit, LocalOffer, LocalShipping } from "@mui/icons-material";
 import { usePersonnelId } from "@/contexts/auth";
 
 const boxStyle = {
@@ -31,80 +31,66 @@ const boxStyle = {
   height: "100%",
 };
 
-interface Account {
-  id: number;
-  name: string;
-}
-
 interface Order {
   id: number;
-  createdAt: Date;
-  accountId: number;
-  type: string;
   description: string;
+  personnelId: number;
   closed: boolean;
+  customerId: number;
+  createdAt: Date;
   personnel: Personnel;
-  account: { name: string };
+  customer: { name: string };
+  orderItem: OrderItem[];
+  orderShipment: OrderShipment[];
 }
 
 interface OrderItem {
   id: number;
   orderId: number;
-  dyeColorId: number;
-  laminationColorId: number;
-  itemTypeId: number;
+  productId: number;
+  dyeColorId?: number;
+  laminationColorId?: number;
+  itemTypeId?: number;
+  description?: string;
   personnelId: number;
-  itemType: { name: string };
-  personnel: Personnel;
-  lot: string;
+  meter: number;
+  kg: number;
+  product: { name: string };
+  dyeColor?: { name: string };
+  laminationColor?: { name: string };
+  itemType?: { name: string };
+}
+
+interface OrderShipment {
+  id: number;
+  orderId: number;
+  createdAt: Date;
+  sentDate?: Date;
+  shippingCompanyId?: number;
+  shippingCarrierId?: number;
+  shippingCarId?: number;
+  closed: boolean;
+  personnelId: number;
+  shippingCompany?: { name: string };
+  shippingCarrier?: { name: string };
+  shippingCar?: { plate: string };
+  orderShipmentItem: OrderShipmentItem[];
+}
+
+interface OrderShipmentItem {
+  id: number;
+  orderShipmentId: number;
+  orderItemId: number;
+  personnelId: number;
+  orderedQuantity: number;
   unit: string;
-  quantity: number;
-  description: string;
-  sentKg: number;
-  sentMeter: number;
+  orderItem: OrderItem;
 }
 
 interface Personnel {
   id: number;
   firstName: string;
   lastName: string;
-}
-
-interface OrderShipment {
-  no: number;
-  id?: number;
-  orderId?: number;
-  createdAt?: Date;
-  sentDate?: Date;
-  closed?: boolean;
-  personnelId?: number;
-  personnel?: Personnel;
-  shippingCompanyId?: number;
-  shippingCompany?: { name: string };
-  shippingCarrier: { name: string };
-  shippingCar: { plate: string };
-  orderShipmentItems: OrderShipmentItem[];
-}
-
-interface OrderShipmentConfirmation {
-  no: number;
-  id?: number;
-  orderShipmentItemId?: number;
-  sentMeter?: number;
-  sentKg: number;
-  personnelId: number;
-  lot?: string;
-  barcode?: string;
-}
-
-interface OrderShipmentItem {
-  no: number;
-  id?: number;
-  orderShipmentId?: number;
-  orderItemId?: number;
-  orderedQuantity: number;
-  unit: string;
-  OrderShipmentConfirmation?: OrderShipmentConfirmation[];
 }
 
 const OrderView = () => {
@@ -114,15 +100,9 @@ const OrderView = () => {
   const [order, setOrder] = useState<Order | null>(null);
   const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
   const [shipments, setShipments] = useState<OrderShipment[]>([]);
-  const [accounts, setAccounts] = useState<Account[]>([]);
-  const [personnels, setPersonnels] = useState<Personnel[]>([]);
-  const [rowModesModel, setRowModesModel] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [refresh, setRefresh] = useState(false);
-
-  const [page, setPage] = useState(0);
-  const [pageSize, setPageSize] = useState(10);
 
   useEffect(() => {
     if (!orderId) return;
@@ -130,37 +110,15 @@ const OrderView = () => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const [orderRes, accountsRes, personnelsRes, shipmentsRes] =
-          await Promise.all([
-            fetch(`/api/order/${orderId}`),
-            fetch(`/api/account/properties/0/0/1/0`),
-            fetch(`/api/personnel`),
-            fetch(`/api/order-shipment/order/${orderId}`),
-          ]);
+        const [orderRes, shipmentsRes] = await Promise.all([
+          fetch(`/api/order/${orderId}`),
+          fetch(`/api/order-shipment/order/${orderId}`),
+        ]);
 
         if (!orderRes.ok) throw new Error("Failed to fetch order.");
         const orderData = await orderRes.json();
         setOrder(orderData);
-        setOrderItems(
-          orderData.orderItems.map((item: OrderItem, index: number) => ({
-            ...item,
-            no: index + 1,
-          })) || []
-        );
-
-        if (accountsRes.ok) {
-          const accountsData = await accountsRes.json();
-          setAccounts(accountsData);
-        } else {
-          console.warn("Failed to fetch accounts.");
-        }
-
-        if (personnelsRes.ok) {
-          const personnelsData = await personnelsRes.json();
-          setPersonnels(personnelsData);
-        } else {
-          console.warn("Failed to fetch personnel.");
-        }
+        setOrderItems(orderData.orderItem || []);
 
         if (shipmentsRes.ok) {
           const shipmentsData = await shipmentsRes.json();
@@ -178,280 +136,132 @@ const OrderView = () => {
     fetchData();
   }, [orderId, refresh]);
 
-  const handleAddRow = (shipmentIndex: number) => {};
-  const handleSaveRow = (row: OrderShipmentItem) => {};
-  const handleDeleteRow = (no: number) => {};
-  const [itemToShip, setItemToShip] = useState<OrderShipmentItem | null>(null);
-  const [shipFormOpen, setShipFormOpen] = useState(false);
-  const [formData, setFormData] = useState<{
-    sentKg: number;
-    sentMeter: number;
-    personnelId: number;
-    orderItemId: number | null;
-    orderShipmentId: number | null;
-  }>({
-    sentKg: 0,
-    sentMeter: 0,
-    personnelId: usePersonnelId(),
-    orderItemId: null,
-    orderShipmentId: null,
-  });
   const handleShip = (row: OrderShipmentItem) => {
-    setItemToShip(row);
-    setFormData({
-      sentKg: 0,
-      sentMeter: 0,
-      personnelId: usePersonnelId(),
-      orderItemId: Number(row.id),
-      orderShipmentId: null,
-    });
-    setShipFormOpen(true);
+    // Handle ship logic
   };
-  const handleSubmit = async (data: typeof formData) => {
-    const shipment = shipments.find((shipment) => !shipment.closed);
-    if (shipment) {
-      await fetch(`/api/order-shipment-item`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          ...data,
-          orderShipmentId: shipment.id,
-        }),
-      });
-    } else {
-      const res = await fetch(`/api/order-shipment`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          orderId: orderId,
-          personnelId: usePersonnelId(),
-        }),
-      });
-      if (res.ok) {
-        const shipmentData = await res.json();
-        await fetch(`/api/order-shipment-item`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            ...data,
-            orderShipmentId: shipmentData.id,
-          }),
-        });
-      }
-    }
+
+  const handleSubmit = async (data: any) => {
+    // Handle submit logic
     setRefresh(!refresh);
   };
 
   const columns: GridColDef[] = [
+    { field: "id", headerName: "ID", width: 70 },
     {
-      field: "no",
-      headerName: "#",
-      width: 70,
-      type: "number",
+      field: "product",
+      headerName: "Ürün",
+      width: 150,
+      valueGetter: (params, row) => row.product?.name,
+    },
+    {
+      field: "dyeColor",
+      headerName: "Boya Rengi",
+      width: 150,
+      valueGetter: (params, row) => row.dyeColor?.name,
+    },
+    {
+      field: "laminationColor",
+      headerName: "Lamine Rengi",
+      width: 150,
+      valueGetter: (params, row) => row.laminationColor?.name,
     },
     {
       field: "itemType",
-      headerName: "Ürün Türü",
+      headerName: "Ürün Tipi",
       width: 150,
+      valueGetter: (params, row) => row.itemType?.name,
+    },
+    {
+      field: "orderItemSpecification",
+      headerName: "Özellikler",
+      width: 200,
       valueGetter: (params, row) =>
-        orderItems.find((item) => item.id === row.id)?.itemType.name,
+        row.orderItemSpecification
+          .map((spec: any) => spec.outsourceType?.name)
+          .join(", "),
     },
+    { field: "kg", headerName: "Kg", width: 100 },
+    { field: "meter", headerName: "Metre", width: 100 },
     {
-      field: "lot",
-      headerName: "Lot",
-      width: 100,
-    },
-    {
-      field: "quantity",
-      headerName: "Miktar",
-      width: 100,
-    },
-    {
-      field: "sentKg",
-      headerName: "Gönderilen Kg",
-      width: 150,
-      valueGetter: (params) => {
-        const shipmentItems = shipments.flatMap(
-          (shipment) => shipment.orderShipmentItems
-        );
-        const totalItemsSent = shipmentItems.flatMap(
-          (item) => item.OrderShipmentConfirmation
-        );
-        const totalSentKg = totalItemsSent.reduce(
-          (acc, item) => acc + (item?.sentKg || 0),
-          0
-        );
-        return totalSentKg;
-      },
-    },
-    {
-      field: "sentMeter",
-      headerName: "Gönderilen Metre",
-      width: 150,
-      valueGetter: (params) => {
-        const shipmentItems = shipments.flatMap(
-          (shipment) => shipment.orderShipmentItems
-        );
-        const totalItemsSent = shipmentItems.flatMap(
-          (item) => item.OrderShipmentConfirmation
-        );
-        const totalSentMeter = totalItemsSent.reduce(
-          (acc, item) => acc + (item?.sentMeter || 0),
-          0
-        );
-      },
-    },
-    {
-      field: "remainingKg",
-      headerName: "Kalan Kg",
-      width: 150,
-      valueGetter: (params, row) => {
-        const shipmentItems = shipments.flatMap(
-          (shipment) => shipment.orderShipmentItems
-        );
-        const totalItemsSent = shipmentItems.flatMap(
-          (item) => item.OrderShipmentConfirmation
-        );
-        const totalSentKg = totalItemsSent.reduce(
-          (acc, item) => acc + (item?.sentKg || 0),
-          0
-        );
-        return row.quantity - totalSentKg;
-      },
+      field: "description",
+      headerName: "Açıklama",
+      width: 200,
     },
     {
       field: "actions",
       headerName: "İşlemler",
       width: 130,
       renderCell: (params: GridRenderEditCellParams) => (
-        <>
-          <GridActionsCellItem
-            icon={<LocalShipping />}
-            label="Sevk Et"
-            onClick={() => handleShip(params.row as OrderShipmentItem)}
-          />
-        </>
+        <GridActionsCellItem
+          icon={<LocalShipping />}
+          label="Gönder"
+          onClick={() => handleShip(params.row as OrderShipmentItem)}
+        />
       ),
     },
   ];
 
-  const actionShipment = async (shipment: OrderShipment) => {
-    await fetch(`/api/order-shipment/${shipment.id}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        closed: !shipment.closed,
-      }),
-    });
-    setRefresh(!refresh);
-  };
-
   const shipmentColumns: GridColDef[] = [
-    {
-      field: "no",
-      headerName: "#",
-      width: 70,
-      type: "number",
-      valueGetter: (params, row) =>
-        shipments.findIndex((shipment) => shipment.id === row.id) + 1,
-    },
-    {
-      field: "id",
-      headerName: "ID",
-      width: 70,
-    },
+    { field: "id", headerName: "ID", width: 70 },
     {
       field: "shippingCompany",
-      headerName: "Nakliye Firması",
+      headerName: "Shipping Company",
       width: 150,
-      valueGetter: (params, row) =>
-        shipments.find((shipment) => shipment.id === row.id)?.shippingCompany
-          ?.name || null,
+      valueGetter: (params, row) => row.shippingCompany?.name || "",
     },
     {
       field: "shippingCarrier",
-      headerName: "Nakliyeci",
+      headerName: "Shipping Carrier",
       width: 150,
-      valueGetter: (params, row) =>
-        shipments.find((shipment) => shipment.id === row.id)?.shippingCarrier
-          ?.name || null,
+      valueGetter: (params, row) => row.shippingCarrier?.name || "",
     },
     {
       field: "shippingCar",
-      headerName: "Araç",
+      headerName: "Car",
       width: 150,
-      valueGetter: (params, row) =>
-        shipments.find((shipment) => shipment.id === row.id)?.shippingCar
-          ?.plate || null,
+      valueGetter: (params, row) => row.shippingCar?.plate || "",
     },
     {
       field: "sentDate",
-      headerName: "Sevk Tarihi",
+      headerName: "Sent Date",
       width: 150,
-      valueFormatter: (params, row) => {
-        return row.sentDate
+      valueFormatter: (params: any) =>
+        params.value
           ? new Intl.DateTimeFormat("tr-TR", {
               day: "2-digit",
               month: "long",
               year: "numeric",
               hour: "2-digit",
               minute: "2-digit",
-            }).format(new Date(row.sentDate as string))
-          : null;
-      },
+            }).format(new Date(params.value))
+          : null,
     },
     {
       field: "closed",
-      headerName: "Durum",
+      headerName: "Status",
       width: 150,
-      valueGetter: (params, row) =>
-        shipments.find((shipment) => shipment.id === row.id)?.closed
-          ? "Kapalı"
-          : "Açık",
+      valueGetter: (params, row) => (row.closed ? "Closed" : "Open"),
     },
     {
       field: "actions",
-      headerName: "İşlemler",
+      headerName: "Actions",
       width: 200,
       renderCell: (params: GridRenderEditCellParams) => (
         <>
           <Button
-            startIcon={
-              shipments.find(
-                (shipment) => shipment.id === (params.row as OrderShipment).id
-              )?.closed ? (
-                <LocalShipping />
-              ) : (
-                <Close />
-              )
-            }
+            startIcon={params.row.closed ? <LocalShipping /> : <Close />}
             variant="contained"
-            color={
-              shipments.find(
-                (shipment) => shipment.id === (params.row as OrderShipment).id
-              )?.closed
-                ? "secondary"
-                : "error"
-            }
-            onClick={() => actionShipment(params.row as OrderShipment)}
+            color={params.row.closed ? "secondary" : "error"}
+            onClick={() => {
+              // Handle action shipment logic
+              setRefresh(!refresh);
+            }}
           >
-            {shipments.find(
-              (shipment) => shipment.id === (params.row as OrderShipment).id
-            )?.closed
-              ? "Aç"
-              : "Kapat"}
+            {params.row.closed ? "Open" : "Close"}
           </Button>
           <GridActionsCellItem
             icon={<Edit />}
-            label="Düzenle"
+            label="Edit"
             onClick={() => {
               router.push(`/order-shipment/form/?id=${params.row.id}`);
             }}
@@ -462,9 +272,14 @@ const OrderView = () => {
   ];
 
   return (
-    <Box sx={{ p: 3 }}>
+    <Paper
+      style={{
+        margin: "auto",
+      }}
+      sx={{ p: 3 }}
+    >
       {loading ? (
-        <Typography>Loading...</Typography>
+        <LinearProgress />
       ) : error ? (
         <Typography color="error">{error}</Typography>
       ) : (
@@ -475,19 +290,16 @@ const OrderView = () => {
                 Sipariş Detayları
               </Typography>
               {[
-                { label: "ID", value: order.id },
-                { label: "Hesap", value: order.account.name },
+                { label: "No", value: order.id },
+                { label: "Müşteri Adı", value: order.customer.name },
                 { label: "Açıklama", value: order.description },
+                {
+                  label: "Oluşturan Personel",
+                  value: `${order.personnel.firstName} ${order.personnel.lastName}`,
+                },
                 { label: "Durum", value: order.closed ? "Kapalı" : "Açık" },
                 {
-                  label: "Personel",
-                  value:
-                    order.personnel?.firstName +
-                    " " +
-                    order.personnel?.lastName,
-                },
-                {
-                  label: "Oluşturulma Tarihi",
+                  label: "Tarih",
                   value: new Intl.DateTimeFormat("tr-TR", {
                     day: "2-digit",
                     month: "long",
@@ -503,111 +315,36 @@ const OrderView = () => {
               ))}
             </Box>
           )}
-          {shipFormOpen && itemToShip ? (
-            <>
-              <form>
-                <Paper sx={{ p: 2 }}>
-                  <Typography variant="h6" gutterBottom>
-                    {itemToShip.no}. Ürün Türü:{" "}
-                    {
-                      orderItems.find((item) => item.id === itemToShip.id)
-                        ?.itemType.name
-                    }
-                  </Typography>
-                  <Grid container spacing={2}>
-                    <Grid item xs={12} sm={6}>
-                      <Typography variant="body1">
-                        <strong>Gönderilecek Kg:</strong>{" "}
-                        {orderItems
-                          .filter((item) => item.id === itemToShip.id)
-                          .reduce((acc, item) => acc + item.quantity, 0)}{" "}
-                        Kg
-                      </Typography>
-                    </Grid>
-                    <Grid item xs={12} sm={6}>
-                      <Typography variant="body1">
-                        <strong>Gönderilecek Metre:</strong>{" "}
-                        {itemToShip.orderedQuantity || 0} Metre
-                      </Typography>
-                    </Grid>
-                    <Grid item xs={12} sm={6}>
-                      <Typography variant="body1">
-                        <strong>Kg miktar:</strong>{" "}
-                        <TextField
-                          size="small"
-                          type="number"
-                          value={formData.sentKg}
-                          onChange={(e) =>
-                            setFormData({
-                              ...formData,
-                              sentKg: +e.target.value,
-                            })
-                          }
-                        />
-                      </Typography>
-                    </Grid>
-                    <Grid item xs={12} sm={6}>
-                      <Typography variant="body1">
-                        <strong>Metre miktar:</strong>{" "}
-                        <TextField
-                          type="number"
-                          size="small"
-                          value={formData.sentMeter}
-                          onChange={(e) =>
-                            setFormData({
-                              ...formData,
-                              sentMeter: +e.target.value,
-                            })
-                          }
-                        />
-                      </Typography>
-                    </Grid>
-                  </Grid>
-                  <Box sx={{ mt: 2 }}>
-                    <Button
-                      color="primary"
-                      startIcon={<SaveIcon />}
-                      onClick={() => {
-                        handleSubmit(formData);
-                        setShipFormOpen(false);
-                      }}
-                    >
-                      Kaydet
-                    </Button>
-                    <Button
-                      variant="outlined"
-                      color="secondary"
-                      startIcon={<DeleteIcon />}
-                      onClick={() => setShipFormOpen(false)}
-                    >
-                      İptal
-                    </Button>
-                  </Box>
-                </Paper>
-              </form>
-            </>
-          ) : null}
+          {/* button to go to offer/order/${id} */}
+          <Button
+            variant="contained"
+            color="primary"
+            startIcon={<LocalOffer />}
+            onClick={() => {
+              router.push(`/offer/form/?orderId=${orderId}`);
+            }}
+          >
+            Teklif Oluştur
+          </Button>
           <Typography variant="h4" gutterBottom>
-            Bu siparişe ait ürünler
+            Sipariş Kalemleri
           </Typography>
           <DataGrid
             rows={orderItems}
             columns={columns}
-            rowCount={orderItems.length}
             localeText={trTR.components.MuiDataGrid.defaultProps.localeText}
           />
-          <Typography variant="h4" gutterBottom>
-            Bu siparişe ait sevkiyatlar
+          {/* <Typography variant="h4" gutterBottom>
+            Shipments
           </Typography>
           <DataGrid
             rows={shipments}
             columns={shipmentColumns}
-            rowCount={shipments.length}
             localeText={trTR.components.MuiDataGrid.defaultProps.localeText}
-          />
+          /> */}
         </>
       )}
-    </Box>
+    </Paper>
   );
 };
 

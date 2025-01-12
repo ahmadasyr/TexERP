@@ -196,26 +196,8 @@ const Account: React.FC = ({ popupHandler, popupSetter }: AccountProps) => {
               <Grid item xs={6} md={4}>
                 <NewNumber {...allProps} keyProp="credit" />
               </Grid>
-            </Grid>
-            <Grid
-              mt={1}
-              border={1}
-              borderColor={"#e0e0e0"}
-              padding={1}
-              spacing={1}
-              xs={3}
-            >
-              <Grid item xs={12} md={12}>
-                <NewCheckBox {...allProps} keyProp="outsource" />
-              </Grid>
-              <Grid item xs={12} md={12}>
-                <NewCheckBox {...allProps} keyProp="dye" />
-              </Grid>
-              <Grid item xs={12} md={12}>
-                <NewCheckBox {...allProps} keyProp="yarn" />
-              </Grid>
-              <Grid item xs={12} md={12}>
-                <NewCheckBox {...allProps} keyProp="buys" />
+              <Grid item xs={6} md={4}>
+                <NewRelation {...allProps} keyProp="accountTypeId" />
               </Grid>
             </Grid>
           </Grid>

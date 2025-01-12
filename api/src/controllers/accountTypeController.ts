@@ -36,7 +36,7 @@ export const createAccountTypeController = async (
   res: Response
 ) => {
   try {
-    const accountType = await createAccountType(req.body.name);
+    const accountType = await createAccountType(req.body);
     res.json(accountType);
   } catch (error) {
     res.status(500).json({ message: error });
@@ -50,7 +50,7 @@ export const updateAccountTypeController = async (
   try {
     const accountType = await updateAccountType(
       Number(req.params.id),
-      req.body.name
+      req.body
     );
     res.json(accountType);
   } catch (error) {

@@ -38,10 +38,12 @@ export const login: RequestHandler = async (
   res: Response,
   next: NextFunction
 ): Promise<void> => {
-  const { email, password } = req.body;
+  const { username, password } = req.body;
 
   try {
-    const personnel = await prisma.personnel.findUnique({ where: { email } });
+    const personnel = await prisma.personnel.findUnique({
+      where: { username },
+    });
     if (!personnel) {
       res.status(401).json({ message: "Invalid email or password" });
       return;
@@ -49,7 +51,7 @@ export const login: RequestHandler = async (
 
     const isPasswordValid = await bcrypt.compare(password, personnel.password);
     if (!isPasswordValid) {
-      res.status(401).json({ message: "Invalid email or password" });
+      res.status(401).json({ message: "Invalid username or password" });
       return;
     }
 
@@ -57,5 +59,34 @@ export const login: RequestHandler = async (
     res.status(200).json({ token, personnel });
   } catch (error) {
     res.status(500).json({ message: "Error logging in", error });
+  }
+};
+
+export const resetPassword: RequestHandler = async (req, res) => {
+  const { username, password } = req.body;
+
+  if (!username || !password) {
+    res.status(400).json({ message: "Username and password are required" });
+    return;
+  }
+
+  const hashedPassword = await bcrypt.hash(password, 10);
+
+  try {
+    await prisma.personnel
+      .update({
+        where: { username },
+        data: { password: hashedPassword },
+      })
+      .then((personnel) => {
+        const token = generateToken(personnel);
+        res.status(200).json({ token, personnel });
+      })
+      .catch((error) => {
+        res.status(500).json({ message: "Error updating password", error });
+      });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Error updating password", error });
   }
 };

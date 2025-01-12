@@ -1,0 +1,66 @@
+[
+  {
+    "code": "sts",
+    "name": "Satış ve Pazarlama"
+  },
+  {
+    "code": "admin",
+    "name": "Admin"
+  },
+  {
+    "code": "yon",
+    "name": "Yönetim"
+  },
+  {
+    "code": "iys",
+    "name": "İş Geliştirme"
+  },
+  {
+    "code": "ika",
+    "name": "İnsan Kaynakları"
+  },
+  {
+    "code": "kal",
+    "name": "Kalite"
+  },
+  {
+    "code": "pln",
+    "name": "Planlama"
+  },
+  {
+    "code": "stn",
+    "name": "Satın Alma"
+  },
+  {
+    "code": "urt",
+    "name": "Üretim"
+  },
+  {
+    "code": "sev",
+    "name": "Sevkiyat"
+  },
+  {
+    "code": "dep",
+    "name": "Depo"
+  },
+  {
+    "code": "coz",
+    "name": "Çözüm"
+  },
+  {
+    "code": "orm",
+    "name": "Örme"
+  },
+  {
+    "code": "kalf",
+    "name": "Kaliteci"
+  },
+  {
+    "code": "kes",
+    "name": "Kesim"
+  },
+  {
+    "code": "muh",
+    "name": "Muhasebe"
+  }
+]

@@ -157,6 +157,15 @@ export const headCells: HeadCell[] = [
   { id: "id", numeric: true, disablePadding: true, label: "No" },
   { id: "name", numeric: false, disablePadding: false, label: "MÜŞTERİ ADI" },
   {
+    id: "account",
+    numeric: false,
+    disablePadding: false,
+    label: "HESAP TÜRÜ",
+    displayValue: ["name"],
+    clickable: true,
+    uri: "/account/form/?id=",
+  },
+  {
     id: "foreign",
     numeric: false,
     disablePadding: false,
@@ -450,9 +459,7 @@ export const fetchOrders = async (setRows: any) => {
     const response = await fetch("/api/customer");
     const data = await response.json();
     setRows(data);
-  } catch (error) {
-    throw new Error("Failed to fetch");
-  }
+  } catch (error) {}
 };
 
 export const tableName = "customer";

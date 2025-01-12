@@ -15,8 +15,9 @@ import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 
 const theme = createTheme();
-import { handleLogin, handleRegister } from "@/contexts/auth";
+import { handleLogin, handleRegister, handleReset } from "@/contexts/auth";
 import { useRouter } from "next/navigation";
+import { env } from "process";
 export default function LoginPage() {
   const router = useRouter();
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
@@ -26,13 +27,20 @@ export default function LoginPage() {
           event.currentTarget.email.value,
           event.currentTarget.password.value
         )
-      : handleRegister(
+      : authType === "register"
+      ? handleRegister(
           event.currentTarget.firstName.value,
           event.currentTarget.lastName.value,
           event.currentTarget.email.value,
           event.currentTarget.password.value,
-          event.currentTarget.username.value
-        );
+          event.currentTarget.email.value
+        )
+      : authType === "reset"
+      ? handleReset(
+          event.currentTarget.email.value,
+          event.currentTarget.password.value
+        )
+      : null;
     router.push("/dashboard");
   };
 
@@ -49,12 +57,21 @@ export default function LoginPage() {
     >
       {authType === "login" ? (
         <>
-          <Avatar sx={{ m: 1, bgcolor: "secondary.main" }}>
-            <LockOutlinedIcon />
-          </Avatar>
-          <Typography component="h1" variant="h5">
-            Sign in
-          </Typography>
+          <img
+            src="./logo.png"
+            alt="logo"
+            style={{
+              width: "20rem",
+            }}
+          />
+          <Box display="flex" alignItems="center">
+            <Avatar sx={{ m: 1, bgcolor: "secondary.main" }}>
+              <LockOutlinedIcon />
+            </Avatar>
+            <Typography component="h1" variant="h5">
+              Giriş Yap
+            </Typography>
+          </Box>
           <Box
             component="form"
             onSubmit={handleSubmit}
@@ -66,7 +83,7 @@ export default function LoginPage() {
               required
               fullWidth
               id="email"
-              label="Email Address"
+              label="kullanıcı adı"
               name="email"
               autoComplete="email"
               autoFocus
@@ -76,7 +93,7 @@ export default function LoginPage() {
               required
               fullWidth
               name="password"
-              label="Password"
+              label="Şifre"
               type="password"
               id="password"
               autoComplete="current-password"
@@ -87,11 +104,12 @@ export default function LoginPage() {
               variant="contained"
               sx={{ mt: 3, mb: 2 }}
             >
-              Sign In
+              Giriş Yap
             </Button>
+
             <Grid container>
               <Grid item xs>
-                <Link href="#" variant="body2">
+                <Link variant="body2" onClick={() => setAuthType("reset")}>
                   Forgot password?
                 </Link>
               </Grid>
@@ -103,7 +121,7 @@ export default function LoginPage() {
             </Grid>
           </Box>
         </>
-      ) : authType === "register" ? (
+      ) : authType === "register" && env.NODE_ENV === "development" ? (
         <>
           <Avatar sx={{ m: 1, bgcolor: "secondary.main" }}>
             <LockOutlinedIcon />
@@ -159,10 +177,10 @@ export default function LoginPage() {
               margin="normal"
               required
               fullWidth
-              id="username"
-              label="Username"
-              name="username"
-              autoComplete="username"
+              id="email"
+              label="email"
+              name="email"
+              autoComplete="email"
             />
             <Button
               type="submit"
@@ -174,11 +192,55 @@ export default function LoginPage() {
             </Button>
             <Grid container>
               <Grid item>
-                <Link href="#" variant="body2">
+                <Link variant="body2" onClick={() => setAuthType("login")}>
                   {"Already have an account? Sign In"}
                 </Link>
               </Grid>
             </Grid>
+          </Box>
+        </>
+      ) : authType === "reset" ? (
+        <>
+          <Avatar sx={{ m: 1, bgcolor: "secondary.main" }}>
+            <LockOutlinedIcon />
+          </Avatar>
+          <Typography component="h1" variant="h5">
+            Reset Password
+          </Typography>
+          <Box
+            component="form"
+            onSubmit={handleSubmit}
+            noValidate
+            sx={{ mt: 1 }}
+          >
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              id="email"
+              label="email"
+              name="email"
+              autoComplete="email"
+              autoFocus
+            />
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              name="password"
+              label="Password"
+              type="password"
+              id="password"
+              autoComplete="new-password"
+            />
+            <Button
+              type="submit"
+              fullWidth
+              variant="contained"
+              sx={{ mt: 3, mb: 2 }}
+            >
+              Reset Password
+            </Button>
           </Box>
         </>
       ) : null}

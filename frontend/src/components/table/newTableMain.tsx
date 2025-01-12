@@ -217,7 +217,6 @@ export default function EnhancedTable({
         },
       },
     ]);
-    console.log("newHeadCells", newHeadCells);
     setSkeleton(false);
   }, [URI, headCells, rows]);
 

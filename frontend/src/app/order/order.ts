@@ -16,11 +16,11 @@ export interface Data {
 
 export const formFields = [
   createField({
-    name: "accountId",
+    name: "customerId",
     label: "Müşteri/Şirket",
     type: "relation",
     relation: true,
-    table: "account/properties/0/0/0/1",
+    table: "customer",
     value: "id",
     displayValue: "name",
     required: true,
@@ -52,7 +52,6 @@ export const formFields = [
     name: "description",
     label: "Açıklama",
     type: "text",
-    required: true,
   }),
   createField({
     name: "createdAt",
@@ -84,11 +83,13 @@ export const headCells: HeadCell[] = [
     label: "Type",
   },
   {
-    id: "account",
+    id: "customer",
     numeric: true,
     disablePadding: false,
     label: "Müşteri/Şirket",
     displayValue: ["name"],
+    clickable: true,
+    uri: "/customer/view/?id=",
   },
   {
     id: "personnel",

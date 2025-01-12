@@ -194,7 +194,14 @@ const Page: React.FC = ({ popupHandler, popupSetter }: PageProps) => {
               <NewDate {...allProps} keyProp="date" />
             </Grid>
             <Grid item xs={12} md={4}>
+              <NewNumber {...allProps} keyProp="upfront" />
+            </Grid>
+            <Grid item xs={12} md={4}>
               <NewNumber {...allProps} keyProp="price" />
+            </Grid>
+
+            <Grid item xs={12} md={4}>
+              <NewNumber {...allProps} keyProp="installment" />
             </Grid>
             <Grid item xs={12} md={4}>
               <NewSelect {...allProps} keyProp="unit" />

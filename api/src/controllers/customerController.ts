@@ -14,6 +14,7 @@ export const getAllCustomers = async (
         bank: true,
         currency: true,
         personnel: true,
+        account: true,
       },
     });
     res.status(200).json(customers);
@@ -83,10 +84,9 @@ export const createCustomer = async (
     const account: any = await prisma.account.create({
       data: {
         name: name,
-        outsource: false,
-        dye: false,
-        yarn: false,
-        buys: true,
+        accountType: {
+          connect: { code: "120" },
+        },
         debit: 0,
         credit: 0,
         customer: {

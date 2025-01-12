@@ -9,6 +9,7 @@
     "title": "Satış",
     "desc": "Satış işlemleri menüsü",
     "icon": "money",
+    "allowedDepartments": ["sts", "admin"],
     "subItems": [
       {
         "title": "Müşteri İşlemleri",
@@ -123,31 +124,6 @@
             "icon": "supervisor_account"
           }
         ]
-      },
-      {
-        "title": "Diğer İşlemler",
-        "desc": "Diğer işlemler menüsü",
-        "icon": "more_horiz",
-        "subItems": [
-          {
-            "title": "Hesaplar",
-            "link": "/account",
-            "desc": "Hesap listesi",
-            "icon": "account_balance_wallet"
-          },
-          {
-            "title": "Bankalar",
-            "link": "/bank",
-            "desc": "Banka listesi",
-            "icon": "account_balance"
-          },
-          {
-            "title": "Vergi Daireleri",
-            "link": "/tax-office",
-            "desc": "Vergi daireleri listesi",
-            "icon": "domain"
-          }
-        ]
       }
     ]
   },
@@ -155,6 +131,7 @@
     "title": "Planlama",
     "desc": "Planlama işlemleri menüsü",
     "icon": "event_note",
+    "allowedDepartments": ["pln", "urt", "admin"],
     "subItems": [
       {
         "title": "İplik İşlemleri",
@@ -274,6 +251,7 @@
     "title": "Üretim",
     "desc": "Üretim işlemleri menüsü",
     "icon": "build",
+    "allowedDepartments": ["urt", "admin"],
     "subItems": [
       {
         "title": "Makineler",
@@ -331,18 +309,26 @@
     "title": "Sevkiyat",
     "desc": "Sevkiyat işlemleri menüsü",
     "icon": "local_shipping",
+    "allowedDepartments": ["sev", "urt", "pln", "admin", "sts"],
     "subItems": [
       {
-        "title": "İplik Satış Sevk Emirleri",
-        "desc": "İplik satış sevkiyatları menüsü",
+        "title": "İplik Sevkiyatları",
+        "desc": "İplik sevkiyatları menüsü",
         "icon": "sports_volleyball",
-        "link": "/yarn-order-shipment"
-      },
-      {
-        "title": "İplik Gönderimleri",
-        "desc": "İplik gönderimleri menüsü",
-        "icon": "sports_volleyball",
-        "link": "/yarn-order-shipment-sent"
+        "subItems": [
+          {
+            "title": "İplik Satış Sevk Emirleri",
+            "desc": "İplik satış sevkiyatları menüsü",
+            "icon": "sports_volleyball",
+            "link": "/yarn-order-shipment"
+          },
+          {
+            "title": "İplik Gönderimleri",
+            "desc": "İplik gönderimleri menüsü",
+            "icon": "sports_volleyball",
+            "link": "/yarn-order-shipment-sent"
+          }
+        ]
       },
       {
         "title": "Kumaş Satış Sevkiyatları",
@@ -356,6 +342,7 @@
     "title": "Kalite Kontrol",
     "desc": "Kalite kontrol işlemleri menüsü",
     "icon": "check",
+    "allowedDepartments": ["urt", "kal", "admin"],
     "subItems": [
       {
         "title": "Kalite Kontrol İş Emirleri",
@@ -387,6 +374,17 @@
     "title": "Depo",
     "desc": "Depo işlemleri menüsü",
     "icon": "warehouse",
+    "allowedDepartments": [
+      "pln",
+      "urt",
+      "kal",
+      "sev",
+      "dep",
+      "yon",
+      "muh",
+      "admin",
+      "sts"
+    ],
     "subItems": [
       {
         "title": "İplik Depo",
@@ -468,6 +466,7 @@
     "title": "Satın Alma",
     "desc": "Satın alma işlemleri menüsü",
     "icon": "shopping_cart",
+    "allowedDepartments": ["yon", "muh", "stn", "admin"],
     "subItems": [
       {
         "title": "Satın Alma Listesi",
@@ -505,6 +504,7 @@
     "title": "Muhasabe",
     "desc": "Muhasabe işlemleri menüsü",
     "icon": "account_balance",
+    "allowedDepartments": ["muh", "yon", "admin"],
     "subItems": [
       {
         "title": "Hesaplar",
@@ -594,6 +594,7 @@
     "title": "İnsan Kaynakları",
     "desc": "İnsan kaynakları işlemleri menüsü",
     "icon": "people",
+    "allowedDepartments": ["ik", "yon", "muh", "admin"],
     "subItems": [
       {
         "title": "Personel",
@@ -670,5 +671,37 @@
         ]
       }
     ]
+  },
+  {
+    "title": "Genel Muhasebe İşlemleri",
+    "desc": "Diğer işlemler menüsü",
+    "icon": "account_balance",
+    "allowedDepartments": ["muh", "yon", "admin", "sts"],
+    "subItems": [
+      {
+        "title": "Hesaplar",
+        "link": "/account",
+        "desc": "Hesap listesi",
+        "icon": "account_balance_wallet"
+      },
+      {
+        "title": "Bankalar",
+        "link": "/bank",
+        "desc": "Banka listesi",
+        "icon": "account_balance"
+      },
+      {
+        "title": "Vergi Daireleri",
+        "link": "/tax-office",
+        "desc": "Vergi daireleri listesi",
+        "icon": "domain"
+      }
+    ]
+  },
+  {
+    "title": "Genel Ayarlar",
+    "desc": "Genel ayarlar menüsü",
+    "icon": "settings",
+    "subItems": []
   }
 ]

@@ -4,236 +4,44 @@ export const tableName = "offer";
 
 export interface Data {
   id: number;
-  offerNo: number;
-  saleNo: number;
-  offerDate: Date;
-  customerId: number;
-  date: Date;
-  proformaNo: number;
-  requestNo: number;
-  requestDate: Date;
-  requestDeadline: Date;
-  requestBudget: number;
-  productId: number;
-  specification: string;
-  detail: string;
-  quantity: number;
-  unit: string; // select mt or kg
-  price: number;
-  currencyId: number;
-  vat: number;
-  total: number;
-  maturity: number;
-  daysDue: number;
-  deadlineDate: Date;
-  specialRequirement: string;
-  deliveryAddress: string;
-  shippingMethod: string; // select
-  proformaDetails: string;
-  packingListNo: number;
-  additionalTerms: string;
+  createdAt: Date;
+  personnelId: number;
+  paymentDue: number;
+  deliveryDeadlineDate: Date;
   validPeriod: number;
-  validPeriodType: string; // select ay, hafta, gün
-  conditions: any; // json
+  validPeriodType: string; // Replace with actual enum (ay, hafta, gün)
   lastValidityDate: Date;
-  acceptanceDate: Date;
-  rejectionDate: Date;
-  status: string; // select Verilecek, Red, onaylandi, beklemede
-  meetNote: string;
-  lastMeetDate: Date;
-  meetStatement: string;
+  additionalTerms?: any; // json
+  conditions?: any; // json
+  total: number;
   totalKDV: number;
+  responseDate?: Date;
+  detail?: string;
+  meetStatement?: string;
+  meetNote?: string;
+  status: string; // offerStatus
+  customerTargetPrice?: number;
+  orderId?: number;
 }
 
 export const formFields = [
   createField({
-    name: "customerId",
-    label: "Müşteri Adı",
-    type: "number",
-    relation: true,
-    table: "customer",
-    value: "id",
-    displayValue: "name",
-    required: true,
-  }),
-  createField({
-    name: "offerNo",
-    label: "Teklif No",
+    name: "personnelId",
+    label: "Personel ID",
     type: "number",
     required: true,
   }),
   createField({
-    name: "saleNo",
-    label: "Satış No",
+    name: "paymentDue",
+    label: "Ödeme Vadesi",
     type: "number",
     required: true,
   }),
   createField({
-    name: "offerDate",
-    label: "Teklif Tarihi",
+    name: "deliveryDeadlineDate",
+    label: "Teslimat Son Tarihi",
     type: "datetime-local",
     required: true,
-  }),
-  createField({
-    name: "date",
-    label: "Giriş Tarihi",
-    type: "date",
-  }),
-  createField({
-    name: "proformaNo",
-    label: "Proforma No",
-    type: "number",
-  }),
-  createField({
-    name: "requestNo",
-    label: "Talep No",
-    type: "number",
-    required: true,
-  }),
-  createField({
-    name: "requestDate",
-    label: "Talep Tarihi",
-    type: "date",
-    required: true,
-  }),
-  createField({
-    name: "requestDeadline",
-    label: "Talep Son Tarihi",
-    type: "date",
-  }),
-  createField({
-    name: "requestBudget",
-    label: "Talep Bütçesi",
-    type: "float",
-    required: true,
-  }),
-  createField({
-    name: "productId",
-    label: "Ürün",
-    type: "number",
-    relation: true,
-    table: "product",
-    value: "id",
-    displayValue: "name",
-    required: true,
-  }),
-  createField({
-    name: "specification",
-    label: "Spesifikasyon",
-    type: "text",
-  }),
-  createField({
-    name: "detail",
-    label: "Detay",
-    type: "text",
-  }),
-  createField({
-    name: "quantity",
-    label: "Miktar",
-    type: "number",
-    required: true,
-  }),
-  createField({
-    name: "unit",
-    label: "Birim",
-    type: "select",
-    options: ["m", "kg"],
-    required: true,
-  }),
-  createField({
-    name: "price",
-    label: "Fiyat",
-    type: "float",
-    required: true,
-  }),
-  createField({
-    name: "currencyId",
-    label: "Para Birimi",
-    type: "number",
-    relation: true,
-    table: "currency",
-    value: "id",
-    displayValue: "name",
-    required: true,
-  }),
-  createField({
-    name: "vat",
-    label: "KDV",
-    type: "float",
-    required: true,
-  }),
-  createField({
-    name: "total",
-    label: "Toplam",
-    type: "float",
-    required: true,
-  }),
-  createField({
-    name: "maturity",
-    label: "Vade",
-    type: "float",
-    required: true,
-  }),
-  createField({
-    name: "daysDue",
-    label: "Gün Sayısı",
-    type: "number",
-    required: true,
-  }),
-  createField({
-    name: "deadlineDate",
-    label: "Termin Tarihi",
-    type: "date",
-    required: true,
-  }),
-  createField({
-    name: "specialRequirement",
-    label: "Özel Gereksinim",
-    type: "text",
-  }),
-  createField({
-    name: "deliveryAddress",
-    label: "Teslimat Adresi",
-    type: "text",
-    required: true,
-  }),
-  createField({
-    name: "shippingMethod",
-    label: "Nakliye Yöntemi",
-    type: "select",
-    required: true,
-
-    options: [
-      "Fabrikadan",
-      "Depodan",
-      "Limana",
-      "EXW",
-      "FCA",
-      "CPT",
-      "CIP",
-      "DAT",
-      "DAP",
-      "DDP",
-      "FAS",
-      "FOB",
-      "CFR",
-      "CIF",
-    ],
-  }),
-  createField({
-    name: "proformaDetails",
-    label: "Proforma Detayları",
-    type: "text",
-  }),
-  createField({
-    name: "packingListNo",
-    label: "Paketleme Listesi No",
-    type: "number",
-  }),
-  createField({
-    name: "additionalTerms",
-    label: "Ek Şartlar",
-    type: "json",
   }),
   createField({
     name: "validPeriod",
@@ -249,26 +57,52 @@ export const formFields = [
     required: true,
   }),
   createField({
+    name: "lastValidityDate",
+    label: "Son Geçerlilik Tarihi",
+    type: "datetime-local",
+    required: true,
+  }),
+  createField({
+    name: "additionalTerms",
+    label: "Ek Şartlar",
+    type: "json",
+  }),
+  createField({
     name: "conditions",
     label: "Koşullar",
     type: "json",
   }),
   createField({
-    name: "lastValidityDate",
-    label: "Son Geçerlilik Tarihi",
-    type: "date",
+    name: "total",
+    label: "Toplam",
+    type: "float",
     required: true,
-    disabled: true,
   }),
   createField({
-    name: "acceptanceDate",
-    label: "Kabul Tarihi",
-    type: "date",
+    name: "totalKDV",
+    label: "Toplam KDV",
+    type: "float",
+    required: true,
   }),
   createField({
-    name: "rejectionDate",
-    label: "Red Tarihi",
-    type: "date",
+    name: "responseDate",
+    label: "Yanıt Tarihi",
+    type: "datetime-local",
+  }),
+  createField({
+    name: "detail",
+    label: "Detay",
+    type: "text",
+  }),
+  createField({
+    name: "meetStatement",
+    label: "Görüşme Beyanı",
+    type: "text",
+  }),
+  createField({
+    name: "meetNote",
+    label: "Görüşme Notu",
+    type: "text",
   }),
   createField({
     name: "status",
@@ -278,210 +112,36 @@ export const formFields = [
     required: true,
   }),
   createField({
-    name: "meetNote",
-    label: "Görüşme Notu",
-    type: "text",
-  }),
-  createField({
-    name: "lastMeetDate",
-    label: "Son Görüşme Tarihi",
-    type: "date",
-  }),
-  createField({
-    name: "meetStatement",
-    label: "Görüşme Beyanı",
-    type: "text",
-  }),
-  createField({
-    name: "totalKDV",
-    label: "Toplam KDV",
+    name: "customerTargetPrice",
+    label: "Müşteri Hedef Fiyatı",
     type: "float",
-    required: true,
+  }),
+  createField({
+    name: "orderId",
+    label: "Sipariş ID",
+    type: "number",
   }),
 ];
 
 export const headCells: HeadCell[] = [
   {
-    id: "customer",
-    numeric: false,
-    disablePadding: true,
-    label: "Müşteri Adı",
-    displayValue: ["name"],
-  },
-  {
-    id: "offerNo",
+    id: "personnelId",
     numeric: true,
     disablePadding: false,
-    label: "Teklif No",
+    label: "Personel ID",
   },
   {
-    id: "status",
-    numeric: false,
-    disablePadding: false,
-    label: "Durum",
-  },
-  {
-    id: "saleNo",
+    id: "paymentDue",
     numeric: true,
     disablePadding: false,
-    label: "Satış No",
+    label: "Ödeme Vadesi",
   },
   {
-    id: "offerDate",
+    id: "deliveryDeadlineDate",
     numeric: false,
     disablePadding: false,
-    label: "Teklif Tarihi",
+    label: "Teslimat Son Tarihi",
     date: true,
-  },
-  {
-    id: "date",
-    numeric: false,
-    disablePadding: false,
-    label: " Oluşturulma Tarihi",
-    date: true,
-  },
-  {
-    id: "proformaNo",
-    numeric: true,
-    disablePadding: false,
-    label: "Proforma No",
-  },
-  {
-    id: "requestNo",
-    numeric: true,
-    disablePadding: false,
-    label: "Talep No",
-  },
-  {
-    id: "requestDate",
-    numeric: false,
-    disablePadding: false,
-    label: "Talep Tarihi",
-    date: true,
-  },
-  {
-    id: "requestDeadline",
-    numeric: false,
-    disablePadding: false,
-    label: "Talep Son Tarihi",
-    date: true,
-  },
-  {
-    id: "requestBudget",
-    numeric: true,
-    disablePadding: false,
-    label: "Talep Bütçesi",
-  },
-  {
-    id: "product",
-    numeric: true,
-    disablePadding: false,
-    label: "Ürün",
-    displayValue: ["name"],
-  },
-  {
-    id: "specification",
-    numeric: false,
-    disablePadding: false,
-    label: "Spesifikasyon",
-  },
-  {
-    id: "detail",
-    numeric: false,
-    disablePadding: false,
-    label: "Detay",
-  },
-  {
-    id: "quantity",
-    numeric: true,
-    disablePadding: false,
-    label: "Miktar",
-  },
-  {
-    id: "unit",
-    numeric: false,
-    disablePadding: false,
-    label: "Birim",
-  },
-  {
-    id: "price",
-    numeric: true,
-    disablePadding: false,
-    label: "Fiyat",
-  },
-  {
-    id: "currency",
-    numeric: true,
-    disablePadding: false,
-    label: "Para Birimi",
-    displayValue: ["name"],
-  },
-  {
-    id: "vat",
-    numeric: true,
-    disablePadding: false,
-    label: "KDV",
-  },
-  {
-    id: "total",
-    numeric: true,
-    disablePadding: false,
-    label: "Toplam",
-  },
-  {
-    id: "maturity",
-    numeric: true,
-    disablePadding: false,
-    label: "Vade",
-  },
-  {
-    id: "daysDue",
-    numeric: true,
-    disablePadding: false,
-    label: "Gün Sayısı",
-  },
-  {
-    id: "deadlineDate",
-    numeric: false,
-    disablePadding: false,
-    label: "Son Tarih",
-    date: true,
-  },
-  {
-    id: "specialRequirement",
-    numeric: false,
-    disablePadding: false,
-    label: "Özel Gereksinim",
-  },
-  {
-    id: "deliveryAddress",
-    numeric: false,
-    disablePadding: false,
-    label: "Teslimat Adresi",
-  },
-  {
-    id: "shippingMethod",
-    numeric: false,
-    disablePadding: false,
-    label: "Nakliye Yöntemi",
-  },
-  {
-    id: "proformaDetails",
-    numeric: false,
-    disablePadding: false,
-    label: "Proforma Detayları",
-  },
-  {
-    id: "packingListNo",
-    numeric: true,
-    disablePadding: false,
-    label: "Paketleme Listesi No",
-  },
-  {
-    id: "additionalTerms",
-    numeric: false,
-    disablePadding: false,
-    label: "Ek Şartlar",
   },
   {
     id: "validPeriod",
@@ -496,12 +156,6 @@ export const headCells: HeadCell[] = [
     label: "Geçerlilik Süresi Türü",
   },
   {
-    id: "conditions",
-    numeric: false,
-    disablePadding: false,
-    label: "Koşullar",
-  },
-  {
     id: "lastValidityDate",
     numeric: false,
     disablePadding: false,
@@ -509,31 +163,41 @@ export const headCells: HeadCell[] = [
     date: true,
   },
   {
-    id: "acceptanceDate",
+    id: "additionalTerms",
     numeric: false,
     disablePadding: false,
-    label: "Kabul Tarihi",
+    label: "Ek Şartlar",
+  },
+  {
+    id: "conditions",
+    numeric: false,
+    disablePadding: false,
+    label: "Koşullar",
+  },
+  {
+    id: "total",
+    numeric: true,
+    disablePadding: false,
+    label: "Toplam",
+  },
+  {
+    id: "totalKDV",
+    numeric: true,
+    disablePadding: false,
+    label: "Toplam KDV",
+  },
+  {
+    id: "responseDate",
+    numeric: false,
+    disablePadding: false,
+    label: "Yanıt Tarihi",
     date: true,
   },
   {
-    id: "rejectionDate",
+    id: "detail",
     numeric: false,
     disablePadding: false,
-    label: "Red Tarihi",
-  },
-
-  {
-    id: "meetNote",
-    numeric: false,
-    disablePadding: false,
-    label: "Görüşme Notu",
-  },
-  {
-    id: "lastMeetDate",
-    numeric: false,
-    disablePadding: false,
-    label: "Son Görüşme Tarihi",
-    date: true,
+    label: "Detay",
   },
   {
     id: "meetStatement",
@@ -542,10 +206,28 @@ export const headCells: HeadCell[] = [
     label: "Görüşme Beyanı",
   },
   {
-    id: "totalKDV",
+    id: "meetNote",
+    numeric: false,
+    disablePadding: false,
+    label: "Görüşme Notu",
+  },
+  {
+    id: "status",
+    numeric: false,
+    disablePadding: false,
+    label: "Durum",
+  },
+  {
+    id: "customerTargetPrice",
     numeric: true,
     disablePadding: false,
-    label: "Toplam KDV",
+    label: "Müşteri Hedef Fiyatı",
+  },
+  {
+    id: "orderId",
+    numeric: true,
+    disablePadding: false,
+    label: "Sipariş ID",
   },
 ];
 

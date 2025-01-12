@@ -1,7 +1,15 @@
 "use client";
 import { Data, formFields, tableName, title } from "../order";
 import React, { useEffect } from "react";
-import { Alert, Box, Button, Grid, Modal, Typography } from "@mui/material";
+import {
+  Alert,
+  Box,
+  Button,
+  Grid,
+  Modal,
+  Paper,
+  Typography,
+} from "@mui/material";
 import {
   NewTextField,
   NewSelect,
@@ -27,6 +35,7 @@ interface Page {
 const Page: React.FC = ({ popupHandler, popupSetter }: Page) => {
   const searchParams = useSearchParams();
   const id = searchParams.get("id");
+  const customerId = searchParams.get("customerId");
   const { formData, handleChange, tableData, runFetchData } =
     useFormData<Data>(formFields);
   const [alertValue, setAlertValue] = React.useState<number>(0);
@@ -48,11 +57,27 @@ const Page: React.FC = ({ popupHandler, popupSetter }: Page) => {
               } as React.ChangeEvent<{ name: string; value: any }>);
             }
           });
-          setSubRows(data.orderItem || []);
+          const subber = data.orderItem.map((item: any) => {
+            return {
+              ...item,
+              orderItemSpecification: item.orderItemSpecification.map(
+                (spec: any) => {
+                  return spec.outsourceTypeId;
+                }
+              ),
+            };
+          });
+          setSubRows(subber || []);
           setRefresh(!refresh);
         });
     }
-  }, [id]);
+    if (customerId) {
+      handleChange({
+        target: { name: "customerId", value: Number(customerId) },
+      } as React.ChangeEvent<{ name: string; value: any }>);
+    }
+  }, [id, customerId]);
+
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const rows = subRows.map((row) => {
@@ -88,6 +113,7 @@ const Page: React.FC = ({ popupHandler, popupSetter }: Page) => {
       try {
         // add personnelId to formData
         formData["personnelId"] = getPersonnelInfo().id;
+
         const response = await fetch(`/api/${tableName}`, {
           method: "POST",
           headers: {
@@ -160,7 +186,19 @@ const Page: React.FC = ({ popupHandler, popupSetter }: Page) => {
       }
     });
     setOldFormData(formData);
+    if (formData.customerId) {
+      // get customer info
+      tableData.find((row) => {
+        row.name === "customer" &&
+          row.values.find((value: any) => {
+            if (value.id === formData.customerId) {
+              setSelectedCustomer(value);
+            }
+          });
+      });
+    }
   }, [formData]);
+  const [selectedCustomer, setSelectedCustomer] = React.useState<any>(null);
   const [subRows, setSubRows] = React.useState<any[]>([]);
   return (
     <>
@@ -201,16 +239,13 @@ const Page: React.FC = ({ popupHandler, popupSetter }: Page) => {
           <Grid container spacing={1}>
             <Grid container spacing={1}>
               <Grid item xs={12} md={4}>
-                <NewRelation {...allProps} keyProp="accountId" />
+                <NewRelation {...allProps} keyProp="customerId" />
               </Grid>
               <Grid item xs={12} md={4}>
                 <NewDate {...allProps} keyProp="createdAt" />
               </Grid>
               <Grid item xs={12} md={4}>
                 <NewTextField {...allProps} keyProp="description" />
-              </Grid>
-              <Grid item xs={12} md={4}>
-                <NewSelect {...allProps} keyProp="type" />
               </Grid>
               {id && (
                 <Grid item xs={12} md={4}>
@@ -219,7 +254,7 @@ const Page: React.FC = ({ popupHandler, popupSetter }: Page) => {
               )}
             </Grid>
             <Grid container spacing={1}>
-              <Grid item xs={12} md={12}>
+              <Grid item xs={12} md={12} style={{ overflow: "auto" }}>
                 <Sheet
                   refresh={refresh}
                   subRows={subRows}

@@ -41,6 +41,7 @@ export const updateAccountController = async (req: Request, res: Response) => {
     const account = await updateAccount(Number(req.params.id), req.body);
     res.status(200).json(account);
   } catch (error) {
+    console.log(error);
     res.status(400).json({ error: error });
   }
 };
@@ -59,17 +60,8 @@ export const getAccountByPropertiesController = async (
   res: Response
 ) => {
   try {
-    const { outsource, dye, yarn, buys } = req.params;
-    const outsourceBool = outsource === "1";
-    const dyeBool = dye === "1";
-    const yarnBool = yarn === "1";
-    const buysBool = buys === "1";
-    const accounts = await getAccountByProperties(
-      outsourceBool,
-      dyeBool,
-      yarnBool,
-      buysBool
-    );
+    const { code } = req.params;
+    const accounts = await getAccountByProperties(code);
     res.status(200).json(accounts);
   } catch (error) {
     res.status(400).json({ error: error });
