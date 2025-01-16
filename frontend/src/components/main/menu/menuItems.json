@@ -50,17 +50,10 @@
         ]
       },
       {
-        "title": "Ürün İşlemleri",
-        "desc ": "Ürün işlemleri menüsü",
+        "title": "Sipariş İşlemleri",
+        "desc ": "Sipariş işlemleri menüsü",
         "icon": "shopping_cart",
         "subItems": [
-          {
-            "title": "Ürünler",
-            "link": "/product",
-            "desc": "Ürün listesi",
-            "icon": "category"
-          },
-
           {
             "title": "Teklifler",
             "link": "/offer",
@@ -74,28 +67,16 @@
             "icon": "shopping_cart_checkout"
           },
           {
-            "title": "Boya Renkleri",
-            "link": "/dye-color",
-            "desc": "Boya renkleri listesi",
-            "icon": "palette"
-          },
-          {
-            "title": "Lamine Renkleri",
-            "link": "/lamination-color",
-            "desc": "Lamine renkleri listesi",
-            "icon": "palette"
-          },
-          {
-            "title": "Ürün Tipleri",
-            "link": "/item-type",
-            "desc": "Ürün tipleri listesi",
-            "icon": "category"
-          },
-          {
             "title": "Ürün Fizibilite Formu",
             "link": "/product-feasibility-form",
             "desc": "Ürün fizibilite formu listesi",
             "icon": "checklist"
+          },
+          {
+            "title": "Ürün Fiyatları",
+            "link": "/sales-product",
+            "desc": "Ürün fiyatları listesi",
+            "icon": "attach_money"
           }
         ]
       },
@@ -253,6 +234,49 @@
     "icon": "build",
     "allowedDepartments": ["urt", "admin"],
     "subItems": [
+      {
+        "title": "Tanıtımlar",
+        "desc ": "Tanıtım işlemleri menüsü",
+        "icon": "local_offer",
+        "subItems": [
+          {
+            "title": "Ürünler",
+            "link": "/product",
+            "desc": "Ürün listesi",
+            "icon": "category"
+          },
+          {
+            "title": "Boya Renkleri",
+            "link": "/dye-color",
+            "desc": "Boya renkleri listesi",
+            "icon": "palette"
+          },
+          {
+            "title": "Lamine Renkleri",
+            "link": "/lamination-color",
+            "desc": "Lamine renkleri listesi",
+            "icon": "palette"
+          },
+          {
+            "title": "Ürün Tipleri",
+            "link": "/item-type",
+            "desc": "Ürün tipleri listesi",
+            "icon": "category"
+          },
+          {
+            "title": "Fason İşlem Tipleri",
+            "desc": "Fason işlem tipleri listesi",
+            "link": "/outsource-type",
+            "icon": "category"
+          },
+          {
+            "title": "Fason İşlem Grupları",
+            "desc": "Fason işlem grupları listesi",
+            "link": "/outsource-group",
+            "icon": "category"
+          }
+        ]
+      },
       {
         "title": "Makineler",
         "desc ": "Makine işlemleri menüsü",
@@ -673,6 +697,75 @@
     ]
   },
   {
+    "title": "Raporlar",
+    "desc": "Raporlar menüsü",
+    "icon": "description",
+    "allowedDepartments": ["yon", "muh", "admin"],
+    "subItems": [
+      {
+        "title": "Satış Raporları",
+        "desc: ": "Satış raporları menüsü",
+        "icon": "description",
+        "link": "/dashboard/?department=sts"
+      },
+      {
+        "title": "Üretim Raporları",
+        "desc": "Üretim raporları menüsü",
+        "icon": "description",
+        "link": "/dashboard/?department=urt"
+      },
+      {
+        "title": "Planlama Raporları",
+        "desc": "Planlama raporları menüsü",
+        "icon": "description",
+        "link": "/dashboard/?department=pln"
+      },
+      {
+        "title": "Depo Raporları",
+        "desc": "Depo raporları menüsü",
+        "icon": "description",
+        "link": "/dashboard/?department=dep"
+      },
+      {
+        "title": "Kalite Kontrol Raporları",
+        "desc": "Kalite kontrol raporları menüsü",
+        "icon": "description",
+        "link": "/dashboard/?department=kal"
+      },
+      {
+        "title": "Satın Alma Raporları",
+        "desc": "Satın alma raporları menüsü",
+        "icon": "description",
+        "link": "/dashboard/?department=stn"
+      },
+      {
+        "title": "İnsan Kaynakları Raporları",
+        "desc": "İnsan kaynakları raporları menüsü",
+        "icon": "description",
+        "link": "/dashboard/?department=ik"
+      },
+      {
+        "title": "Muhasabe Raporları",
+        "desc": "Muhasabe raporları menüsü",
+        "icon": "description",
+        "link": "/dashboard/?department=muh"
+      }
+    ]
+  },
+  {
+    "title": "Genel İşlemler",
+    "desc": "Genel işlemler menüsü",
+    "icon": "settings",
+    "subItems": [
+      {
+        "title": "Düzenleyici ve Önleyici Faaliyetler",
+        "desc": "DÖF listesi",
+        "icon": "engineering",
+        "link": "/dof"
+      }
+    ]
+  },
+  {
     "title": "Genel Muhasebe İşlemleri",
     "desc": "Diğer işlemler menüsü",
     "icon": "account_balance",
@@ -702,6 +795,7 @@
     "title": "Genel Ayarlar",
     "desc": "Genel ayarlar menüsü",
     "icon": "settings",
-    "subItems": []
+    "subItems": [],
+    "allowedDepartments": ["stopi"]
   }
 ]

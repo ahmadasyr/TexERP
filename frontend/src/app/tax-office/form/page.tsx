@@ -157,6 +157,8 @@ const Page: React.FC<any> = ({ popupHandler, popupSetter }: PageProps) => {
         isPopup={popupHandler ? true : false}
         alertValue={alertValue}
         setAlertValue={setAlertValue}
+        handleChange={handleChange}
+        formData={formData}
       />
       <form
         style={

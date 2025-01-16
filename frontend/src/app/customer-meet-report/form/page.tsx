@@ -9,6 +9,8 @@ import {
   Grid,
   Modal,
   Typography,
+  ButtonGroup,
+  Tooltip,
 } from "@mui/material";
 import {
   NewTextField,
@@ -154,6 +156,8 @@ const CustomerComplaint: React.FC = ({
         isPopup={popupHandler ? true : false}
         alertValue={alertValue}
         setAlertValue={setAlertValue}
+        handleChange={handleChange}
+        formData={formData}
       />
       <form
         style={
@@ -238,14 +242,51 @@ const CustomerComplaint: React.FC = ({
               <NewMultiEntryField {...allProps} keyProp="peopleMet" />
             </Grid>
           </Grid>
-          <Button
-            style={{ marginTop: "1rem" }}
-            type="submit"
-            variant="contained"
-            color="primary"
+          <ButtonGroup
+            variant="outlined"
+            aria-label="Loading button group"
+            style={{ display: "flex", justifyContent: "right" }}
           >
-            Kaydet
-          </Button>
+            {/* Save Button */}
+            <Tooltip title="Kaydetmek için tıklayın">
+              <Button
+                type="submit"
+                variant="contained"
+                color="primary"
+                size="large"
+              >
+                Kaydet
+              </Button>
+            </Tooltip>
+
+            {/* Restore Button */}
+            <Tooltip title="Formu yerel verilerle geri yükle">
+              <Button
+                onClick={() => {
+                  setAlertValue(-2);
+                }}
+                variant="contained"
+                color="secondary"
+                size="large"
+              >
+                Geri Yükle
+              </Button>
+            </Tooltip>
+
+            {/* Reset Button */}
+            <Tooltip title="Formu sıfırla">
+              <Button
+                onClick={() => {
+                  setAlertValue(-1);
+                }}
+                variant="text"
+                color="error"
+                size="large"
+              >
+                Sıfırla
+              </Button>
+            </Tooltip>
+          </ButtonGroup>
         </Box>
       </form>
     </>

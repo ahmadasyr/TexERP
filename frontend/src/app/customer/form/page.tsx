@@ -5,9 +5,11 @@ import {
   Alert,
   Box,
   Button,
+  ButtonGroup,
   Divider,
   Grid,
   Modal,
+  Tooltip,
   Typography,
 } from "@mui/material";
 import {
@@ -153,7 +155,10 @@ const customer: React.FC<any> = ({
         isPopup={popupHandler ? true : false}
         alertValue={alertValue}
         setAlertValue={setAlertValue}
+        handleChange={handleChange}
+        formData={formData}
       />
+
       <form
         onSubmit={handleSubmit}
         style={
@@ -171,6 +176,8 @@ const customer: React.FC<any> = ({
               }
         }
       >
+        {/* go back simple button text with arrow */}
+
         <Box width="100%">
           <Typography variant="h4" gutterBottom>
             {title}
@@ -274,9 +281,55 @@ const customer: React.FC<any> = ({
               marginTop: "1rem",
             }}
           />
-          <Button type="submit" variant="contained" color="primary">
-            Kaydet
-          </Button>
+          <ButtonGroup
+            variant="outlined"
+            aria-label="Loading button group"
+            style={{ display: "flex", justifyContent: "right" }}
+          >
+            {/* Save Button */}
+            <Tooltip title="Kaydetmek için tıklayın">
+              <Button
+                type="submit"
+                variant="contained"
+                color="primary"
+                size="large"
+              >
+                Kaydet
+              </Button>
+            </Tooltip>
+
+            {/* Restore Button */}
+            {!popupHandler && (
+              <>
+                <Tooltip title="Formu yerel verilerle geri yükle">
+                  <Button
+                    onClick={() => {
+                      setAlertValue(-2);
+                    }}
+                    variant="contained"
+                    color="secondary"
+                    size="large"
+                  >
+                    Geri Yükle
+                  </Button>
+                </Tooltip>
+
+                {/* Reset Button */}
+                <Tooltip title="Formu sıfırla">
+                  <Button
+                    onClick={() => {
+                      setAlertValue(-1);
+                    }}
+                    variant="text"
+                    color="error"
+                    size="large"
+                  >
+                    Sıfırla
+                  </Button>
+                </Tooltip>
+              </>
+            )}
+          </ButtonGroup>
         </Box>
       </form>
     </>

@@ -1,5 +1,6 @@
 import { HeadCell } from "../../components/table/utils";
 import { createField } from "../../components/form/utils";
+import { create } from "domain";
 export const tableName = "customer-price";
 
 export interface Data {
@@ -12,6 +13,8 @@ export interface Data {
   date: Date;
   upfront: number;
   installment: number;
+  productTypeId: number;
+  outsourceTypeId: number;
 }
 
 export const formFields = [
@@ -76,6 +79,16 @@ export const formFields = [
     label: "Tarih",
     type: "date",
   }),
+  createField({
+    name: "outsourceTypeId",
+    label: "Dış Kaynak Tipi",
+    type: "number",
+    relation: true,
+    table: "outsource-type",
+    value: "id",
+    displayValue: "name",
+    required: true,
+  }),
 ];
 
 export const headCells: HeadCell[] = [
@@ -131,6 +144,13 @@ export const headCells: HeadCell[] = [
     disablePadding: false,
     label: "Tarih",
     date: true,
+  },
+  {
+    id: "outsourceType",
+    numeric: false,
+    disablePadding: false,
+    label: "Dış Kaynak Tipi",
+    displayValue: ["name"],
   },
 ];
 

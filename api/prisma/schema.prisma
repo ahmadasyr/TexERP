@@ -47,7 +47,6 @@ model personnel {
   username         String?     @unique
   department       department?
 
-  customerMeetPlan          customerMeetPlan[]
   customerMeetReport        customerMeetReport[]
   complaintsDealt           customerComplaint[]         @relation("ref_dealingPersonnel")
   complaintsEvaluated       customerComplaint[]         @relation("ref_evaluatingPersonnel")
@@ -84,6 +83,9 @@ model personnel {
   followedPersonnel         dofiRequest[]               @relation("followedPersonnelRelation")
   log                       log[]
   offer                     offer[]
+  notification              notification[]
+  customerMeetPlanAttendee  customerMeetPlanAttendee[]
+  reportIssue               reportIssue[]
 }
 
 // GENERAL SECTION
@@ -207,14 +209,14 @@ model customer {
   bank                   bank?                    @relation(fields: [bankId], references: [id])
   currency               currency?                @relation(fields: [currencyId], references: [id])
   personnel              personnel                @relation(fields: [personnelId], references: [id])
-  customerMeetPlan       customerMeetPlan[]
   customerMeetReport     customerMeetReport[]
   customerPrice          customerPrice[]
   order                  order[]
   productFeasibilityForm productFeasibilityForm[]
 
-  customerComplaint customerComplaint[]
-  account           account?            @relation(fields: [accountId], references: [id])
+  customerComplaint        customerComplaint[]
+  account                  account?                   @relation(fields: [accountId], references: [id])
+  customerMeetPlanCustomer customerMeetPlanCustomer[]
 }
 
 model competitor {
@@ -224,26 +226,47 @@ model competitor {
 }
 
 model customerMeetPlan {
-  id                   Int       @id @default(autoincrement())
-  customerId           Int
-  country              String
-  visitReason          String
-  plannedDate          DateTime
-  realDate             DateTime?
-  visitingPersonnelId  Int?
-  result               String?
-  accuracyRate         Float?
-  note                 String?
-  travelExpense        Float?
-  accommodationExpense Float?
-  foodExpense          Float?
-  giftExpense          Float?
-  officeExpense        Float?
-  sampleExpense        Float?
+  id                       Int                        @id @default(autoincrement())
+  location                 String
+  visitReason              String
+  plannedDate              DateTime
+  realDate                 DateTime?
+  returnDate               DateTime?
+  result                   String?
+  note                     String?
+  travelExpense            Float?
+  accommodationExpense     Float?
+  foodExpense              Float?
+  giftExpense              Float?
+  officeExpense            Float?
+  sampleExpense            Float?
+  customerMeetPlanAttendee customerMeetPlanAttendee[]
+  customerMeetPlanCustomer customerMeetPlanCustomer[]
+}
+
+model customerMeetPlanAttendee {
+  id                 Int @id @default(autoincrement())
+  customerMeetPlanId Int
+  personnelId        Int
 
   // Relations
-  customer          customer   @relation(fields: [customerId], references: [id])
-  visitingPersonnel personnel? @relation(fields: [visitingPersonnelId], references: [id])
+  customerMeetPlan customerMeetPlan @relation(fields: [customerMeetPlanId], references: [id])
+  personnel        personnel        @relation(fields: [personnelId], references: [id])
+
+  @@unique([customerMeetPlanId, personnelId])
+}
+
+model customerMeetPlanCustomer {
+  id                 Int     @id @default(autoincrement())
+  customerId         Int
+  customerMeetPlanId Int
+  note               String?
+
+  // Relations
+  customerMeetPlan customerMeetPlan @relation(fields: [customerMeetPlanId], references: [id])
+  customer         customer         @relation(fields: [customerId], references: [id])
+
+  @@unique([customerId, customerMeetPlanId])
 }
 
 model customerMeetReport {
@@ -298,30 +321,34 @@ model competitorReportContent {
 }
 
 model customerPrice {
-  id          Int       @id @default(autoincrement())
-  date        DateTime? @default(now())
-  customerId  Int
-  productId   Int
-  currencyId  Int
-  upfront     Float
-  price       Float
-  installment Float
-  unit        unit
-  personnelId Int
+  id              Int       @id @default(autoincrement())
+  date            DateTime? @default(now())
+  customerId      Int
+  productId       Int
+  currencyId      Int
+  upfront         Float
+  price           Float
+  installment     Float
+  unit            unit
+  personnelId     Int
+  outsourceTypeId Int?
 
   // Relations
-  customer  customer   @relation(fields: [customerId], references: [id])
-  product   product    @relation(fields: [productId], references: [id])
-  currency  currency   @relation(fields: [currencyId], references: [id])
-  personnel personnel? @relation(fields: [personnelId], references: [id])
+  customer      customer       @relation(fields: [customerId], references: [id])
+  product       product        @relation(fields: [productId], references: [id])
+  currency      currency       @relation(fields: [currencyId], references: [id])
+  personnel     personnel?     @relation(fields: [personnelId], references: [id])
+  outsourceType outsourceType? @relation(fields: [outsourceTypeId], references: [id])
 }
 
 model offer {
   id          Int       @id @default(autoincrement())
   createdAt   DateTime? @default(now())
+  orderId     Int?
   personnelId Int
+
   // payment deadline
-  paymentDue  Int // to pay
+  paymentDue Int // to pay
 
   // product delivery deadline
   deliveryDeadlineDate DateTime
@@ -331,21 +358,23 @@ model offer {
   validPeriodType  String // Replace with actual enum (ay, hafta, gün)
   lastValidityDate DateTime
 
-  additionalTerms     Json?
-  conditions          Json?
+  additionalTerms Json?
+  conditions      Json?
+
   total               Float
   totalKDV            Float
-  responseDate        DateTime?
-  detail              String?
-  meetStatement       String?
-  meetNote            String?
-  status              offerStatus
   customerTargetPrice Float?
-  orderId             Int?
+
+  detail        String?
+  meetStatement String?
+
+  meetNote     String?
+  status       offerStatus
+  responseDate DateTime?
   // Relations
-  order               order?      @relation(fields: [orderId], references: [id])
-  offerItem           offerItem[]
-  personnel           personnel   @relation(fields: [personnelId], references: [id])
+  order        order?      @relation(fields: [orderId], references: [id])
+  offerItem    offerItem[]
+  personnel    personnel   @relation(fields: [personnelId], references: [id])
 }
 
 model offerItem {
@@ -503,20 +532,22 @@ model productWrap {
 }
 
 model productPrice {
-  id          Int      @id @default(autoincrement())
-  productId   Int
-  upfront     Float
-  price       Float
-  installment Float
-  currencyId  Int
-  date        DateTime @default(now())
-  unit        unit
-  personnelId Int
+  id              Int      @id @default(autoincrement())
+  productId       Int
+  outsourceTypeId Int?
+  upfront         Float
+  price           Float
+  installment     Float
+  currencyId      Int
+  date            DateTime @default(now())
+  unit            unit
+  personnelId     Int
 
   // Relations
-  product   product   @relation(fields: [productId], references: [id])
-  currency  currency  @relation(fields: [currencyId], references: [id])
-  personnel personnel @relation(fields: [personnelId], references: [id])
+  product       product        @relation(fields: [productId], references: [id])
+  currency      currency       @relation(fields: [currencyId], references: [id])
+  personnel     personnel      @relation(fields: [personnelId], references: [id])
+  outsourceType outsourceType? @relation(fields: [outsourceTypeId], references: [id])
 }
 
 // Yarn Section
@@ -1015,6 +1046,8 @@ model outsourceType {
   parentOutsourceType outsourceType?           @relation("parentOutsourceType", fields: [parentOutsourceTypeId], references: [id])
 
   outsourceType outsourceType[] @relation("parentOutsourceType")
+  productPrice  productPrice[]
+  customerPrice customerPrice[]
 }
 
 model outsourceOrder {
@@ -1167,6 +1200,8 @@ model orderItemSpecification {
   // Relations
   orderItem     orderItem     @relation(fields: [orderItemId], references: [id])
   outsourceType outsourceType @relation(fields: [outsourceTypeId], references: [id])
+
+  @@unique([orderItemId, outsourceTypeId])
 }
 
 model shippingCompany {
@@ -1259,7 +1294,7 @@ model dofiRequest {
   reason                   String // Tedarikçi, Müşteri, İç Tetkik, Diğer
   fromPersonnelId          Int
   toPersonnelId            Int
-  followedByPersonnelId    Int?
+  followedPersonnelId      Int?
   date                     DateTime
   nonconformityDescription String
   plannedCorrectiveActions String?
@@ -1270,7 +1305,7 @@ model dofiRequest {
   // Relations
   fromPersonnel     personnel  @relation("fromPersonnelRelation", fields: [fromPersonnelId], references: [id])
   toPersonnel       personnel  @relation("toPersonnelRelation", fields: [toPersonnelId], references: [id])
-  followedPersonnel personnel? @relation("followedPersonnelRelation", fields: [followedByPersonnelId], references: [id])
+  followedPersonnel personnel? @relation("followedPersonnelRelation", fields: [followedPersonnelId], references: [id])
 }
 
 model log {
@@ -1281,4 +1316,53 @@ model log {
   description String
   // Relations
   personnel   personnel @relation(fields: [personnelId], references: [id])
+}
+
+enum NotificationCategory {
+  General
+  Customer
+  Personnel
+  Product
+  Order
+  Offer
+  Dye
+  Outsource
+  Yarn
+  Wrap
+  Production
+  Account
+  Stock
+  Machine
+  Dofi
+  Log
+}
+
+model notification {
+  id          Int                  @id @default(autoincrement())
+  createdAt   DateTime             @default(now())
+  category    NotificationCategory
+  personnelId Int
+  title       String
+  description String
+  link        String?
+  read        Boolean              @default(false)
+  // Relations
+  personnel   personnel            @relation(fields: [personnelId], references: [id])
+}
+
+enum issueStatus {
+  Open
+  InProgress
+  Closed
+}
+
+model reportIssue {
+  id          Int         @id @default(autoincrement())
+  createdAt   DateTime    @default(now())
+  personnelId Int
+  title       String
+  description String
+  status      issueStatus
+  // Relations
+  personnel   personnel   @relation(fields: [personnelId], references: [id])
 }

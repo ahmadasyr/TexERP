@@ -1,7 +1,16 @@
 "use client";
 import { Data, formFields, tableName, title } from "../yarnOrder";
 import React, { useEffect } from "react";
-import { Alert, Box, Button, Grid, Modal, Typography } from "@mui/material";
+import {
+  Alert,
+  Box,
+  Button,
+  Grid,
+  Modal,
+  Typography,
+  ButtonGroup,
+  Tooltip,
+} from "@mui/material";
 import {
   NewTextField,
   NewSelect,
@@ -176,6 +185,8 @@ const Page: React.FC = ({ popupHandler, popupSetter }: Page) => {
         isPopup={popupHandler ? true : false}
         alertValue={alertValue}
         setAlertValue={setAlertValue}
+        handleChange={handleChange}
+        formData={formData}
       />
 
       <form

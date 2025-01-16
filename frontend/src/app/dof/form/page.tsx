@@ -1,7 +1,16 @@
 "use client";
 import { Data, formFields, tableName, title } from "../dof";
 import React, { useEffect } from "react";
-import { Alert, Box, Button, Grid, Modal, Typography } from "@mui/material";
+import {
+  Alert,
+  Box,
+  Button,
+  ButtonGroup,
+  Grid,
+  Modal,
+  Tooltip,
+  Typography,
+} from "@mui/material";
 import {
   NewTextField,
   NewSelect,
@@ -34,12 +43,25 @@ const DOF: React.FC<any> = ({ popupHandler, popupSetter }: DOFProps) => {
     table: "",
     column: "",
   });
-
+  const [disabledColumns, setDisabledColumns] = React.useState<string[]>([]);
   useEffect(() => {
     if (id && !popupHandler) {
       fetch(`/api/${tableName}/${id}`)
         .then((response) => response.json())
         .then((data) => {
+          const personnelId = getPersonnelInfo().id;
+          if (personnelId !== data.fromPersonnelId) {
+            setDisabledColumns([
+              "fromPersonnelId",
+              "toPersonnelId",
+              "date",
+              "reason",
+              "nonconformityDescription",
+            ]);
+          }
+          if (personnelId !== data.toPersonnelId) {
+            setDisabledColumns(["plannedCorrectiveActions", "dueDate"]);
+          }
           Object.keys(data).forEach((key) => {
             handleChange({
               target: { name: key, value: data[key] },
@@ -139,9 +161,9 @@ const DOF: React.FC<any> = ({ popupHandler, popupSetter }: DOFProps) => {
         togglePopup={togglePopup}
         popupHandler={popUpDataParser}
         popupSetter={setPopup}
-      ></Popup>
+      />
       <FormModal
-        isPopup={popupHandler ? true : false}
+        isPopup={!!popupHandler}
         alertValue={alertValue}
         setAlertValue={setAlertValue}
       />
@@ -151,7 +173,7 @@ const DOF: React.FC<any> = ({ popupHandler, popupSetter }: DOFProps) => {
             ? {}
             : {
                 marginTop: "5%",
-                margin: "5% auto 5% auto",
+                margin: "5% auto",
                 width: "90%",
                 display: "flex",
                 padding: "5%",
@@ -191,10 +213,12 @@ const DOF: React.FC<any> = ({ popupHandler, popupSetter }: DOFProps) => {
                   <img src="/logo.png" alt="Logo" style={{ height: "50px" }} />
                 </div>
                 <div style={{ textAlign: "center" }}>
-                  <h1 style={{ fontSize: "18px", margin: "0" }}>DÖFİ Formu</h1>
-                  <p style={{ fontSize: "14px", margin: "0" }}>
+                  <Typography variant="h6" style={{ margin: 0 }}>
+                    DÖFİ Formu
+                  </Typography>
+                  <Typography variant="body2" style={{ margin: 0 }}>
                     (Düzeltici / Önleyici Faaliyet İsteği)
-                  </p>
+                  </Typography>
                 </div>
                 <div style={{ width: "50px" }}></div>
               </div>
@@ -207,10 +231,14 @@ const DOF: React.FC<any> = ({ popupHandler, popupSetter }: DOFProps) => {
                   paddingBottom: "10px",
                 }}
               >
-                <p>
+                <Typography variant="body1">
                   <strong>DÖF nedeni:</strong>
-                </p>
-                <NewSelect {...allProps} keyProp="reason" />
+                </Typography>
+                {disabledColumns.includes("reason") ? (
+                  <Typography>{formData.reason}</Typography>
+                ) : (
+                  <NewSelect {...allProps} keyProp="reason" />
+                )}
               </div>
 
               {/* Sender and Receiver Section */}
@@ -221,18 +249,28 @@ const DOF: React.FC<any> = ({ popupHandler, popupSetter }: DOFProps) => {
                   paddingBottom: "10px",
                 }}
               >
-                <p>
-                  <strong>Kimden:</strong>{" "}
-                  {personnelInfo.firstName + " " + personnelInfo.lastName}
-                </p>
-                <p>
-                  <strong>Kime:</strong>{" "}
+                <Typography variant="body1">
+                  <strong>Kimden:</strong> {formData.fromPersonnel?.firstName}{" "}
+                  {formData.fromPersonnel?.lastName}
+                </Typography>
+                <strong>Kime:</strong>{" "}
+                {disabledColumns.includes("toPersonnelId") ? (
+                  <Typography variant="body1">
+                    {`${formData.toPersonnel.firstName} ${formData.toPersonnel.lastName}`}
+                  </Typography>
+                ) : (
                   <NewRelation {...allProps} keyProp="toPersonnelId" />
-                </p>
-                <p>
-                  <strong>Tarih:</strong>{" "}
-                </p>
-                <NewDate {...allProps} keyProp="date" />
+                )}
+                <strong>Tarih:</strong>{" "}
+                {disabledColumns.includes("date") ? (
+                  <Typography variant="body1">
+                    {formData?.date
+                      ? new Date(formData?.date).toLocaleDateString()
+                      : ""}
+                  </Typography>
+                ) : (
+                  <NewDate {...allProps} keyProp="date" />
+                )}
               </div>
 
               {/* Nonconformity Description Section */}
@@ -243,14 +281,18 @@ const DOF: React.FC<any> = ({ popupHandler, popupSetter }: DOFProps) => {
                   paddingBottom: "10px",
                 }}
               >
-                <p>
+                <Typography variant="body1">
                   <strong>Uygunsuzluğun Tanımı:</strong>
-                </p>
-                <NewTextField
-                  {...allProps}
-                  multiline={true}
-                  keyProp="nonconformityDescription"
-                />
+                </Typography>
+                {disabledColumns.includes("nonconformityDescription") ? (
+                  <Typography>{formData.nonconformityDescription}</Typography>
+                ) : (
+                  <NewTextField
+                    {...allProps}
+                    multiline={true}
+                    keyProp="nonconformityDescription"
+                  />
+                )}
               </div>
 
               {/* Planned Corrective Actions Section */}
@@ -261,62 +303,114 @@ const DOF: React.FC<any> = ({ popupHandler, popupSetter }: DOFProps) => {
                   paddingBottom: "10px",
                 }}
               >
-                <p>
+                <Typography variant="body1">
                   <strong>Planlanan Düzeltici Faaliyetler:</strong>
-                </p>
-                <NewTextField
-                  {...allProps}
-                  multiline={true}
-                  keyProp="plannedCorrectiveActions"
-                />
-                <p>
-                  <span>
-                    <strong>Düzeltici Faaliyeti Planlayan:</strong>{" "}
-                  </span>
-                  <span style={{ float: "right" }}>
-                    <strong>Termin Tarihi:</strong>{" "}
-                  </span>
-                </p>
-                <NewDate {...allProps} keyProp="dueDate" />
+                </Typography>
+                {disabledColumns.includes("plannedCorrectiveActions") ? (
+                  <Typography>{formData.plannedCorrectiveActions}</Typography>
+                ) : (
+                  <NewTextField
+                    {...allProps}
+                    multiline={true}
+                    keyProp="plannedCorrectiveActions"
+                  />
+                )}
+                <div
+                  style={{ display: "flex", justifyContent: "space-between" }}
+                >
+                  <Typography variant="body1">
+                    <strong>Düzeltici Faaliyeti Planlayan:</strong>
+                  </Typography>
+                  <Typography variant="body1">
+                    <strong>Termin Tarihi:</strong>
+                  </Typography>
+                </div>
+                {disabledColumns.includes("dueDate") ? (
+                  <Typography variant="body1">
+                    {formData?.dueDate
+                      ? new Date(formData?.dueDate).toLocaleDateString()
+                      : ""}
+                  </Typography>
+                ) : (
+                  <NewDate {...allProps} keyProp="dueDate" />
+                )}
               </div>
 
               {/* Follow-up and Closure Section */}
               <div style={{ marginTop: "10px", paddingBottom: "10px" }}>
-                <p>
+                <Typography variant="body1">
                   <strong>Düzeltici Faaliyetin Takibi ve Kapatılması:</strong>
-                </p>
-                <p>
+                </Typography>
+                <Typography variant="body1">
                   <strong>Sonuç ve Açıklamalar:</strong>
-                </p>
+                </Typography>
                 <NewTextField
                   {...allProps}
                   multiline={true}
                   keyProp="resultsAndComments"
                 />
-                <p>
-                  <span>
-                    <strong>Takip Eden/Kapatan:</strong>{" "}
-                    <NewRelation
-                      {...allProps}
-                      keyProp="followedByPersonnelId"
-                    />
-                  </span>
-                  <span style={{ float: "right" }}>
-                    <strong>İmza:</strong> <strong>Tarih:</strong>{" "}
+                <Grid container spacing={2}>
+                  <Grid item xs={6}>
+                    <Typography variant="body1">
+                      <strong>Takip Eden/Kapatan:</strong>{" "}
+                    </Typography>
+                    <NewRelation {...allProps} keyProp="followedPersonnelId" />
+                  </Grid>
+                  <Grid item xs={6}>
+                    <Typography variant="body1">
+                      <strong>Kapanış Tarih:</strong>
+                    </Typography>
                     <NewDate {...allProps} keyProp="closureDate" />
-                  </span>
-                </p>
+                  </Grid>
+                </Grid>
               </div>
             </div>
           </Grid>
-          <Button
-            style={{ marginTop: "1rem" }}
-            type="submit"
-            variant="contained"
-            color="primary"
+          <ButtonGroup
+            variant="outlined"
+            aria-label="Loading button group"
+            style={{ display: "flex", justifyContent: "right" }}
           >
-            Kaydet
-          </Button>
+            {/* Save Button */}
+            <Tooltip title="Kaydetmek için tıklayın">
+              <Button
+                type="submit"
+                variant="contained"
+                color="primary"
+                size="large"
+              >
+                Kaydet
+              </Button>
+            </Tooltip>
+
+            {/* Restore Button */}
+            <Tooltip title="Formu yerel verilerle geri yükle">
+              <Button
+                onClick={() => {
+                  setAlertValue(-2);
+                }}
+                variant="contained"
+                color="secondary"
+                size="large"
+              >
+                Geri Yükle
+              </Button>
+            </Tooltip>
+
+            {/* Reset Button */}
+            <Tooltip title="Formu sıfırla">
+              <Button
+                onClick={() => {
+                  setAlertValue(-1);
+                }}
+                variant="text"
+                color="error"
+                size="large"
+              >
+                Sıfırla
+              </Button>
+            </Tooltip>
+          </ButtonGroup>
         </Box>
       </form>
     </>

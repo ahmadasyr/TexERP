@@ -4,7 +4,7 @@ import React from "react";
 import { Button } from "@mui/material";
 import { useRouter } from "next/navigation";
 import EnhancedTable from "@/components/table/tableMain";
-import { headCells, tableName } from "./dof";
+import { headCells, tableName, conditions } from "./dof";
 import { Data } from "./dof";
 
 const Page: React.FC = () => {
@@ -17,6 +17,7 @@ const Page: React.FC = () => {
         tableName={tableName}
         viewable={true}
         URI={"/dof"}
+        conditions={conditions}
       />
     </div>
   );

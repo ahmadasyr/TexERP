@@ -51,6 +51,7 @@ export interface HeadCell {
   clickable?: boolean;
   uri?: string;
   boolean?: boolean;
+  actionConditions?: any;
 }
 
 export const handleDelete = async (tableName: string, selected: number[]) => {

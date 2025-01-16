@@ -48,6 +48,7 @@ import itemTypeRoutes from "./routes/itemTypeRoutes";
 import dofRoutes from "./routes/dofRoutes";
 import laminationTypeRoutes from "./routes/laminationTypeRoutes";
 import outsourceGroupRoutes from "./routes/outsourceGroupRoutes";
+import notificationRoutes from "./routes/notificationRoutes";
 const cors = require("cors");
 
 const app = express();
@@ -148,5 +149,6 @@ app.use("/dof", dofRoutes);
 app.use("/lamination-type", laminationTypeRoutes);
 // Use outsourceGroup routes
 app.use("/outsource-group", outsourceGroupRoutes);
-
+// Use notification routes
+app.use("/notification", notificationRoutes);
 export default app;

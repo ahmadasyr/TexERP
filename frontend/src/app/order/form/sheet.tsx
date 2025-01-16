@@ -43,6 +43,7 @@ import {
   CustomChipSelectWithGroups,
 } from "@/components/table/utils";
 import { Delete } from "@mui/icons-material";
+import MobileSheetEdit from "./mobileSheet";
 
 interface orderItem {
   id: number;
@@ -437,7 +438,7 @@ export default function Sheet(props: SheetProps) {
   const [isTop, setIsTop] = React.useState(true);
   const [topCount, setTopCount] = React.useState(0);
   const [isPerTop, setIsPerTop] = React.useState(false);
-  const [topQuantity, setTopQuantity] = React.useState(0);
+  const [topQuantity, setTopQuantity] = React.useState(50);
   const [tempValues, setTempValues] = React.useState<any>({});
   const [meter, setMeter] = React.useState(0);
   const [kg, setKg] = React.useState(0);
@@ -480,17 +481,13 @@ export default function Sheet(props: SheetProps) {
     setDescription("");
     setTopCount(0);
     setIsPerTop(false);
-    setTopQuantity(0);
 
     const inputs = document.querySelectorAll("input, textarea, select");
     inputs.forEach((input: any) => (input.value = ""));
   };
 
   const calculateMeter = () => {
-    if (isTop && isPerTop) {
-      return topCount * topQuantity;
-    }
-    return meter;
+    return topCount * topQuantity;
   };
 
   const handleTopCountChange = (value: string) => {
@@ -499,9 +496,8 @@ export default function Sheet(props: SheetProps) {
     if (isPerTop) {
       const newMeter = newTopCount * topQuantity;
       setMeter(newMeter);
-      updateTempValues({ meter: newMeter, description: `${newMeter} Top` });
+      updateTempValues({ meter: newMeter });
     } else {
-      updateTempValues({ description: `${newTopCount} Top` });
     }
   };
 
@@ -511,7 +507,6 @@ export default function Sheet(props: SheetProps) {
     if (newIsPerTop) {
       const newMeter = topCount * topQuantity;
       setMeter(newMeter);
-      updateTempValues({ meter: newMeter, description: `${newMeter} Top` });
     } else {
       setMeter(0);
       updateTempValues({ description: "" });
@@ -620,7 +615,7 @@ export default function Sheet(props: SheetProps) {
                 }
                 label="Top Sayı Var"
               />
-              {isTop && (
+              {(isTop && (
                 <>
                   <TextField
                     id="topCount"
@@ -628,48 +623,28 @@ export default function Sheet(props: SheetProps) {
                     type="number"
                     onChange={(e) => handleTopCountChange(e.target.value)}
                   />
-                  <FormControl>
-                    <InputLabel id="demo-simple-select-label">
-                      Miktar Tipi
-                    </InputLabel>
-                    <Select
-                      labelId="demo-simple-select-label"
-                      id="isPerTop"
-                      value={isPerTop ? "true" : "false"}
-                      onChange={(e) => handleIsPerTopChange(e.target.value)}
-                    >
-                      <MenuItem value="true">Top Başına</MenuItem>
-                      <MenuItem value="false">Toplam</MenuItem>
-                    </Select>
-                  </FormControl>
-                  {isPerTop && (
-                    <TextField
-                      id="topQuantity"
-                      label="Top Metre"
-                      type="number"
-                      onChange={(e) => {
-                        setTopQuantity(Number(e.target.value));
-                        const newMeter = topCount * Number(e.target.value);
-                        setMeter(newMeter);
-                        updateTempValues({
-                          meter: newMeter,
-                          description: `${newMeter} Top`,
-                        });
-                      }}
-                    />
-                  )}
+                  <TextField
+                    id="meter"
+                    label="Metre"
+                    type="number"
+                    disabled={isTop}
+                    value={calculateMeter()}
+                    onChange={(e) =>
+                      updateTempValues({ meter: Number(e.target.value) })
+                    }
+                  />
                 </>
+              )) || (
+                <TextField
+                  id="meter"
+                  label="Metre"
+                  type="number"
+                  onChange={(e) =>
+                    updateTempValues({ meter: Number(e.target.value) })
+                  }
+                />
               )}
-              <TextField
-                id="meter"
-                label="Metre"
-                type="number"
-                value={meter}
-                disabled={isPerTop}
-                onChange={(e) =>
-                  updateTempValues({ meter: Number(e.target.value) })
-                }
-              />
+
               <TextField
                 id="kg"
                 label="Kg"
@@ -706,76 +681,15 @@ export default function Sheet(props: SheetProps) {
           </Grid>
         </Grid>
       )}
-      {rows.length > 0 && window.innerWidth < 600 && (
-        <Box sx={{ height: 500, width: "100%", mt: 2, position: "relative" }}>
-          {rows.map((row) => (
-            <Box
-              key={row.id}
-              sx={{
-                mb: 2,
-                p: 2,
-                border: "1px solid #ccc",
-                borderRadius: 2,
-                maxWidth: "100%",
-              }}
-            >
-              <Typography variant="h6">
-                Ürün:{" "}
-                {
-                  products.find((product) => product.value === row.productId)
-                    ?.label
-                }
-              </Typography>
-              <Typography variant="body1">
-                Boya Rengi:{" "}
-                {
-                  dyeColors.find((color) => color.value === row.dyeColorId)
-                    ?.label
-                }
-              </Typography>
-              <Typography variant="body1">
-                Kumaş Türü:{" "}
-                {itemTypes.find((type) => type.value === row.itemTypeId)?.label}
-              </Typography>
-              <Typography variant="body1">
-                Lamine Rengi:{" "}
-                {
-                  laminationColors.find(
-                    (color) => color.value === row.laminationColorId
-                  )?.label
-                }
-              </Typography>
-              <Typography variant="body1">Metre: {row.meter}</Typography>
-              <Typography variant="body1">Kg: {row.kg}</Typography>
-              <Typography variant="body1">
-                Özellikler:{" "}
-                <b>
-                  {row.orderItemSpecification
-                    .map(
-                      (spec: any) =>
-                        outsourceTypes.find((type) => type.value === spec)
-                          ?.label
-                    )
-                    .join(", ")}
-                </b>
-              </Typography>
-              <Typography variant="body1">
-                Açıklama: {row.description}
-              </Typography>
-              <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 2 }}>
-                <Button
-                  variant="contained"
-                  color="error"
-                  startIcon={<DeleteIcon />}
-                  onClick={handleDeleteClick(row.id)}
-                >
-                  Sil
-                </Button>
-              </Box>
-            </Box>
-          ))}
-        </Box>
-      )}
+      <MobileSheetEdit
+        rows={rows}
+        setRows={setRows}
+        products={products}
+        dyeColors={dyeColors}
+        itemTypes={itemTypes}
+        laminationColors={laminationColors}
+        outsourceTypes={outsourceTypes}
+      />
     </>
   );
 }

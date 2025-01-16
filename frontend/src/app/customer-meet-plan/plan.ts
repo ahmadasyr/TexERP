@@ -6,11 +6,16 @@ export const tableName = "customer-meet-plan";
 export interface Data {
   id: number;
   customerId: number;
-  country: string;
+  location: string;
   visitReason: string;
   plannedDate: Date;
   realDate: Date;
-  visitingPersonnelId: number;
+  returnDate: Date;
+  customerMeetPlanAttendee: number[];
+  customerMeetPlanCustomer: {
+    customerId: number;
+    note: string;
+  };
   accuracyRate: number;
   note: string;
   travelExpense: number;
@@ -32,7 +37,7 @@ export const formFields = [
     displayValue: "name",
     required: true,
   }),
-  createField({ name: "country", label: "Ülke", type: "text", required: true }),
+  createField({ name: "location", label: "Yer", type: "text", required: true }),
   createField({
     name: "visitReason",
     label: "Ziyaret Nedeni",
@@ -51,8 +56,13 @@ export const formFields = [
     type: "datetime-local",
   }),
   createField({
-    name: "visitingPersonnelId",
-    label: "Ziyareti Gerçekleştiren Personel",
+    name: "returnDate",
+    label: "Ziyaretten Dönüş Tarihi",
+    type: "datetime-local",
+  }),
+  createField({
+    name: "customerMeetPlanAttendee",
+    label: "Ziyareti Gerçekleştiren Kişiler",
     type: "number",
     relation: true,
     table: "personnel",
@@ -107,7 +117,7 @@ export const columns = [
     table: "customer", // table name to fetch from api
     relation: true, // is it a relation
   },
-  { name: "country", label: "Ülke", type: "text" },
+  { name: "location", label: "Yer", type: "text" },
   { name: "visitReason", label: "Ziyaret Nedeni", type: "text" },
   { name: "plannedDate", label: "Planlanan Ziyaret Tarihi", type: "datetime" },
   { name: "realDate", label: "Gerçekleşen Ziyaret Tarihi", type: "datetime" },
@@ -148,7 +158,7 @@ export const headCells: HeadCell[] = [
     label: "Müşteri Adı",
     displayValue: ["name"],
   },
-  { id: "country", numeric: false, disablePadding: false, label: "Ülke" },
+  { id: "location", numeric: false, disablePadding: false, label: "Yer" },
   {
     id: "visitReason",
     numeric: false,

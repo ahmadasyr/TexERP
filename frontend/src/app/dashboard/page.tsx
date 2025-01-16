@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Grid,
   Paper,
@@ -29,6 +29,7 @@ import {
 } from "chart.js";
 
 import Sts from "./departments/sts";
+import { useSearchParams } from "next/navigation";
 
 // Register Chart.js components
 ChartJS.register(
@@ -43,17 +44,27 @@ ChartJS.register(
 );
 
 const Dashboard = () => {
+  const params = useSearchParams();
+  const department = params.get("department");
   const [year, setYear] = useState(new Date().getFullYear());
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
-  const [filterType, setFilterType] = useState("year");
-  const personnel = JSON.parse(localStorage.getItem("personnel") || "{}");
-  const userDepartment = personnel.department;
-  const years = Array.from(
-    { length: new Date().getFullYear() - 2023 },
-    (_, i) => 2024 + i
+  const [startDate, setStartDate] = useState(
+    new Date().getFullYear() + "-01-01"
   );
-
+  const [endDate, setEndDate] = useState(
+    new Date().toISOString().split("T")[0]
+  );
+  const [filterType, setFilterType] = useState("date");
+  const personnel = JSON.parse(localStorage.getItem("personnel") || "{}");
+  const [userDepartment, setUserDepartment] = useState(
+    department || personnel.department
+  );
+  const years = Array.from(
+    { length: new Date().getFullYear() - 2024 },
+    (_, i) => 2025 + i
+  );
+  useEffect(() => {
+    setUserDepartment(department || personnel.department);
+  }, [department]);
   return (
     <Box paddingX={window.innerWidth > 600 ? 20 : 3} paddingY={3}>
       <Typography variant="h2" gutterBottom>
@@ -73,7 +84,7 @@ const Dashboard = () => {
               onChange={(e) => {
                 setFilterType(e.target.value);
                 setYear(new Date().getFullYear());
-                setStartDate("");
+                setStartDate(new Date().getFullYear() + "-01-01");
                 setEndDate(new Date().toISOString().split("T")[0]);
               }}
             >
@@ -103,6 +114,7 @@ const Dashboard = () => {
                 size="small"
                 fullWidth
                 InputLabelProps={{ shrink: true }}
+                defaultValue={new Date().getFullYear() + "-01-01"}
                 onChange={(e) => setStartDate(e.target.value)}
               />
               <TextField
@@ -111,6 +123,7 @@ const Dashboard = () => {
                 size="small"
                 fullWidth
                 InputLabelProps={{ shrink: true }}
+                defaultValue={new Date().toISOString().split("T")[0]}
                 onChange={(e) => setEndDate(e.target.value)}
               />
             </Box>
@@ -119,7 +132,12 @@ const Dashboard = () => {
       </Grid>
 
       {userDepartment === "sts" ? (
-        <Sts year={year} startDate={startDate} endDate={endDate} />
+        <Sts
+          filterType={filterType}
+          year={year}
+          startDate={startDate}
+          endDate={endDate}
+        />
       ) : null}
     </Box>
   );

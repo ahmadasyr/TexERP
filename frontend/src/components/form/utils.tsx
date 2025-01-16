@@ -54,10 +54,14 @@ export const fetchData = async (
 
 export const useFormData = <Data extends {}>(formFields: any[]) => {
   const initializeFormData = <T extends {}>(fields: any[]): T => {
-    const formData: Partial<Record<keyof T, null>> = {};
+    const formData: Partial<Record<keyof T, any>> = {};
+
     fields.forEach((field) => {
-      formData[field.name as keyof T] = null;
+      if (!(field.name in formData)) {
+        formData[field.name as keyof T] = null;
+      }
     });
+
     return formData as T;
   };
 
@@ -91,6 +95,7 @@ export const useFormData = <Data extends {}>(formFields: any[]) => {
       ...prev,
       [name as string]: value,
     }));
+    saveFormDataToCookiesBasedOnTable(formData, window.location.pathname);
   };
 
   return {
@@ -100,3 +105,8 @@ export const useFormData = <Data extends {}>(formFields: any[]) => {
     runFetchData,
   };
 };
+
+function saveFormDataToCookiesBasedOnTable(formData: any, route: string) {
+  const data = JSON.stringify(formData);
+  localStorage.setItem(route, data);
+}

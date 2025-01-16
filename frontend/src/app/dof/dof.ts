@@ -13,6 +13,7 @@
 
 import { HeadCell } from "../../components/table/utils";
 import { createField } from "../../components/form/utils";
+import { getPersonnelInfo } from "@/contexts/auth";
 export const tableName = "dof";
 
 export interface Data {
@@ -27,6 +28,8 @@ export interface Data {
   dueDate: Date;
   resultsAndComments: string;
   closureDate: Date;
+  toPersonnel: any;
+  fromPersonnel: any;
 }
 
 export const formFields = [
@@ -44,12 +47,14 @@ export const formFields = [
     required: true,
     relation: true,
     table: "personnel",
+    creatable: false,
     value: "id",
     displayValue: ["firstName", "lastName"],
   }),
   createField({
     name: "toPersonnelId",
     label: "Kime",
+    creatable: false,
     type: "relation",
     required: true,
     relation: true,
@@ -65,6 +70,7 @@ export const formFields = [
     required: false,
     relation: true,
     table: "personnel",
+    creatable: false,
 
     value: "id",
     displayValue: ["firstName", "lastName"],
@@ -131,7 +137,13 @@ export const headCells: HeadCell[] = [
     label: "Takip eden",
     displayValue: ["firstName", "lastName"],
   },
-  { id: "date", numeric: false, disablePadding: false, label: "Tarih" },
+  {
+    id: "date",
+    numeric: false,
+    disablePadding: false,
+    label: "Tarih",
+    date: true,
+  },
   {
     id: "nonconformityDescription",
     numeric: false,
@@ -149,6 +161,7 @@ export const headCells: HeadCell[] = [
     numeric: false,
     disablePadding: false,
     label: "Termin Tarihi",
+    date: true,
   },
   {
     id: "resultsAndComments",
@@ -161,6 +174,40 @@ export const headCells: HeadCell[] = [
     numeric: false,
     disablePadding: false,
     label: "Kapanış Tarihi",
+    date: true,
   },
 ];
 export const title = "DÖFİ Formu  ";
+
+export const conditions = [
+  {
+    action: ["edit"],
+    checks: [
+      {
+        key: "fromPersonnelId",
+        type: "equal",
+        value: getPersonnelInfo().id,
+      },
+      {
+        key: "toPersonnelId",
+        type: "equal",
+        value: getPersonnelInfo().id,
+      },
+      {
+        key: "followedPersonnelId",
+        type: "equal",
+        value: getPersonnelInfo().id,
+      },
+    ],
+  },
+  {
+    action: ["delete"],
+    checks: [
+      {
+        key: "fromPersonnelId",
+        type: "equal",
+        value: getPersonnelInfo().id,
+      },
+    ],
+  },
+];

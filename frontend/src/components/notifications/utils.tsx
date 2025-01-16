@@ -1,0 +1,18 @@
+export const notificationIcon = {
+  General: "campaign",
+  Customer: "people",
+  Personnel: "person",
+  Product: "inventory_2",
+  Order: "shopping_cart",
+  Offer: "local_offer",
+  Dye: "color_lens",
+  Outsource: "business",
+  Yarn: "fiber_manual_record",
+  Wrap: "layers",
+  Production: "build",
+  Account: "account_balance",
+  Stock: "inventory",
+  Machine: "settings",
+  Dofi: "engineering",
+  Log: "history",
+};

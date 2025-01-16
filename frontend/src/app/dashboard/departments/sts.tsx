@@ -52,8 +52,9 @@ interface Props {
   year: number;
   startDate: string;
   endDate: string;
+  filterType: string;
 }
-export default function Sts({ year, startDate, endDate }: Props) {
+export default function Sts({ year, startDate, endDate, filterType }: Props) {
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
   const [complaints, setComplaints] = useState<Complaint[]>([]);
@@ -79,7 +80,7 @@ export default function Sts({ year, startDate, endDate }: Props) {
         .then((data) => setOffers(data));
     };
     getData();
-  }, []);
+  }, [startDate, endDate]);
 
   const getMonthlyCounts = (
     items: {
@@ -91,28 +92,100 @@ export default function Sts({ year, startDate, endDate }: Props) {
     }[],
     dateField: string
   ) => {
-    const counts = Array(12).fill(0);
+    const counts: Record<string, number> = {}; // Use a map to track counts for each year-month combination
     items.forEach((item) => {
       const date = new Date((item as Record<string, any>)[dateField]);
+      const year = date.getFullYear();
       const month = date.getMonth(); // 0 = January, 11 = December
-      if (startDate && endDate) {
+
+      if (filterType === "date") {
         const start = new Date(startDate);
         const end = new Date(endDate);
         if (date >= start && date <= end) {
-          counts[month]++;
+          const key = `${year}-${month}`;
+          counts[key] = (counts[key] || 0) + 1;
         }
-      } else if (date.getFullYear() === year) {
-        counts[month]++;
+      } else if (
+        filterType === "year" &&
+        year === parseInt(year.toString(), 10)
+      ) {
+        const key = `${year}-${month}`;
+        counts[key] = (counts[key] || 0) + 1;
       }
     });
+
     return counts;
   };
 
-  const [orderCounts, setOrderCounts] = useState<number[]>([]);
-  const [complaintCounts, setComplaintCounts] = useState<number[]>([]);
+  const getFilteredLabelsAndCounts = (
+    counts: Record<string, number>,
+    start: Date,
+    end: Date
+  ) => {
+    const filteredLabels: string[] = [];
+    const filteredCounts: number[] = [];
+
+    for (
+      let date = new Date(start);
+      date <= end;
+      date.setMonth(date.getMonth() + 1)
+    ) {
+      const year = date.getFullYear();
+      const month = date.getMonth();
+      const key = `${year}-${month}`;
+
+      filteredLabels.push(
+        `${new Date(year, month).toLocaleString("tr-TR", {
+          month: "long",
+        })} ${year}`
+      );
+      filteredCounts.push(counts[key] || 0);
+    }
+
+    return { filteredLabels, filteredCounts };
+  };
+
+  const calculatePercentageDifference = (
+    currentCount: number,
+    previousCount: number
+  ): number => {
+    if (previousCount === 0) {
+      return currentCount > 0 ? 100 : 0;
+    }
+    return ((currentCount - previousCount) / previousCount) * 100;
+  };
+
+  const calculateLast30DaysCounts = (items: { createdAt: string }[]) => {
+    const referenceEnd =
+      filterType === "year" ? new Date(year, 11, 31) : new Date(endDate);
+    const last30DaysStart = new Date(
+      referenceEnd.getTime() - 30 * 24 * 60 * 60 * 1000
+    );
+    const previous30DaysStart = new Date(
+      referenceEnd.getTime() - 60 * 24 * 60 * 60 * 1000
+    );
+
+    const last30DaysCount = items.filter(
+      (item) =>
+        new Date(item.createdAt) >= last30DaysStart &&
+        new Date(item.createdAt) <= referenceEnd
+    ).length;
+
+    const previous30DaysCount = items.filter(
+      (item) =>
+        new Date(item.createdAt) >= previous30DaysStart &&
+        new Date(item.createdAt) < last30DaysStart
+    ).length;
+
+    return { last30DaysCount, previous30DaysCount };
+  };
+
   const [plannedMeetCount, setPlannedMeetCount] = useState<number[]>([]);
   const [realMeetCount, setRealMeetCount] = useState<number[]>([]);
   const [offerCounts, setOfferCounts] = useState<number[]>([]);
+  const [orderCounts, setOrderCounts] = useState<number[]>([]);
+  const [orderLabels, setOrderLabels] = useState<string[]>([]);
+  const [complaintCounts, setComplaintCounts] = useState<number[]>([]);
   // count cities per customer
   const customerPerCity = customers.reduce((acc, c) => {
     acc[c.city] = (acc[c.city] || 0) + 1;
@@ -125,10 +198,12 @@ export default function Sts({ year, startDate, endDate }: Props) {
       acc[key] = value;
       return acc;
     }, {} as Record<string, number>);
+
   const complaintPerProduct = complaints.reduce((acc, c) => {
     acc[c.product.name] = (acc[c.product.name] || 0) + 1;
     return acc;
   }, {} as Record<string, number>);
+
   const orderPerProduct = orders.reduce((acc, o) => {
     o.orderItem.forEach((oi) => {
       acc[oi.product.name] = (acc[oi.product.name] || 0) + 1;
@@ -137,58 +212,99 @@ export default function Sts({ year, startDate, endDate }: Props) {
   }, {} as Record<string, number>);
 
   useEffect(() => {
-    setOrderCounts(getMonthlyCounts(orders, "createdAt"));
-    setComplaintCounts(getMonthlyCounts(complaints, "date"));
-    setPlannedMeetCount(getMonthlyCounts(meetings, "plannedDate"));
-    setRealMeetCount(getMonthlyCounts(meetings, "realDate"));
-    setOfferCounts(getMonthlyCounts(offers, "offerDate"));
-  }, [year, startDate, endDate]);
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+
+    const ordersCounts = getMonthlyCounts(orders, "createdAt");
+    const complaintsCounts = getMonthlyCounts(complaints, "date");
+    const meetingsPlanned = getMonthlyCounts(meetings, "plannedDate");
+    const meetingsReal = getMonthlyCounts(meetings, "realDate");
+
+    const { filteredLabels: orderLabels, filteredCounts: orderData } =
+      getFilteredLabelsAndCounts(ordersCounts, start, end);
+    const { filteredLabels: complaintLabels, filteredCounts: complaintData } =
+      getFilteredLabelsAndCounts(complaintsCounts, start, end);
+
+    setOrderCounts(orderData);
+    setOrderLabels(orderLabels);
+    setComplaintCounts(complaintData);
+    setPlannedMeetCount(Object.values(meetingsPlanned));
+    setRealMeetCount(Object.values(meetingsReal));
+  }, [year, startDate, endDate, filterType, orders, complaints, meetings]);
 
   const [last30DaysOrders, setLast30DaysOrders] = useState(0);
   const [previous30DaysOrders, setPrevious30DaysOrders] = useState(0);
-  const calculatePercentageDifference = (
-    currentCount: number,
-    previousCount: number
-  ): number => {
-    if (previousCount === 0) {
-      return currentCount > 0 ? 100 : 0;
-    }
-    return ((currentCount - previousCount) / previousCount) * 100;
-  };
-
-  const calculateLast30DaysCounts = (items: { createdAt: string }[]) => {
-    const end = new Date(endDate);
-    const last30DaysStart = new Date(end.getTime() - 30 * 24 * 60 * 60 * 1000);
-    const previous30DaysStart = new Date(
-      end.getTime() - 60 * 24 * 60 * 60 * 1000
-    );
-
-    const last30DaysCount = items.filter(
-      (item) =>
-        new Date(item.createdAt) >= last30DaysStart &&
-        new Date(item.createdAt) <= end
-    ).length;
-
-    const previous30DaysCount = items.filter(
-      (item) =>
-        new Date(item.createdAt) >= previous30DaysStart &&
-        new Date(item.createdAt) < last30DaysStart
-    ).length;
-
-    return { last30DaysCount, previous30DaysCount };
-  };
 
   useEffect(() => {
     const { last30DaysCount, previous30DaysCount } =
       calculateLast30DaysCounts(orders);
     setLast30DaysOrders(last30DaysCount);
     setPrevious30DaysOrders(previous30DaysCount);
-  }, [year, startDate, endDate]);
+  }, [year, startDate, endDate, orders]);
+
+  useEffect(() => {
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+
+    // Calculate monthly counts for planned and real meetings
+    const plannedMeetingCounts = calculateMonthlyCounts(
+      meetings,
+      "plannedDate"
+    );
+    const realMeetingCounts = calculateMonthlyCounts(meetings, "realDate");
+
+    // Generate filtered labels and counts for the line chart
+    const { labels: meetingLabels, filteredCounts: plannedCounts } =
+      generateFilteredLabelsAndCounts(plannedMeetingCounts);
+    const { filteredCounts: realCounts } =
+      generateFilteredLabelsAndCounts(realMeetingCounts);
+
+    setPlannedMeetCount(plannedCounts);
+    setRealMeetCount(realCounts);
+  }, [meetings, startDate, endDate, filterType]);
 
   const ordersPercentageDifference = calculatePercentageDifference(
     last30DaysOrders,
     previous30DaysOrders
   );
+
+  const calculateMonthlyCounts = (items: any[], dateField: string) => {
+    const counts = Array(12).fill(0);
+    items.forEach((item) => {
+      const date = new Date(item[dateField]);
+      if (date >= new Date(startDate) && date <= new Date(endDate)) {
+        counts[date.getMonth()]++;
+      }
+    });
+    return counts;
+  };
+
+  const generateFilteredLabelsAndCounts = (counts: number[]) => {
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    const labels = [];
+    const filteredCounts = [];
+
+    for (
+      let date = start;
+      date <= end;
+      date = new Date(date.setMonth(date.getMonth() + 1))
+    ) {
+      labels.push(date.toLocaleString("tr-TR", { month: "long" }));
+      filteredCounts.push(counts[date.getMonth()]);
+    }
+
+    return { labels, filteredCounts };
+  };
+
+  // Process data for charts
+  const orderMonthlyCounts = calculateMonthlyCounts(orders, "createdAt");
+  const { labels: orderLabelsFinal, filteredCounts: orderCountsFinal } =
+    generateFilteredLabelsAndCounts(orderMonthlyCounts);
+
+  const complaintMonthlyCounts = calculateMonthlyCounts(complaints, "date");
+  const { filteredCounts: complaintCountsFinal } =
+    generateFilteredLabelsAndCounts(complaintMonthlyCounts);
 
   return (
     <Grid container spacing={2}>
@@ -254,40 +370,28 @@ export default function Sts({ year, startDate, endDate }: Props) {
               <Divider />
               <Line
                 data={{
-                  labels: [
-                    "Ocak",
-                    "Şubat",
-                    "Mart",
-                    "Nisan",
-                    "Mayıs",
-                    "Haziran",
-                    "Temmuz",
-                    "Ağustos",
-                    "Eylül",
-                    "Ekim",
-                    "Kasım",
-                    "Aralık",
-                  ],
+                  labels: orderLabels,
                   datasets: [
                     {
-                      label: "Planlanan",
+                      label: "Planlanan Ziyaretler",
                       data: plannedMeetCount,
                       backgroundColor: "rgba(255,206,86,0.5)",
                       borderColor: "rgba(255,206,86,1)",
+                      fill: true,
                     },
                     {
-                      label: "Gerçekleşen",
+                      label: "Gerçekleşen Ziyaretler",
                       data: realMeetCount,
                       backgroundColor: "rgba(54,162,235,0.5)",
                       borderColor: "rgba(54,162,235,1)",
+                      fill: true,
                     },
                   ],
                 }}
                 options={{
                   scales: {
-                    y: {
-                      beginAtZero: true,
-                    },
+                    x: { title: { display: true, text: "Aylar" } },
+                    y: { title: { display: true, text: "Ziyaret Sayısı" } },
                   },
                 }}
               />
@@ -335,20 +439,7 @@ export default function Sts({ year, startDate, endDate }: Props) {
             <Divider />
             <Line
               data={{
-                labels: [
-                  "Ocak",
-                  "Şubat",
-                  "Mart",
-                  "Nisan",
-                  "Mayıs",
-                  "Haziran",
-                  "Temmuz",
-                  "Ağustos",
-                  "Eylül",
-                  "Ekim",
-                  "Kasım",
-                  "Aralık",
-                ],
+                labels: orderLabels,
                 datasets: [
                   {
                     label: "Teklifler",
@@ -426,20 +517,7 @@ export default function Sts({ year, startDate, endDate }: Props) {
             <Divider />
             <Line
               data={{
-                labels: [
-                  "Ocak",
-                  "Şubat",
-                  "Mart",
-                  "Nisan",
-                  "Mayıs",
-                  "Haziran",
-                  "Temmuz",
-                  "Ağustos",
-                  "Eylül",
-                  "Ekim",
-                  "Kasım",
-                  "Aralık",
-                ],
+                labels: orderLabels,
                 datasets: [
                   {
                     label: "Siparişler",
@@ -517,20 +595,7 @@ export default function Sts({ year, startDate, endDate }: Props) {
               </Grid>
               <Line
                 data={{
-                  labels: [
-                    "Ocak",
-                    "Şubat",
-                    "Mart",
-                    "Nisan",
-                    "Mayıs",
-                    "Haziran",
-                    "Temmuz",
-                    "Ağustos",
-                    "Eylül",
-                    "Ekim",
-                    "Kasım",
-                    "Aralık",
-                  ],
+                  labels: orderLabels,
                   datasets: [
                     {
                       label: "Şikayetler",

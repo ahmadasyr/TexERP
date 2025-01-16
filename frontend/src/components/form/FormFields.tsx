@@ -21,6 +21,7 @@ interface FormFieldProps {
   handleChange: (event: any) => void;
   togglePopup?: (table: string, column: string, on: boolean) => void;
   multiline?: boolean;
+  multiSelect?: boolean;
 }
 
 const gridSize = 12;
@@ -285,7 +286,6 @@ export const NewDate = ({
     />
   );
 };
-
 export const NewRelation = ({
   keyProp,
   formFields,
@@ -355,7 +355,7 @@ export const NewRelation = ({
                 required={field?.required}
                 {...params}
                 label={field.label}
-                placeholder="Search..."
+                placeholder="Ara..."
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </>
@@ -366,6 +366,111 @@ export const NewRelation = ({
               target: {
                 name: keyProp,
                 value: newValue ? newValue[field.value] : "",
+              },
+            });
+          }}
+        />
+      </FormControl>
+
+      {field?.creatable ? (
+        <IconButton
+          style={{ fontSize: "1rem" }}
+          color="primary"
+          onClick={() => {
+            togglePopup && togglePopup(field.table, keyProp, true);
+          }}
+        >
+          Yeni {field.label} Ekle
+          <AddIcon />
+        </IconButton>
+      ) : null}
+    </>
+  );
+};
+export const NewMultiRelation = ({
+  keyProp,
+  formFields,
+  formData,
+  handleChange,
+  tableData,
+  togglePopup,
+  multiSelect,
+}: FormFieldProps & { tableData: any[] }) => {
+  const field = formFields.find((f) => f.name === keyProp);
+  if (!field) return null;
+
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const selectedTable = tableData.find((table) => table.name === field.table);
+  const selectedValues = selectedTable
+    ? selectedTable.values.filter((value: any) =>
+        (formData[keyProp] || []).includes(value[field.value])
+      )
+    : [];
+
+  const filteredOptions: string[] = field.relationDependancy
+    ? tableData
+        .find((table) => table.name === field.table)
+        ?.values?.filter((value: any) =>
+          Array.isArray(field.displayValue)
+            ? field.displayValue
+                .map((item: any) => String(value[item] ?? ""))
+                .join(" ")
+                .toLowerCase()
+                .includes(searchTerm.toLowerCase()) &&
+              value[field.relationDependancy.field] ===
+                formData[field.relationDependancy.value]
+            : String(value[field.displayValue] ?? "")
+                .toLowerCase()
+                .includes(searchTerm.toLowerCase()) &&
+              value[field.relationDependancy.field] ===
+                formData[field.relationDependancy.value]
+        ) ?? []
+    : tableData
+        .find((table) => table.name === field.table)
+        ?.values?.filter((value: any) =>
+          Array.isArray(field.displayValue)
+            ? field.displayValue
+                .map((item: any) => String(value[item] ?? ""))
+                .join(" ")
+                .toLowerCase()
+                .includes(searchTerm.toLowerCase())
+            : String(value[field.displayValue] ?? "")
+                .toLowerCase()
+                .includes(searchTerm.toLowerCase())
+        ) ?? [];
+
+  return (
+    <>
+      <FormControl fullWidth>
+        <Autocomplete
+          multiple={multiSelect || false}
+          disabled={field?.disabled}
+          options={filteredOptions || []}
+          getOptionLabel={(option: any) =>
+            Array.isArray(field.displayValue)
+              ? field.displayValue.map((item: any) => option[item]).join(" ")
+              : option[field.displayValue]
+          }
+          renderInput={(params) => (
+            <>
+              <TextField
+                required={field?.required}
+                {...params}
+                label={field.label}
+                placeholder="Ara..."
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </>
+          )}
+          value={selectedValues}
+          onChange={(event, newValue) => {
+            handleChange({
+              target: {
+                name: keyProp,
+                value: newValue
+                  ? newValue.map((val: any) => val[field.value])
+                  : [],
               },
             });
           }}

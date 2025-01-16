@@ -17,12 +17,16 @@ interface FormModalProps {
   alertValue: number;
   setAlertValue: React.Dispatch<React.SetStateAction<number>>;
   isPopup?: boolean;
+  handleChange?: any;
+  formData?: any;
 }
 
 export const FormModal: React.FC<FormModalProps> = ({
   alertValue,
   setAlertValue,
   isPopup,
+  handleChange,
+  formData,
 }) => {
   const handleClose = () => setAlertValue(0);
   const playerRef = useRef<Player>(null);
@@ -99,6 +103,19 @@ export const FormModal: React.FC<FormModalProps> = ({
           </DialogContentText>
         </DialogContent>
         <DialogActions>
+          {!isPopup ? (
+            <Button
+              variant="contained"
+              color="error"
+              onClick={() => {
+                setAlertValue(0);
+
+                window.history.back();
+              }}
+            >
+              Formdan Çık
+            </Button>
+          ) : null}
           <Button
             variant="outlined"
             color="primary"
@@ -108,19 +125,91 @@ export const FormModal: React.FC<FormModalProps> = ({
           >
             Düzenle
           </Button>
-          {!isPopup ? (
-            <Button
-              variant="outlined"
-              color="error"
-              onClick={() => {
-                setAlertValue(0);
-
-                window.history.back();
-              }}
-            >
-              Formu kapat
-            </Button>
-          ) : null}
+        </DialogActions>
+      </Dialog>
+      <Dialog
+        open={alertValue == -1}
+        onClose={handleClose}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">
+          {"Formu Sıfırlamak İstediğinizden Emin misiniz?"}
+          <IconButton
+            onClick={handleClose}
+            style={{ position: "absolute", right: 8, top: 8 }}
+          >
+            <Clear />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            Formu sıfırlamak istediğinizden emin misiniz? Bu işlem geri
+            alınamaz.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            variant="outlined"
+            color="primary"
+            onClick={() => {
+              setAlertValue(0);
+              Object.keys(formData).forEach((key) => {
+                handleChange({
+                  target: { name: key, value: "" },
+                } as React.ChangeEvent<{ name: string; value: any }>);
+              });
+            }}
+          >
+            Evet
+          </Button>
+          <Button variant="outlined" color="secondary" onClick={handleClose}>
+            Hayır
+          </Button>
+        </DialogActions>
+      </Dialog>
+      <Dialog
+        open={alertValue == -2}
+        onClose={handleClose}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">
+          {"Formu Geri Almak İstediğinizden Emin misiniz?"}
+          <IconButton
+            onClick={handleClose}
+            style={{ position: "absolute", right: 8, top: 8 }}
+          >
+            <Clear />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            Formu geri almak istediğinizden emin misiniz? Bu işlem geri
+            alınamaz.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            variant="outlined"
+            color="primary"
+            onClick={() => {
+              setAlertValue(0);
+              const data = JSON.parse(
+                localStorage.getItem(window.location.pathname) || "{}"
+              );
+              Object.keys(data).forEach((key) => {
+                handleChange({
+                  target: { name: key, value: data[key] },
+                } as React.ChangeEvent<{ name: string; value: any }>);
+              });
+            }}
+          >
+            Evet
+          </Button>
+          <Button variant="outlined" color="secondary" onClick={handleClose}>
+            Hayır
+          </Button>
         </DialogActions>
       </Dialog>
     </>

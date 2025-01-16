@@ -5,6 +5,7 @@ import {
   updateOrder,
   deleteOrder,
   getOrderByCustomerId,
+  orderStatus,
 } from "../services/orderServices";
 import { Request, Response } from "express";
 
@@ -64,6 +65,26 @@ export const getOrderByCustomerIdController = async (
 ) => {
   try {
     const order = await getOrderByCustomerId(Number(req.params.id));
+    res.status(200).json(order);
+  } catch (error) {
+    console.log(error);
+    res.status(400).json({ message: error });
+  }
+};
+
+export const openOrder = async (req: Request, res: Response) => {
+  try {
+    const order = await orderStatus(Number(req.params.id), false);
+    res.status(200).json(order);
+  } catch (error) {
+    console.log(error);
+    res.status(400).json({ message: error });
+  }
+};
+
+export const closeOrder = async (req: Request, res: Response) => {
+  try {
+    const order = await orderStatus(Number(req.params.id), true);
     res.status(200).json(order);
   } catch (error) {
     console.log(error);

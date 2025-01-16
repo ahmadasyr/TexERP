@@ -21,17 +21,43 @@ import {
   Autocomplete,
   TextField,
   Grid,
+  Breadcrumbs,
+  Link,
+  Icon,
+  Badge,
+  Avatar,
+  Divider,
+  ListItemIcon,
+  Button,
 } from "@mui/material";
 import { handleLogout, getPersonnelInfo } from "@/contexts/auth";
 import { useRouter } from "next/navigation";
 import SearchIcon from "@mui/icons-material/Search";
 import menuItems from "./main/menu/menuItems.json";
+import BreadcrumbComponent from "./Breadcrumb";
+import {
+  Close,
+  Delete,
+  DeleteForever,
+  Logout,
+  Settings,
+  Widgets,
+} from "@mui/icons-material";
+import { notificationIcon } from "./notifications/utils";
 interface PrimaryAppBarProps {
   toggleDrawer: () => void;
   toggleTheme: () => void;
   open: boolean;
   theme: boolean;
   setTheme: React.Dispatch<React.SetStateAction<true | false>>;
+}
+interface Notifications {
+  id: number;
+  category: string;
+  title: string;
+  description: string;
+  link?: string;
+  read: boolean;
 }
 
 const ThemeSwitch = styled(Switch)(({ theme }) => ({
@@ -101,7 +127,9 @@ export default function PrimaryAppBar({
   setTheme,
 }: PrimaryAppBarProps) {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-
+  const [isNotificationsOpen, setIsNotificationsOpen] = React.useState(false);
+  const [notifications, setNotifications] = React.useState<Notifications[]>([]);
+  const [unreadNotifications, setUnreadNotifications] = React.useState(0);
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] =
     React.useState<null | HTMLElement>(null);
   const [customers, setCustomers] = React.useState<
@@ -110,20 +138,305 @@ export default function PrimaryAppBar({
   const router = useRouter();
 
   const personnel = getPersonnelInfo();
-  React.useEffect(() => {
-    fetch("/api/customer")
+  const fetchNotifications = () => {
+    fetch("/api/notification/personnel/" + personnel?.id)
       .then((res) => res.json())
       .then((data) => {
-        setCustomers(data || []);
+        console.log(data);
+        setNotifications(data || []);
+        setUnreadNotifications(
+          data.filter((notification: Notifications) => !notification.read)
+            .length
+        );
       })
-      .catch((err) => console.error("Error fetching customers:", err));
+      .catch((err) => console.error("Error fetching notifications:", err));
+  };
+  React.useEffect(() => {
+    if (personnel?.department === "sts") {
+      fetch("/api/customer")
+        .then((res) => res.json())
+        .then((data) => {
+          setCustomers(data || []);
+        })
+        .catch((err) => console.error("Error fetching customers:", err));
+    }
+    fetchNotifications();
   }, []);
+  React.useEffect(() => {
+    fetchNotifications();
+  }, [isNotificationsOpen]);
+  const handleNotificationClick = (link: string) => {
+    router.push(link);
+  };
+  const handleNotificationRead = (id: number) => {
+    fetch("/api/notification/" + id, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ read: true }),
+    })
+      .then(() => {
+        setNotifications(
+          notifications.map((notification) =>
+            notification.id === id
+              ? { ...notification, read: true }
+              : notification
+          )
+        );
+      })
+      .catch((err) => console.error("Error updating notification:", err));
+  };
+  const handleNotificationDelete = (id: number) => {
+    fetch("/api/notification/" + id, {
+      method: "DELETE",
+    })
+      .then(() => {
+        setNotifications(
+          notifications.filter((notification) => notification.id !== id)
+        );
+      })
+      .catch((err) => console.error("Error deleting notification:", err));
+  };
+  const markAllAsRead = () => {
+    fetch("/api/notification/markAllAsRead", {
+      method: "put",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ personnelId: personnel.id }),
+    })
+      .then(() => {
+        setNotifications(
+          notifications.map((notification) => ({
+            ...notification,
+            read: true,
+          }))
+        );
+        setUnreadNotifications(0);
+      })
+      .catch((err) => console.error("Error updating notifications:", err));
+  };
+  const renderNotifications = () => {
+    return (
+      <Menu
+        anchorEl={anchorEl}
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+        open={isNotificationsOpen}
+        onClose={() => {
+          setIsNotificationsOpen(false);
+        }}
+        slotProps={{
+          paper: {
+            sx: {
+              marginTop: "3rem",
+              width: "30rem",
+              height: "25rem",
+              overflowY: "hidden",
+              borderRadius: "0.5rem",
+              pt: ".5rem",
+            },
+          },
+        }}
+      >
+        {notifications.length === 0 ? (
+          <Box
+            sx={{
+              paddingTop: "2rem",
+              justifyItems: "center",
+              verticalAlign: "middle",
+              margin: "auto",
+              width: "80%",
+            }}
+          >
+            <NotificationsIcon
+              style={{
+                fontSize: "10rem",
+                color: "rgba(0, 0, 0, 0.2)",
+              }}
+            />
+            <Typography
+              variant="h5"
+              sx={{
+                textAlign: "center",
+                width: "100%",
+              }}
+              fontWeight={"bold"}
+            >
+              Bildirim yok
+            </Typography>
+            <Typography
+              variant="body1"
+              sx={{
+                textAlign: "center",
+                width: "100%",
+              }}
+            >
+              Şu anda görüntülenecek herhangi bir bildirim yoktur.
+            </Typography>
+            <Box
+              sx={{
+                display: "flex",
+                mt: 2,
+                justifyContent: "space-evenly",
+                width: "50%",
+              }}
+            >
+              <Button
+                variant="contained"
+                color="primary"
+                sx={
+                  {
+                    // marginRight: "0.5rem",
+                  }
+                }
+                onClick={() => {
+                  setIsNotificationsOpen(false);
+                }}
+              >
+                Kapat
+              </Button>
+              <Button
+                onClick={fetchNotifications}
+                variant="outlined"
+                color="secondary"
+              >
+                Yenile
+              </Button>
+            </Box>
+          </Box>
+        ) : (
+          <Box>
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                padding: "0.5rem",
+              }}
+            >
+              <Typography fontWeight="bold" variant="h6" sx={{ ml: 0.5 }}>
+                Bildirimler
+              </Typography>
+              <Typography
+                variant="body2"
+                sx={{
+                  fontSize: "0.75rem",
+                  cursor: "pointer",
+                  color: "primary.main",
+                  fontWeight: "bold",
+                  whiteSpace: "nowrap",
+                }}
+                onClick={markAllAsRead}
+              >
+                Tümünü okundu olarak işaretle
+              </Typography>
+            </Box>
+
+            <div
+              style={{
+                height: "20rem",
+                overflowY: "auto",
+                overflowX: "hidden",
+              }}
+            >
+              {notifications.map((notification) => (
+                <MenuItem
+                  key={notification.id}
+                  onClick={() => {
+                    handleNotificationClick(notification.link || "#");
+                    handleNotificationRead(notification.id);
+                    handleMenuClose();
+                  }}
+                  sx={{
+                    width: "100%",
+                    backgroundColor: notification.read
+                      ? "transparent"
+                      : "rgba(0, 0, 0, 0.05)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                  }}
+                >
+                  <Avatar
+                    sx={{
+                      backgroundColor: notification.read
+                        ? "transparent"
+                        : "primary.main",
+                      color: notification.read
+                        ? "primary.main"
+                        : "primary.contrastText",
+                      marginRight: ".5rem",
+                      width: "2rem",
+                      height: "2rem",
+                    }}
+                  >
+                    <Icon>
+                      {
+                        notificationIcon[
+                          notification.category as keyof typeof notificationIcon
+                        ]
+                      }
+                    </Icon>
+                  </Avatar>
+                  <Box sx={{ flexGrow: 1 }}>
+                    <Typography
+                      variant="subtitle1"
+                      sx={{
+                        fontWeight: notification.read ? "normal" : "600",
+                      }}
+                    >
+                      {notification.title}
+                    </Typography>
+                    <Typography variant="body2">
+                      {notification.description}
+                    </Typography>
+                  </Box>
+                  <IconButton
+                    edge="end"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleNotificationDelete(notification.id);
+                    }}
+                  >
+                    <Close />
+                  </IconButton>
+                </MenuItem>
+              ))}
+            </div>
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "left",
+                alignItems: "left",
+                height: "2rem",
+                marginLeft: "0.5rem",
+              }}
+            >
+              <Typography
+                variant="body2"
+                sx={{
+                  fontSize: "0.75rem",
+                  fontWeight: "bold",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                {unreadNotifications} okunmamış
+              </Typography>
+            </Box>
+          </Box>
+        )}
+      </Menu>
+    );
+  };
 
   const handleProfileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
+    setIsMenuOpen(true);
   };
 
   const handleMenuClose = () => {
+    setIsMenuOpen(false);
     setAnchorEl(null);
     setMobileMoreAnchorEl(null);
   };
@@ -140,8 +453,11 @@ export default function PrimaryAppBar({
       router.push(`/customer/view/?id=${value.id}`);
     }
   };
-
-  const isMenuOpen = Boolean(anchorEl);
+  const handleNotificationMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+    setIsNotificationsOpen(true);
+  };
+  const [isMenuOpen, setIsMenuOpen] = React.useState(false);
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
   const Searcher = () => {
     type OptionType =
@@ -171,18 +487,20 @@ export default function PrimaryAppBar({
                     subItem?.allowedDepartments.includes(personnel?.department)
                 )
                 .flatMap((subItem) =>
-                  (subItem.subItems || [])
-                    .filter(
-                      (deepSubItem: any) =>
-                        !deepSubItem?.allowedDepartments ||
-                        deepSubItem?.allowedDepartments.includes(
-                          personnel?.department
+                  "subItems" in subItem
+                    ? (subItem.subItems || [])
+                        .filter(
+                          (deepSubItem: any) =>
+                            !deepSubItem?.allowedDepartments ||
+                            deepSubItem?.allowedDepartments.includes(
+                              personnel?.department
+                            )
                         )
-                    )
-                    .map((deepSubItem) => ({
-                      ...deepSubItem,
-                      group: `${item.title} > ${subItem.title}`, // Group by parent and subItem title
-                    }))
+                        .map((deepSubItem) => ({
+                          ...deepSubItem,
+                          group: `${item.title} > ${subItem.title}`, // Group by parent and subItem title
+                        }))
+                    : []
                 )
             : []
         )
@@ -209,7 +527,9 @@ export default function PrimaryAppBar({
     return (
       <Autocomplete
         style={
-          theme ? { backgroundColor: "#2C2C2C" } : { backgroundColor: "white" }
+          theme
+            ? { backgroundColor: "#2C2C2C", borderRadius: ".5rem" }
+            : { backgroundColor: "white", borderRadius: ".5rem" }
         }
         popupIcon={null}
         options={options}
@@ -228,6 +548,7 @@ export default function PrimaryAppBar({
             <TextField
               {...params}
               // label={label}
+              placeholder={label}
               size="small"
               InputProps={{
                 ...params.InputProps,
@@ -249,28 +570,67 @@ export default function PrimaryAppBar({
   const renderMenu = (
     <Menu
       anchorEl={anchorEl}
-      anchorOrigin={{ vertical: "top", horizontal: "right" }}
       keepMounted
       open={isMenuOpen}
       onClose={handleMenuClose}
+      slotProps={{
+        paper: {
+          sx: {
+            width: "13rem",
+            height: "15rem",
+            borderRadius: "0.5rem",
+            pt: ".5rem",
+          },
+        },
+      }}
     >
       <MenuItem
-        onClick={() => {
+        onClick={(e) => {
           router.push("/profile");
           handleMenuClose();
         }}
       >
-        Profil
+        <Avatar
+          sx={{
+            bgcolor: "primary.main",
+          }}
+          color="primary"
+        >
+          {personnel?.avatar ? (
+            <img
+              src={personnel.avatar}
+              alt="avatar"
+              style={{ borderRadius: "50%", width: "30px" }}
+            />
+          ) : (
+            personnel?.firstName?.charAt(0).toUpperCase()
+          )}
+        </Avatar>
+        <Typography
+          variant="subtitle1"
+          sx={{ fontWeight: "600", ml: 1 }}
+        >{`${personnel?.firstName} ${personnel?.lastName}`}</Typography>
+      </MenuItem>
+      <Divider />
+      <MenuItem>
+        <ListItemIcon>
+          <Settings fontSize="small" />
+        </ListItemIcon>
+        Ayarlar
       </MenuItem>
       <MenuItem
         onClick={() => {
           router.push("/logout");
         }}
       >
+        <ListItemIcon>
+          <Logout fontSize="small" />
+        </ListItemIcon>
         Çıkış Yap
       </MenuItem>
     </Menu>
   );
+
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="sticky" color="primary">
@@ -290,6 +650,19 @@ export default function PrimaryAppBar({
                 </IconButton>
 
                 <Searcher />
+
+                <IconButton
+                  size="large"
+                  color="inherit"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleNotificationMenuOpen(e);
+                  }}
+                >
+                  <Badge badgeContent={unreadNotifications} color="error">
+                    <NotificationsIcon />
+                  </Badge>
+                </IconButton>
               </>
             ) : (
               <>
@@ -302,7 +675,7 @@ export default function PrimaryAppBar({
                 >
                   <MenuIcon />
                 </IconButton>
-                <Typography variant="h6" noWrap sx={{ flexGrow: 1 }}>
+                <Typography variant="h6" noWrap sx={{ flexGrow: 0.5 }}>
                   {(() => {
                     const hour = new Date().getHours();
                     if (hour < 12)
@@ -312,9 +685,22 @@ export default function PrimaryAppBar({
                     return `🌜 İyi akşamlar, ${personnel?.firstName} ${personnel?.lastName}`;
                   })()}
                 </Typography>
-
+                <BreadcrumbComponent menuItems={menuItems} />
                 <Searcher />
 
+                <Box>
+                  <IconButton
+                    color="inherit"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleNotificationMenuOpen(e);
+                    }}
+                  >
+                    <Badge badgeContent={unreadNotifications} color="error">
+                      <NotificationsIcon />
+                    </Badge>
+                  </IconButton>
+                </Box>
                 <IconButton color="inherit" onClick={handleProfileMenuOpen}>
                   {personnel?.avatar ? (
                     <img
@@ -336,6 +722,7 @@ export default function PrimaryAppBar({
         </Toolbar>
       </AppBar>
       {renderMenu}
+      {renderNotifications()}
     </Box>
   );
 }

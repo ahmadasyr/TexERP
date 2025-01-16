@@ -99,6 +99,12 @@ const ProductView = () => {
 
   const [product, setProduct] = useState<Product | null>(null);
   const [productPrice, setProductPrice] = useState<ProductPrice[]>([]);
+  const [productTypes, setProductTypes] = useState<
+    { value: number; label: string }[]
+  >([]);
+  const [outsourceTypes, setOutsourceTypes] = useState<
+    { value: number; label: string }[]
+  >([]);
   const [personnels, setPersonnels] = useState<Personnel[]>([]);
   const [rowModesModel, setRowModesModel] = useState<GridRowModesModel>({});
   const [customers, setCustomers] = useState<Customer[]>([]);
@@ -121,11 +127,15 @@ const ProductView = () => {
           personnelResponse,
           currencyResponse,
           customerResponse,
+          productTypeResponse,
+          outsourceTypeResponse,
         ] = await Promise.all([
           fetch(`/api/product/${id}`),
           fetch(`/api/personnel`),
           fetch(`/api/currency`),
           fetch(`/api/customer`),
+          fetch(`/api/product-type`),
+          fetch(`/api/outsource-type`),
         ]);
 
         if (!productResponse.ok)
@@ -177,6 +187,24 @@ const ProductView = () => {
             customerRes.map((customer: Customer) => ({
               value: customer?.id,
               label: customer.name,
+            }))
+          );
+        }
+        if (productTypeResponse.ok) {
+          const productTypeRes = await productTypeResponse.json();
+          setProductTypes(
+            productTypeRes.map((productType: any) => ({
+              value: productType?.id,
+              label: productType.name,
+            }))
+          );
+        }
+        if (outsourceTypeResponse.ok) {
+          const outsourceTypeRes = await outsourceTypeResponse.json();
+          setOutsourceTypes(
+            outsourceTypeRes.map((outsourceType: any) => ({
+              value: outsourceType?.id,
+              label: outsourceType.name,
             }))
           );
         }
@@ -315,6 +343,22 @@ const ProductView = () => {
       valueFormatter: (params, row) => {
         return Number(row.id) < 1 ? "Taslak" : row.id;
       },
+    },
+    {
+      field: "productTypeId",
+      headerName: "Ürün Tipi",
+      width: 200,
+      editable: true,
+      type: "singleSelect",
+      valueOptions: productTypes,
+    },
+    {
+      field: "outsourceTypeId",
+      headerName: "Fason Tipi",
+      width: 200,
+      editable: true,
+      type: "singleSelect",
+      valueOptions: outsourceTypes,
     },
     {
       field: "date",

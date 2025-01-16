@@ -19,9 +19,31 @@ const prisma = new PrismaClient();
 export const getAllProductPrices = async () => {
   return await prisma.productPrice.findMany({
     include: {
-      product: true,
-      currency: true,
-      personnel: true,
+      product: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+      currency: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+      personnel: {
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+        },
+      },
+      outsourceType: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
     },
   });
 };
@@ -30,9 +52,31 @@ export const getProductPriceById = async (id: number) => {
   return await prisma.productPrice.findUnique({
     where: { id },
     include: {
-      product: true,
-      currency: true,
-      personnel: true,
+      product: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+      currency: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+      personnel: {
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+        },
+      },
+      outsourceType: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
     },
   });
 };
@@ -46,6 +90,7 @@ export const createProductPrice = async (data: {
   date: Date;
   unit: unit;
   personnelId: number;
+  outsourceTypeId: number;
 }) => {
   return await prisma.productPrice.create({
     data: {
@@ -63,6 +108,11 @@ export const createProductPrice = async (data: {
       personnel: {
         connect: { id: data.personnelId },
       },
+      outsourceType: data.outsourceTypeId
+        ? {
+            connect: { id: data.outsourceTypeId },
+          }
+        : undefined,
     },
   });
 };
@@ -78,6 +128,7 @@ export const updateProductPrice = async (
     date: Date;
     unit: unit;
     personnelId: number;
+    outsourceTypeId: number;
   }
 ) => {
   return await prisma.productPrice.update({
@@ -97,6 +148,11 @@ export const updateProductPrice = async (
       personnel: {
         connect: { id: data.personnelId },
       },
+      outsourceType: data.outsourceTypeId
+        ? {
+            connect: { id: data.outsourceTypeId },
+          }
+        : undefined,
     },
   });
 };

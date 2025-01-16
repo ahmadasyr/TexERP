@@ -33,7 +33,7 @@ export default function LoginPage() {
           event.currentTarget.lastName.value,
           event.currentTarget.email.value,
           event.currentTarget.password.value,
-          event.currentTarget.email.value
+          event.currentTarget.username.value
         )
       : authType === "reset"
       ? handleReset(
@@ -121,7 +121,7 @@ export default function LoginPage() {
             </Grid>
           </Box>
         </>
-      ) : authType === "register" && env.NODE_ENV === "development" ? (
+      ) : authType === "register" ? (
         <>
           <Avatar sx={{ m: 1, bgcolor: "secondary.main" }}>
             <LockOutlinedIcon />
@@ -177,10 +177,10 @@ export default function LoginPage() {
               margin="normal"
               required
               fullWidth
-              id="email"
-              label="email"
-              name="email"
-              autoComplete="email"
+              id="username"
+              label="Username"
+              name="username"
+              autoComplete="username"
             />
             <Button
               type="submit"

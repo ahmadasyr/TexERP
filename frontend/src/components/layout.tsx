@@ -26,12 +26,15 @@ import Menu from "./main/menu/page";
 import { lightPalette, darkPalette } from "./theme";
 import PrimarySearchAppBar from "./navbar";
 import Login from "../app/login/page";
+import Footer from "./main/footer/page";
 const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [darkMode, setDarkMode] = useState(false);
   const [token, setToken] = useState<string | null>(null);
   useEffect(() => {
     const handleTokenChange = () => {
-      setToken(localStorage.token);
+      if (localStorage.token) {
+        setToken(localStorage.token);
+      }
     };
     handleTokenChange();
     // Listen for logout events
@@ -52,7 +55,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   };
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
+    if (typeof window !== undefined) {
       localStorage.setItem("darkMode", JSON.stringify(darkMode));
     }
   }, [darkMode]);
@@ -63,7 +66,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         main: darkMode ? "#E3CBA8" : "#F05A29", // Brighter primary color
       },
       secondary: {
-        main: darkMode ? "#46EBC2" : "#22868A", // More vibrant secondary color
+        main: darkMode ? "#58A6A6" : "#22868A", // More vibrant secondary color
       },
       background: {
         default: darkMode ? "#202020" : "#F9F9F9", // Slightly darker/lighter for contrast
@@ -245,7 +248,14 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                 theme={darkMode}
                 setTheme={setDarkMode}
               />
-              {children}
+              <Box
+                sx={{
+                  paddingBottom: "4rem",
+                }}
+              >
+                {children}
+              </Box>
+              <Footer />
             </Grid>
           </Grid>
         ) : (

@@ -61,6 +61,9 @@ type EnhancedTableProps = {
   URI: string;
   customPath?: string;
   useTableName?: boolean;
+  conditions?: any;
+  createable?: boolean;
+  editable?: boolean;
 };
 
 export default function EnhancedTable({
@@ -71,6 +74,9 @@ export default function EnhancedTable({
   URI,
   customPath,
   useTableName,
+  conditions,
+  createable = true,
+  editable = true,
 }: EnhancedTableProps): JSX.Element {
   const router = useRouter();
   const [rows, setRows] = React.useState<Data[]>([]);
@@ -120,6 +126,59 @@ export default function EnhancedTable({
     }, URI);
   }, [URI, refresh]);
 
+  // condition example:
+  // conditions = [
+  //   {
+  //     action: ["edit"],
+  //     checks: [
+  //       {
+  //         key: "fromPersonnelId",
+  //         type: "equal",
+  //         value: getPersonnelInfo().id,
+  //       },
+  //       {
+  //         key: "toPersonnelId",
+  //         type: "equal",
+  //         value: getPersonnelInfo().id,
+  //       },
+  //       {
+  //         key: "followedPersonnelId",
+  //         type: "equal",
+  //         value: getPersonnelInfo().id,
+  //       },
+  //     ],
+  //   },
+  //   {
+  //     action: ["delete"],
+  //     checks: [
+  //       {
+  //         key: "fromPersonnelId",
+  //         type: "equal",
+  //         value: getPersonnelInfo().id,
+  //       },
+  //     ],
+  //   },
+  // ];
+
+  const checkConditions = (row: any, action: string) => {
+    let result = true;
+    conditions?.forEach((condition: any) => {
+      if (condition.action.includes(action)) {
+        let check = false;
+        condition.checks.forEach((checkCondition: any) => {
+          if (checkCondition.type === "equal") {
+            check =
+              check || row[checkCondition.key] === checkCondition.value
+                ? true
+                : false;
+          }
+        });
+        result = check;
+      }
+    });
+    return result;
+  };
+
   React.useEffect(() => {
     // Fetch data and preprocess rows
 
@@ -144,6 +203,51 @@ export default function EnhancedTable({
             type: "string",
           },
         ];
+      }
+      if (cell.actionConditions) {
+        return {
+          field: cell.id + "_actions",
+          headerName: cell.label,
+          width: cell.width || 130,
+          hide: !cell.visible,
+          type: cell.numeric ? "number" : "string",
+          valueGetter: (params: any, row: any) => {
+            if (typeof row === "object" && cell.displayValue) {
+              return `${row[cell.id]?.id} - ${cell.displayValue
+                .map((key: string) => row[cell.id]?.[key])
+                .join(" ")}`;
+            } else if (cell.boolean) {
+              return Boolean(row[cell.id]) ? "Evet" : "Hayır";
+            } else {
+              return row[cell.id];
+            }
+          },
+
+          renderCell: (params: any) => {
+            const render = cell.actionConditions.find(
+              (condition: any) => condition.value === params.value
+            );
+            return (
+              <Button
+                onClick={async () => {
+                  if (render.action) {
+                    await fetch(`${render.action}/${params.row.id}`, {
+                      method: "PUT",
+                      headers: {
+                        "Content-Type": "application/json",
+                      },
+                    });
+                    setRefresh(!refresh);
+                  }
+                }}
+                variant="contained"
+                color={render?.color || "primary"}
+              >
+                {render?.label || "İşlem Bulunamadı"}
+              </Button>
+            );
+          },
+        };
       }
       return {
         field: cell.id,
@@ -234,11 +338,25 @@ export default function EnhancedTable({
               {viewable && (
                 <IconButton
                   onClick={() => {
-                    router.push(
-                      `${useTableName ? tableName : currentURI}/view/?id=${
-                        params.row.id
-                      }`
-                    );
+                    if (conditions) {
+                      if (checkConditions(params.row, "view")) {
+                        router.push(
+                          `${useTableName ? tableName : currentURI}/view/?id=${
+                            params.row.id
+                          }`
+                        );
+                      } else {
+                        setResult({
+                          code: 401,
+                        });
+                      }
+                    } else {
+                      router.push(
+                        `${useTableName ? tableName : currentURI}/view/?id=${
+                          params.row.id
+                        }`
+                      );
+                    }
                   }}
                 >
                   <Visibility />
@@ -246,11 +364,25 @@ export default function EnhancedTable({
               )}
               <IconButton
                 onClick={() => {
-                  router.push(
-                    `${useTableName ? tableName : currentURI}/form/?id=${
-                      params.row.id
-                    }`
-                  );
+                  if (conditions) {
+                    if (checkConditions(params.row, "edit")) {
+                      router.push(
+                        `${useTableName ? tableName : currentURI}/form/?id=${
+                          params.row.id
+                        }`
+                      );
+                    } else {
+                      setResult({
+                        code: 401,
+                      });
+                    }
+                  } else {
+                    router.push(
+                      `${useTableName ? tableName : currentURI}/form/?id=${
+                        params.row.id
+                      }`
+                    );
+                  }
                 }}
               >
                 <Edit />
@@ -294,12 +426,31 @@ export default function EnhancedTable({
             style={{ marginLeft: "auto" }}
             variant="contained"
             onClick={() => {
-              router.push(customPath ? customPath : `${currentURI}/form`);
+              if (conditions) {
+                if (checkConditions({}, "create")) {
+                  router.push(
+                    `${useTableName ? tableName : currentURI}/form/?id=0`
+                  );
+                } else {
+                  setResult({
+                    code: 401,
+                  });
+                }
+              } else if (!createable) {
+                setResult({
+                  code: 401,
+                });
+              } else {
+                router.push(
+                  `${useTableName ? tableName : currentURI}/form/?id=0`
+                );
+              }
             }}
           >
             Yeni Oluştur
             <Add />
           </Button>
+
           {selected.length === 0 && (
             <Button
               variant="outlined"
@@ -317,10 +468,33 @@ export default function EnhancedTable({
               variant="outlined"
               color="error"
               onClick={() => {
-                const selections = selected.map((id) => id as number);
-                setSelections(selections);
-                setDeleteDialog(true);
-                setRefresh(!refresh);
+                const newSelections: number[] = [];
+                if (conditions) {
+                  selected.forEach((id) => {
+                    if (
+                      checkConditions(
+                        rows.find((row) => row.id === id),
+                        "delete"
+                      )
+                    ) {
+                      newSelections.push(id as number);
+                    } else {
+                      setResult({
+                        code: 401,
+                      });
+                    }
+                  });
+                } else {
+                  newSelections.push(...selected.map((id) => id as number));
+                }
+                if (newSelections.length > 0) {
+                  setSelections(newSelections);
+                  setDeleteDialog(true);
+                } else {
+                  setResult({
+                    code: 401,
+                  });
+                }
               }}
             >
               <Delete />
@@ -333,11 +507,26 @@ export default function EnhancedTable({
                   variant="contained"
                   color="info"
                   onClick={() => {
-                    router.push(
-                      `${useTableName ? tableName : currentURI}/view/?id=${
-                        selected[0]
-                      }`
-                    );
+                    if (conditions) {
+                      if (
+                        checkConditions(
+                          rows.find((row) => row.id === selected[0]),
+                          "view"
+                        )
+                      ) {
+                        router.push(
+                          `${useTableName ? tableName : currentURI}/view/?id=${
+                            selected[0]
+                          }`
+                        );
+                      }
+                    } else {
+                      router.push(
+                        `${useTableName ? tableName : currentURI}/view/?id=${
+                          selected[0]
+                        }`
+                      );
+                    }
                   }}
                 >
                   <Visibility />
@@ -347,11 +536,30 @@ export default function EnhancedTable({
                 variant="contained"
                 color="info"
                 onClick={() => {
-                  router.push(
-                    `${useTableName ? tableName : currentURI}/form/?id=${
-                      selected[0]
-                    }`
-                  );
+                  if (conditions) {
+                    if (
+                      checkConditions(
+                        rows.find((row) => row.id === selected[0]),
+                        "edit"
+                      )
+                    ) {
+                      router.push(
+                        `${useTableName ? tableName : currentURI}/form/?id=${
+                          selected[0]
+                        }`
+                      );
+                    } else {
+                      setResult({
+                        code: 401,
+                      });
+                    }
+                  } else {
+                    router.push(
+                      `${useTableName ? tableName : currentURI}/form/?id=${
+                        selected[0]
+                      }`
+                    );
+                  }
                 }}
               >
                 <Edit />
@@ -362,6 +570,12 @@ export default function EnhancedTable({
       </>
     );
   }
+  const [resultDialog, setResultDialog] = React.useState(false);
+  useEffect(() => {
+    if (result.code) {
+      setResultDialog(true);
+    }
+  }, [result]);
   return (
     <>
       <Dialog open={deleteDialog} onClose={handleClose}>
@@ -398,7 +612,7 @@ export default function EnhancedTable({
         </DialogActions>
       </Dialog>
 
-      <Dialog open={Boolean(result.code)} onClose={() => setResult({})}>
+      <Dialog open={resultDialog} onClose={() => setResult({})}>
         <DialogTitle>
           {result.code === 200
             ? "Başarılı"
@@ -412,11 +626,13 @@ export default function EnhancedTable({
               ? "Silme işlemi başarılı"
               : result.code === 500
               ? "Silme işlemi başarısız"
+              : result.code === 401
+              ? "Bu işlemi gerçekleştirmek için yetkiniz yok"
               : "Silme işlemi kısmen başarısız"}
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setResult({})}>Kapat</Button>
+          <Button onClick={() => setResultDialog(false)}>Kapat</Button>
         </DialogActions>
       </Dialog>
       <Box

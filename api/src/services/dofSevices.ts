@@ -34,14 +34,16 @@ export const createDof = async (data: {
   dueDate?: Date;
   resultsAndComments?: string;
   closureDate?: Date;
-  followedByPersonnelId?: number;
+  followedPersonnelId?: number;
 }) => {
   return await prisma.dofiRequest.create({
     data: {
       reason: data.reason,
       fromPersonnel: { connect: { id: data.fromPersonnelId } },
       toPersonnel: { connect: { id: data.toPersonnelId } },
-      followedPersonnel: { connect: { id: data.followedByPersonnelId } },
+      followedPersonnel: data.followedPersonnelId
+        ? { connect: { id: data.followedPersonnelId } }
+        : undefined,
       nonconformityDescription: data.nonconformityDescription,
       plannedCorrectiveActions: data.plannedCorrectiveActions,
       resultsAndComments: data.resultsAndComments,
@@ -64,7 +66,7 @@ export const updateDof = async (
     dueDate?: Date;
     resultsAndComments?: string;
     closureDate?: Date;
-    followedByPersonnelId?: number;
+    followedPersonnelId?: number;
   }
 ) => {
   return await prisma.dofiRequest.update({
@@ -76,10 +78,12 @@ export const updateDof = async (
       date: data.date,
       nonconformityDescription: data.nonconformityDescription,
       plannedCorrectiveActions: data.plannedCorrectiveActions,
-      dueDate: data.dueDate,
+      dueDate: data.dueDate ? new Date(data.dueDate) : undefined,
       resultsAndComments: data.resultsAndComments,
-      closureDate: data.closureDate,
-      followedPersonnel: { connect: { id: data.followedByPersonnelId } },
+      closureDate: data.closureDate ? new Date(data.closureDate) : undefined,
+      followedPersonnel: data.followedPersonnelId
+        ? { connect: { id: data.followedPersonnelId } }
+        : undefined,
     },
   });
 };

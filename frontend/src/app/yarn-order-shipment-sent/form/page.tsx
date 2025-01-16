@@ -1,7 +1,15 @@
 "use client";
 
 import React, { useEffect, useState, useCallback } from "react";
-import { Alert, Box, Button, Grid, Typography } from "@mui/material";
+import {
+  Alert,
+  Box,
+  Button,
+  Grid,
+  Typography,
+  ButtonGroup,
+  Tooltip,
+} from "@mui/material";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { useSearchParams } from "next/navigation";
 import { useFormData } from "@/components/form/utils";
@@ -363,14 +371,51 @@ const Bank: React.FC = ({ popupHandler, popupSetter }: Props) => {
               </Grid>
             </Grid>
           )}
-          <Button
-            style={{ marginTop: "1rem" }}
-            type="submit"
-            variant="contained"
-            color="primary"
+          <ButtonGroup
+            variant="outlined"
+            aria-label="Loading button group"
+            style={{ display: "flex", justifyContent: "right" }}
           >
-            Kaydet
-          </Button>
+            {/* Save Button */}
+            <Tooltip title="Kaydetmek için tıklayın">
+              <Button
+                type="submit"
+                variant="contained"
+                color="primary"
+                size="large"
+              >
+                Kaydet
+              </Button>
+            </Tooltip>
+
+            {/* Restore Button */}
+            <Tooltip title="Formu yerel verilerle geri yükle">
+              <Button
+                onClick={() => {
+                  setAlertValue(-2);
+                }}
+                variant="contained"
+                color="secondary"
+                size="large"
+              >
+                Geri Yükle
+              </Button>
+            </Tooltip>
+
+            {/* Reset Button */}
+            <Tooltip title="Formu sıfırla">
+              <Button
+                onClick={() => {
+                  setAlertValue(-1);
+                }}
+                variant="text"
+                color="error"
+                size="large"
+              >
+                Sıfırla
+              </Button>
+            </Tooltip>
+          </ButtonGroup>
         </Box>
       </form>
     </>

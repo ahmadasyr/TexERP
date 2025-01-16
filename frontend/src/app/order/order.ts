@@ -70,6 +70,34 @@ export const formFields = [
 export const headCells: HeadCell[] = [
   { id: "id", numeric: true, disablePadding: true, label: "No" },
   {
+    id: "closed",
+    numeric: false,
+    disablePadding: false,
+    label: "Kapalı",
+    boolean: true,
+  },
+  {
+    id: "closed",
+    numeric: false,
+    disablePadding: false,
+    label: "Durum",
+    boolean: true,
+    actionConditions: [
+      {
+        value: "Evet",
+        label: "Aç",
+        color: "success",
+        action: "api/order/open",
+      },
+      {
+        value: "Hayır",
+        label: "Kapat",
+        color: "error",
+        action: "api/order/close",
+      },
+    ],
+  },
+  {
     id: "createdAt",
     numeric: false,
     disablePadding: false,
@@ -93,7 +121,7 @@ export const headCells: HeadCell[] = [
   },
   {
     id: "personnel",
-    numeric: true,
+    numeric: false,
     disablePadding: false,
     label: "Oluşturan Kişi",
     displayValue: ["firstName", "lastName"],
@@ -103,13 +131,6 @@ export const headCells: HeadCell[] = [
     numeric: false,
     disablePadding: false,
     label: "Açıklama",
-  },
-  {
-    id: "closed",
-    numeric: false,
-    disablePadding: false,
-    label: "Kapalı",
-    boolean: true,
   },
 ];
 

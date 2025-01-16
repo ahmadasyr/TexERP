@@ -136,7 +136,7 @@ export default function Menu(props: MenuProps) {
           sx={{ pl: 2 }}
         >
           <ListItemIcon sx={{ minWidth: 36 }}>
-            <Icon fontSize="small">settings</Icon>
+            <Icon fontSize="small">account_circle</Icon>
           </ListItemIcon>
           <ListItemText primary="Kullanıcı Ayarları" />
           {openItems["user-settings"] ? <ExpandLess /> : <ExpandMore />}

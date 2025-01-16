@@ -7,9 +7,30 @@ export const getAllCustomerPrices = async (req: Request, res: Response) => {
   try {
     const customerPrices = await prisma.customerPrice.findMany({
       include: {
-        product: true,
-        currency: true,
-        customer: true,
+        product: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+        currency: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+        customer: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+        outsourceType: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
       },
     });
     res.status(200).json(customerPrices);
@@ -43,9 +64,30 @@ export const getCustomerPriceByCustomer = async (
     const customerPrice = await prisma.customerPrice.findMany({
       where: { customerId: Number(id) },
       include: {
-        product: true,
-        currency: true,
-        customer: true,
+        product: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+        currency: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+        customer: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+        outsourceType: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
       },
     });
     if (customerPrice) {
@@ -69,6 +111,7 @@ export const createCustomerPrice = async (req: Request, res: Response) => {
     upfront,
     installment,
     personnelId,
+    outsourceTypeId,
   } = req.body;
   try {
     const newCustomerPrice = await prisma.customerPrice.create({
@@ -78,6 +121,12 @@ export const createCustomerPrice = async (req: Request, res: Response) => {
         product: { connect: { id: productId } },
         currency: { connect: { id: currencyId } },
         personnel: { connect: { id: personnelId } },
+        outsourceType: outsourceTypeId
+          ? {
+              connect: { id: outsourceTypeId },
+            }
+          : undefined,
+
         price,
         upfront,
         installment,
@@ -103,6 +152,7 @@ export const updateCustomerPrice = async (req: Request, res: Response) => {
     upfront,
     installment,
     personnelId,
+    outsourceTypeId,
   } = req.body;
   try {
     const updatedCustomerPrice = await prisma.customerPrice.update({
@@ -113,6 +163,11 @@ export const updateCustomerPrice = async (req: Request, res: Response) => {
         customer: { connect: { id: customerId } },
         currency: { connect: { id: currencyId } },
         product: { connect: { id: productId } },
+        outsourceType: outsourceTypeId
+          ? {
+              connect: { id: outsourceTypeId },
+            }
+          : undefined,
         price,
         upfront,
         installment,

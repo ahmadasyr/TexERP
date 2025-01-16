@@ -128,6 +128,7 @@ export default function Sheet(props: SheetProps) {
       type: "number",
       editable: true,
       width: 150,
+      // getter product name
     },
     {
       field: "price",

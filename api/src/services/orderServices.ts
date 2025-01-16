@@ -285,3 +285,14 @@ export const getOrderByCustomerId = async (customerId: number) => {
     },
   });
 };
+
+export const orderStatus = async (id: number, status: boolean) => {
+  return await prisma.order.update({
+    where: {
+      id,
+    },
+    data: {
+      closed: status,
+    },
+  });
+};
