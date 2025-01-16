@@ -2,11 +2,24 @@ import React, { useEffect } from "react";
 import { Box, Typography, Link, Button } from "@mui/material";
 import { Announcement, Campaign } from "@mui/icons-material";
 
-const Footer = () => {
+const Footer = ({ darkMode }: { darkMode: boolean }) => {
+  const [liveTime, setLiveTime] = React.useState(
+    new Date().toLocaleTimeString("tr-TR")
+  );
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setLiveTime(new Date().toLocaleTimeString("tr-TR"));
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <Box
       sx={{
-        bgcolor: "secondary.main",
+        backgroundColor: Boolean(darkMode)
+          ? "background.paper"
+          : "secondary.main",
         padding: ".1rem 2rem",
         position: "fixed",
         bottom: 0,
@@ -16,19 +29,24 @@ const Footer = () => {
         alignItems: "center",
         gap: "5rem",
         zIndex: 100,
+        color: "white",
       }}
     >
       <Typography
         variant="body2"
-        sx={{ color: "white", textAlign: "left", fontSize: "0.875rem" }}
+        sx={{ textAlign: "left", fontSize: "0.875rem" }}
       >
-        © {new Date().getFullYear()} Dokumaş Fabric
+        © {new Date().getFullYear()} <b>Dokumaş Fabric</b>
       </Typography>
       <Typography
         variant="body2"
-        sx={{ color: "white", fontSize: "0.875rem", textAlign: "center" }}
+        sx={{
+          fontSize: "0.875rem",
+          textAlign: "center",
+          minWidth: "150px",
+        }}
       >
-        {new Date().toLocaleDateString("tr-TR")} - <span id="live-time"></span>
+        {new Date().toLocaleDateString("tr-TR")} - {liveTime}
       </Typography>
       <Typography
         variant="button"
@@ -40,12 +58,12 @@ const Footer = () => {
           textTransform: "none",
           padding: "8px 16px",
           backgroundColor: "var(--mui-palette-info-main)",
-          color: "white",
+
           borderRadius: "4px",
           cursor: "pointer",
           transition: "background-color 0.3s ease",
           "&:hover": {
-            color: "Highlight",
+            textDecoration: "underline",
           },
         }}
         aria-label="Report an issue"

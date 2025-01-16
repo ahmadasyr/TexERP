@@ -398,3 +398,35 @@ export function CustomChipSelectWithGroups(props: any) {
               {item[displayValueKey]}
             </MenuItem> */
 }
+
+export function CustomChipSelectWithGroupsAutocomplete(props: any) {
+  const { value, onChange, valueKey, displayValueKey, values, label } = props;
+
+  const handleOnChange = (event: any, newValue: any[]) => {
+    const selectedValues = newValue.map(
+      (item: any) =>
+        values.find((val: any) => val[displayValueKey] === item)?.[valueKey]
+    );
+    onChange(selectedValues);
+  };
+
+  const selectedOptions = values.filter((item: any) =>
+    value.includes(item[valueKey])
+  );
+
+  return (
+    <Autocomplete
+      multiple
+      limitTags={1}
+      id="multiple-limit-tags"
+      options={values.map((item: any) => item[displayValueKey])}
+      getOptionLabel={(option) => option}
+      value={selectedOptions.map((item: any) => item[displayValueKey])}
+      onChange={handleOnChange}
+      renderInput={(params) => (
+        <TextField {...params} label={label} placeholder="" />
+      )}
+      sx={{ width: "500px" }}
+    />
+  );
+}

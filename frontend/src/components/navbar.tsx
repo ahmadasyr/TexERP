@@ -228,14 +228,22 @@ export default function PrimaryAppBar({
         }}
         slotProps={{
           paper: {
-            sx: {
-              marginTop: "3rem",
-              width: "30rem",
-              height: "25rem",
-              overflowY: "hidden",
-              borderRadius: "0.5rem",
-              pt: ".5rem",
-            },
+            sx:
+              window.innerWidth < 600
+                ? {
+                    width: "100%",
+                    height: "100vh",
+                    overflowY: "hidden",
+                    pt: ".5rem",
+                  }
+                : {
+                    marginTop: "3rem",
+                    width: "30rem",
+                    height: "25rem",
+                    overflowY: "hidden",
+                    borderRadius: "0.5rem",
+                    pt: ".5rem",
+                  },
           },
         }}
       >
@@ -333,9 +341,9 @@ export default function PrimaryAppBar({
               </Typography>
             </Box>
 
-            <div
-              style={{
-                height: "20rem",
+            <Box
+              sx={{
+                height: window.innerWidth < 600 ? "77vh" : "20rem",
                 overflowY: "auto",
                 overflowX: "hidden",
               }}
@@ -346,7 +354,7 @@ export default function PrimaryAppBar({
                   onClick={() => {
                     handleNotificationClick(notification.link || "#");
                     handleNotificationRead(notification.id);
-                    handleMenuClose();
+                    setIsNotificationsOpen(false);
                   }}
                   sx={{
                     width: "100%",
@@ -403,7 +411,7 @@ export default function PrimaryAppBar({
                   </IconButton>
                 </MenuItem>
               ))}
-            </div>
+            </Box>
             <Box
               sx={{
                 display: "flex",

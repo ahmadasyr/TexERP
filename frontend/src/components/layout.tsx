@@ -55,7 +55,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   };
 
   useEffect(() => {
-    if (typeof window !== undefined) {
+    if (window) {
       localStorage.setItem("darkMode", JSON.stringify(darkMode));
     }
   }, [darkMode]);
@@ -109,6 +109,9 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         styleOverrides: (theme) => ({
           form: {
             backgroundColor: theme.palette.background.paper,
+          },
+          footer: {
+            backgroundColor: darkMode ? "#FFFFFF" : "#2C2C2C",
           },
         }),
       },
@@ -255,7 +258,8 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
               >
                 {children}
               </Box>
-              <Footer />
+              {window.location.pathname !== "/login" &&
+                window.innerWidth > 600 && <Footer darkMode={darkMode} />}
             </Grid>
           </Grid>
         ) : (
