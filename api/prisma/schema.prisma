@@ -27,6 +27,7 @@ enum department {
   dep
   coz
   orm
+  dok
   kalf
   kes
   muh
@@ -34,6 +35,7 @@ enum department {
 
 model personnel {
   id               Int         @id @default(autoincrement())
+  supervisorId     Int?
   firstName        String?     @db.VarChar(50)
   lastName         String?     @db.VarChar(50)
   position         String?     @db.VarChar(50)
@@ -43,10 +45,12 @@ model personnel {
   phone            String?     @db.VarChar(15)
   handleComplaints Boolean?
   handleSales      Boolean?
-  password         String?
+  password         String
   username         String?     @unique
   department       department?
 
+  // Relations
+  supervisor                personnel?                  @relation("supervisor", fields: [supervisorId], references: [id])
   customerMeetReport        customerMeetReport[]
   complaintsDealt           customerComplaint[]         @relation("ref_dealingPersonnel")
   complaintsEvaluated       customerComplaint[]         @relation("ref_evaluatingPersonnel")
@@ -86,6 +90,16 @@ model personnel {
   notification              notification[]
   customerMeetPlanAttendee  customerMeetPlanAttendee[]
   reportIssue               reportIssue[]
+  purchaseDelivery          purchaseDelivery[]
+  purchaseDeliveryItem      purchaseDeliveryItem[]
+  subordinate               personnel[]                 @relation("supervisor")
+  purchaseOrder             purchaseOrder[]
+  purchaseOrderItem         purchaseOrderItem[]
+  warehouse                 warehouse[]
+  materialStock             materialStock[]
+  movedMaterialStock        materialStock[]             @relation("MovedPersonnelRelation")
+  supplierEvaluation        supplierEvaluation[]
+  purchaseRequest           purchaseRequest[]
 }
 
 // GENERAL SECTION
@@ -150,6 +164,7 @@ model taxOffice {
   city     String
   customer customer[]
   account  account[]
+  supplier supplier[]
 }
 
 model bank {
@@ -159,18 +174,20 @@ model bank {
 }
 
 model currency {
-  id              Int             @id @default(autoincrement())
-  name            String
-  code            String          @db.Char(3)
-  rate            Float
-  exchangePercent Float?
-  customer        customer[]
-  customerPrice   customerPrice[]
-  dyeOrderItem    dyeOrderItem[]
-  yarnType        yarnType[]
-  yarnOrderItem   yarnOrderItem[]
-  productPrice    productPrice[]
-  account         account[]
+  id                Int                 @id @default(autoincrement())
+  name              String
+  code              String              @db.Char(3)
+  rate              Float
+  exchangePercent   Float?
+  customer          customer[]
+  customerPrice     customerPrice[]
+  dyeOrderItem      dyeOrderItem[]
+  yarnType          yarnType[]
+  yarnOrderItem     yarnOrderItem[]
+  productPrice      productPrice[]
+  account           account[]
+  materialPrice     materialPrice[]
+  purchaseOrderItem purchaseOrderItem[]
 }
 
 // SALES SECTION
@@ -469,6 +486,7 @@ model account {
   outsourceOrder outsourceOrder[]
   yarnOrder      yarnOrder[]
   yarnStockEntry yarnStockEntry[]
+  supplier       supplier[]
 }
 
 model accountType {
@@ -1211,6 +1229,7 @@ model shippingCompany {
   shippingCar       shippingCar[]
   orderShipment     orderShipment[]
   yarnOrderShipment yarnOrderShipment[]
+  purchaseDelivery  purchaseDelivery[]
 }
 
 model shippingCarrier {
@@ -1227,6 +1246,7 @@ model shippingCarrier {
   shippingCompany   shippingCompany     @relation(fields: [shippingCompanyId], references: [id])
   orderShipment     orderShipment[]
   yarnOrderShipment yarnOrderShipment[]
+  purchaseDelivery  purchaseDelivery[]
 }
 
 model shippingCar {
@@ -1238,6 +1258,7 @@ model shippingCar {
   shippingCompany   shippingCompany     @relation(fields: [shippingCompanyId], references: [id])
   orderShipment     orderShipment[]
   yarnOrderShipment yarnOrderShipment[]
+  purchaseDelivery  purchaseDelivery[]
 }
 
 model orderShipment {
@@ -1365,4 +1386,301 @@ model reportIssue {
   status      issueStatus
   // Relations
   personnel   personnel   @relation(fields: [personnelId], references: [id])
+}
+
+model supplier {
+  id                     Int       @id @default(autoincrement())
+  name                   String
+  accountId              Int
+  materials              String
+  foreign                Boolean   @default(false)
+  suitable               Boolean   @default(false)
+  supplierScore          Int
+  approved               Boolean   @default(false)
+  evaluationDate         DateTime
+  createdAt              DateTime  @default(now())
+  entryScore             Int?
+  maxApprovalDate        DateTime?
+  contractType           String?
+  contractDate           DateTime?
+  contractValidityPeriod Int?
+  selfPickup             Boolean   @default(false)
+  address                String
+  phone                  String?
+  email                  String?
+  authorizedPerson       String?
+  authorizedPersonPhone  String?
+  authorizedPersonEmail  String?
+  taxOfficeId            Int?
+  taxNumber              String?
+  vade                   Int?
+  iso9001Status          Boolean   @default(false)
+  iso14001Status         Boolean   @default(false)
+  iso45001Status         Boolean   @default(false)
+
+  // relations
+  account            account              @relation(fields: [accountId], references: [id])
+  taxOffice          taxOffice?           @relation(fields: [taxOfficeId], references: [id])
+  materialPrice      materialPrice[]
+  purchaseOrder      purchaseOrder[]
+  supplierEvaluation supplierEvaluation[]
+}
+
+model supplierEvaluation {
+  id            Int      @id @default(autoincrement())
+  supplierId    Int
+  createdAt     DateTime @default(now())
+  personnelId   Int
+  location      String
+  locationScore Int      @default(0)
+
+  pricing      String
+  pricingScore Int    @default(0)
+
+  payment      String
+  paymentScore Int    @default(0)
+
+  packaging      String
+  packagingScore Int    @default(0)
+
+  skill      String
+  skillScore Int    @default(0)
+
+  financial      String
+  financialScore Int    @default(0)
+
+  flexibilityDescription String
+  flexibilityScore       Int    @default(0)
+
+  legalRequirements      String
+  legalRequirementsScore Int    @default(0)
+
+  afterSalesService      String?
+  afterSalesServiceScore Int     @default(0)
+
+  qualitySystemDocument      String?
+  qualitySystemDocumentScore Int     @default(0)
+
+  // relations
+  supplier  supplier  @relation(fields: [supplierId], references: [id])
+  personnel personnel @relation(fields: [personnelId], references: [id])
+}
+
+model materialCategory {
+  id       Int        @id @default(autoincrement())
+  name     String     @unique
+  material material[]
+}
+
+enum materialUnit {
+  kg
+  metre
+  adet
+  litre
+  paket
+  kutu
+  ton
+  koli
+}
+
+model material {
+  id         Int          @id @default(autoincrement())
+  // will include name of the material, type of the material, unit of the material
+  name       String       @unique
+  unit       materialUnit
+  categoryId Int
+
+  // Relations
+  materialCategory  materialCategory    @relation(fields: [categoryId], references: [id])
+  materialPrice     materialPrice[]
+  purchaseOrderItem purchaseOrderItem[]
+  materialStock     materialStock[]
+}
+
+model materialPrice {
+  id          Int      @id @default(autoincrement())
+  // will include id of the material, price of the material, currency of the price, date of the price, account of the seller
+  createdAt   DateTime @default(now())
+  materialId  Int
+  price       Float
+  vade        Int?
+  vatIncluded Boolean  @default(false)
+  currencyId  Int
+  supplierId  Int
+  // Relations
+  material    material @relation(fields: [materialId], references: [id])
+  currency    currency @relation(fields: [currencyId], references: [id])
+  supplier    supplier @relation(fields: [supplierId], references: [id])
+}
+
+model warehouse {
+  id                Int    @id @default(autoincrement())
+  // will include name of the warehouse, address of the warehouse, personnel responsible for the warehouse
+  name              String
+  address           String
+  personnelId       Int
+  parentWarehouseId Int?
+
+  // relations
+  personnel       personnel       @relation(fields: [personnelId], references: [id])
+  parentWarehouse warehouse?      @relation("WarehouseRelation", fields: [parentWarehouseId], references: [id])
+  childWarehouse  warehouse[]     @relation("WarehouseRelation")
+  materialStock   materialStock[]
+}
+
+model materialStock {
+  id                  Int          @id @default(autoincrement())
+  // will include id of the material, id of the warehouse, amount of the material, unit of the material, date of the stock, 
+  // purchase order id, purchase order item id, personnel who added the stock, and if moved which stock it was moved from, and personnel who moved the stock
+  materialId          Int
+  warehouseId         Int?
+  amount              Float
+  unit                materialUnit
+  createdAt           DateTime     @default(now())
+  purchaseOrderItemId Int?
+  personnelId         Int
+  movedFromStockId    Int?
+  movedPersonnelId    Int?
+
+  // relations
+  material          material           @relation(fields: [materialId], references: [id])
+  warehouse         warehouse?         @relation(fields: [warehouseId], references: [id])
+  purchaseOrderItem purchaseOrderItem? @relation(fields: [purchaseOrderItemId], references: [id])
+  personnel         personnel          @relation(fields: [personnelId], references: [id])
+  movedFromStock    materialStock?     @relation("MovedFromStockRelation", fields: [movedFromStockId], references: [id])
+  movedPersonnel    personnel?         @relation("MovedPersonnelRelation", fields: [movedPersonnelId], references: [id])
+
+  materialStock materialStock[] @relation("MovedFromStockRelation")
+}
+
+model purchaseRequest {
+  id                         Int                   @id @default(autoincrement())
+  createdAt                  DateTime              @default(now())
+  department                 department
+  personnelId                Int
+  approvalFromSupervisor     Boolean               @default(false)
+  approvalFromSupervisorDate DateTime
+  approvalFromManagement     Boolean               @default(false)
+  approvalFromManagementDate DateTime
+  // will include date, personnel who requested, personnel who resulted, management approval, status, description
+  //Relations
+  personnel                  personnel             @relation(fields: [personnelId], references: [id])
+  purchaseRequestItem        purchaseRequestItem[]
+
+  purchaseOrder purchaseOrder[]
+}
+
+model purchaseRequestItem {
+  id                Int             @id @default(autoincrement())
+  createdAt         DateTime        @default(now())
+  purchaseRequestId Int
+  material          String
+  quantity          Float
+  requestedDate     DateTime
+  description       String?
+  // will include purchase request id, material id, quantity
+  purchaseRequest   purchaseRequest @relation(fields: [purchaseRequestId], references: [id])
+}
+
+model purchaseOrder {
+  id                Int      @id @default(autoincrement())
+  createdAt         DateTime @default(now())
+  personnelId       Int
+  supplierId        Int
+  purchaseRequestId Int
+  purchaseType      String
+  vade              Int?
+  shippingType      String?
+  deadline          DateTime
+
+  // will include purchase request id, account from where we make the order, date, personnel who created the order, status, description, due date
+  purchaseDelivery  purchaseDelivery[]
+  // relations
+  personnel         personnel           @relation(fields: [personnelId], references: [id])
+  purchaseRequest   purchaseRequest     @relation(fields: [purchaseRequestId], references: [id])
+  purchaseOrderItem purchaseOrderItem[]
+  supplier          supplier            @relation(fields: [supplierId], references: [id])
+}
+
+model packagingType {
+  id                Int                 @id @default(autoincrement())
+  name              String
+  purchaseOrderItem purchaseOrderItem[]
+}
+
+model purchaseOrderItem {
+  id              Int          @id @default(autoincrement())
+  purchaseOrderId Int
+  materialId      Int
+  quantity        Float
+  personnelId     Int
+  unit            materialUnit
+  pricePerUnit    Float
+  currencyId      Int
+  vat             Float
+  packagingTypeId Int?
+  specification   String?
+  description     String?
+
+  // will include material id, purchase order id, quantity, personnel who added the item
+  // relations
+  purchaseOrder        purchaseOrder          @relation(fields: [purchaseOrderId], references: [id])
+  material             material               @relation(fields: [materialId], references: [id])
+  personnel            personnel              @relation(fields: [personnelId], references: [id])
+  currency             currency               @relation(fields: [currencyId], references: [id])
+  packagingType        packagingType?         @relation(fields: [packagingTypeId], references: [id])
+  purchaseDeliveryItem purchaseDeliveryItem[]
+  materialStock        materialStock[]
+}
+
+model purchaseOrderReturn {
+  id Int @id @default(autoincrement())
+
+  // will include purhcase order, date, personnel who created the return
+}
+
+model purchaseOrderReturnItem {
+  id Int @id @default(autoincrement())
+
+  // will include return id, reason, orderItem id, quantity, personnel who added the return item
+}
+
+model purchaseDelivery {
+  id                Int      @id @default(autoincrement())
+  createdAt         DateTime @default(now())
+  purchaseOrderId   Int
+  date              DateTime
+  personnelId       Int
+  deliveryNo        String?
+  freightType       String?
+  deliveryType      String?
+  CarId             Int?
+  shippingCarrierId Int?
+  shippingCompanyId Int?
+  km                Int?
+  kmPrice           Float?
+  cost              Float?
+  description       String?
+  // will include purchase order id, date, personnel who accepted the delivery
+
+  // relations
+  purchaseOrder        purchaseOrder          @relation(fields: [purchaseOrderId], references: [id])
+  personnel            personnel              @relation(fields: [personnelId], references: [id])
+  shippingCarrier      shippingCarrier?       @relation(fields: [shippingCarrierId], references: [id])
+  shippingCar          shippingCar?           @relation(fields: [CarId], references: [id])
+  shippingCompany      shippingCompany?       @relation(fields: [shippingCompanyId], references: [id])
+  purchaseDeliveryItem purchaseDeliveryItem[]
+}
+
+model purchaseDeliveryItem {
+  id                  Int               @id @default(autoincrement())
+  purchaseDeliveryId  Int
+  purchaseOrderItemId Int
+  quantity            Float
+  personnelId         Int
+  description         String?
+  // will include delivery accept id, order item id, quantity, personnel who accepted the item
+  purchaseDelivery    purchaseDelivery  @relation(fields: [purchaseDeliveryId], references: [id])
+  purchaseOrderItem   purchaseOrderItem @relation(fields: [purchaseOrderItemId], references: [id])
+  personnel           personnel         @relation(fields: [personnelId], references: [id])
 }

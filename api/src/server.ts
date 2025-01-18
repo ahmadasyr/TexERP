@@ -49,6 +49,9 @@ import dofRoutes from "./routes/dofRoutes";
 import laminationTypeRoutes from "./routes/laminationTypeRoutes";
 import outsourceGroupRoutes from "./routes/outsourceGroupRoutes";
 import notificationRoutes from "./routes/notificationRoutes";
+import supplierRoutes from "./routes/supplierRoutes";
+import materialRoutes from "./routes/materialRoutes";
+import materialCategoryRoutes from "./routes/materialCategoryRoutes";
 const cors = require("cors");
 
 const app = express();
@@ -151,4 +154,10 @@ app.use("/lamination-type", laminationTypeRoutes);
 app.use("/outsource-group", outsourceGroupRoutes);
 // Use notification routes
 app.use("/notification", notificationRoutes);
+// Use supplier routes
+app.use("/supplier", supplierRoutes);
+// Use material routes
+app.use("/material", materialRoutes);
+// Use materialCategory routes
+app.use("/material-category", materialCategoryRoutes);
 export default app;
