@@ -61,7 +61,7 @@ const DyeColor: React.FC = ({ popupHandler, popupSetter }: DyeColorProps) => {
       name: "",
       debit: 0,
       credit: 0,
-      outsource: false,
+
       dye: false,
       yarn: false,
       buys: false,

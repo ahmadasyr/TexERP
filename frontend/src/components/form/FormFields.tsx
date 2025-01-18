@@ -98,7 +98,7 @@ export const NewSelect = ({
         required={field?.required}
         labelId={`${keyProp}-label`}
         name={keyProp}
-        value={formData[keyProp] || ""}
+        value={formData[keyProp]}
         onChange={(e) =>
           handleChange({
             target: { name: keyProp, value: e.target.value },
@@ -120,16 +120,31 @@ export const NewSelect = ({
                   option.value ===
                   formData[field.dependency as keyof typeof formData]
               )
-              ?.options.map((option: string) => (
-                <MenuItem key={option} value={option}>
-                  {option}
+              ?.options.map((option: any) => (
+                <MenuItem
+                  key={option.value || option}
+                  value={option.value || option}
+                >
+                  {option.label || option}
                 </MenuItem>
               ))
-          : field.options.map((option: any) => (
-              <MenuItem key={option} value={option}>
-                {option}
-              </MenuItem>
-            ))}
+          : field.options.map((option: any) =>
+              typeof option === "object" ? (
+                <MenuItem
+                  key={option.value}
+                  value={option.value == false ? false : option.value}
+                >
+                  {option.label}
+                </MenuItem>
+              ) : (
+                <MenuItem
+                  key={option.value || option}
+                  value={option.value || option}
+                >
+                  {option.label || option}
+                </MenuItem>
+              )
+            )}
       </Select>
     </FormControl>
   );
@@ -226,7 +241,9 @@ export const NewNumber = ({
       name={keyProp as string}
       type="number"
       label={field?.label}
-      value={formData[keyProp] || ""}
+      value={
+        formData[keyProp] || formData[keyProp] === 0 ? formData[keyProp] : ""
+      }
       disabled={field?.disabled}
       onChange={(e) =>
         handleChange({
@@ -360,7 +377,7 @@ export const NewRelation = ({
               />
             </>
           )}
-          value={selectedValue || null}
+          value={selectedValue || undefined}
           onChange={(event, newValue) => {
             handleChange({
               target: {

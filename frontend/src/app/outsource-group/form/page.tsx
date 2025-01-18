@@ -63,7 +63,7 @@ const OutsourceGroup: React.FC<any> = ({
       name: "",
       debit: 0,
       credit: 0,
-      outsource: false,
+
       dye: false,
       yarn: false,
       buys: false,

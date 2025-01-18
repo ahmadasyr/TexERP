@@ -1,15 +1,16 @@
 "use client";
-import { Data, formFields, tableName, title } from "../type";
+import { Data, formFields, tableName, title } from "../supplier";
 import React, { useEffect } from "react";
 import {
   Alert,
   Box,
   Button,
+  ButtonGroup,
+  Divider,
   Grid,
   Modal,
-  Typography,
-  ButtonGroup,
   Tooltip,
+  Typography,
 } from "@mui/material";
 import {
   NewTextField,
@@ -25,16 +26,16 @@ import { useFormData } from "@/components/form/utils";
 import { FormModal } from "@/components/form/modal";
 import Popup from "@/components/form/Popup";
 import { useSearchParams } from "next/navigation";
-interface OutsourceTypeProps {
+interface customerProps {
   popupHandler?: (data: any) => void;
   popupSetter?: (data: any) => void;
   render?: any[];
 }
 
-const OutsourceType: React.FC = ({
+const customer: React.FC<any> = ({
   popupHandler,
   popupSetter,
-}: OutsourceTypeProps) => {
+}: customerProps) => {
   const searchParams = useSearchParams();
   const id = searchParams.get("id");
   const { formData, handleChange, tableData, runFetchData } =
@@ -59,27 +60,6 @@ const OutsourceType: React.FC = ({
         });
     }
   }, [id]);
-  useEffect(() => {
-    const defaultValues = {
-      name: "",
-      debit: 0,
-      credit: 0,
-
-      dye: false,
-      yarn: false,
-      buys: false,
-    };
-    if (!id) {
-      Object.keys(defaultValues).forEach((key) => {
-        handleChange({
-          target: {
-            name: key,
-            value: defaultValues[key as keyof typeof defaultValues],
-          },
-        } as React.ChangeEvent<{ name: string; value: any }>);
-      });
-    }
-  }, []);
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (id) {
@@ -178,7 +158,9 @@ const OutsourceType: React.FC = ({
         handleChange={handleChange}
         formData={formData}
       />
+
       <form
+        onSubmit={handleSubmit}
         style={
           popupHandler
             ? {}
@@ -193,23 +175,123 @@ const OutsourceType: React.FC = ({
                 borderRadius: ".5rem",
               }
         }
-        onSubmit={handleSubmit}
       >
-        <Box width={"100%"}>
+        {/* go back simple button text with arrow */}
+
+        <Box width="100%">
           <Typography variant="h4" gutterBottom>
             {title}
           </Typography>
+          <Box display="flex" justifyContent="center">
+            <Grid item xs={12} md={4}>
+              <NewCheckBox {...allProps} keyProp="foreign" />
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <NewSelect {...allProps} keyProp="suitable" />
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <NewSelect {...allProps} keyProp="approved" />
+            </Grid>
+          </Box>
+          <Divider
+            style={{
+              marginBottom: "1rem",
+              marginTop: "1rem",
+            }}
+          />
           <Grid container spacing={1}>
-            <Grid item xs={6} md={4}>
+            <Grid item xs={12} md={4}>
               <NewTextField {...allProps} keyProp="name" />
             </Grid>
-            <Grid item xs={6} md={4}>
-              <NewRelation {...allProps} keyProp="parentOutsourceTypeId" />
+            <Grid item xs={12} md={4}>
+              <NewTextField {...allProps} keyProp="materials" />
             </Grid>
-            <Grid item xs={6} md={4}>
-              <NewRelation {...allProps} keyProp="outsourceGroupId" />
+            <Grid item xs={12} md={4}>
+              <NewNumber {...allProps} keyProp="supplierScore" />
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <NewDate {...allProps} keyProp="evaluationDate" />
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <NewDate {...allProps} keyProp="createdAt" />
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <NewNumber {...allProps} keyProp="entryScore" />
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <NewDate {...allProps} keyProp="maxApprovalDate" />
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <NewTextField {...allProps} keyProp="contractType" />
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <NewDate {...allProps} keyProp="contractDate" />
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <NewNumber {...allProps} keyProp="contractValidityPeriod" />
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <NewSelect {...allProps} keyProp="selfPickup" />
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <NewTextField {...allProps} keyProp="address" />
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <NewPhone {...allProps} keyProp="phone" />
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <NewEmail {...allProps} keyProp="email" />
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <NewNumber {...allProps} keyProp="vade" />
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <NewTextField {...allProps} keyProp="taxNumber" />
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <NewRelation {...allProps} keyProp="taxOfficeId" />
             </Grid>
           </Grid>
+          <Divider
+            style={{
+              marginBottom: "1rem",
+              marginTop: "1rem",
+            }}
+          />
+          <Grid container spacing={1}>
+            <Grid item xs={12} md={4}>
+              <NewTextField {...allProps} keyProp="authorizedPerson" />
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <NewPhone {...allProps} keyProp="authorizedPersonPhone" />
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <NewEmail {...allProps} keyProp="authorizedPersonEmail" />
+            </Grid>
+          </Grid>
+          {/* <Divider
+            style={{
+              marginBottom: "1rem",
+              marginTop: "1rem",
+            }}
+          />
+          <Grid container spacing={1}>
+            <Grid item xs={12} md={4}>
+              <NewCheckBox {...allProps} keyProp="iso9001Status" />
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <NewCheckBox {...allProps} keyProp="iso14001Status" />
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <NewCheckBox {...allProps} keyProp="iso45001Status" />
+            </Grid>
+          </Grid> */}
+          <Divider
+            style={{
+              marginBottom: "1rem",
+              marginTop: "1rem",
+            }}
+          />
           <ButtonGroup
             variant="outlined"
             aria-label="Loading button group"
@@ -228,32 +310,36 @@ const OutsourceType: React.FC = ({
             </Tooltip>
 
             {/* Restore Button */}
-            <Tooltip title="Formu yerel verilerle geri yükle">
-              <Button
-                onClick={() => {
-                  setAlertValue(-2);
-                }}
-                variant="contained"
-                color="secondary"
-                size="large"
-              >
-                Geri Yükle
-              </Button>
-            </Tooltip>
+            {!popupHandler && (
+              <>
+                <Tooltip title="Formu yerel verilerle geri yükle">
+                  <Button
+                    onClick={() => {
+                      setAlertValue(-2);
+                    }}
+                    variant="contained"
+                    color="secondary"
+                    size="large"
+                  >
+                    Geri Yükle
+                  </Button>
+                </Tooltip>
 
-            {/* Reset Button */}
-            <Tooltip title="Formu sıfırla">
-              <Button
-                onClick={() => {
-                  setAlertValue(-1);
-                }}
-                variant="text"
-                color="error"
-                size="large"
-              >
-                Sıfırla
-              </Button>
-            </Tooltip>
+                {/* Reset Button */}
+                <Tooltip title="Formu sıfırla">
+                  <Button
+                    onClick={() => {
+                      setAlertValue(-1);
+                    }}
+                    variant="text"
+                    color="error"
+                    size="large"
+                  >
+                    Sıfırla
+                  </Button>
+                </Tooltip>
+              </>
+            )}
           </ButtonGroup>
         </Box>
       </form>
@@ -261,4 +347,4 @@ const OutsourceType: React.FC = ({
   );
 };
 
-export default OutsourceType;
+export default customer;

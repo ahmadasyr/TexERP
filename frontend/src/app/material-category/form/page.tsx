@@ -1,5 +1,5 @@
 "use client";
-import { Data, formFields, tableName, title } from "../type";
+import { Data, formFields, tableName, title } from "../material";
 import React, { useEffect } from "react";
 import {
   Alert,
@@ -25,16 +25,13 @@ import { useFormData } from "@/components/form/utils";
 import { FormModal } from "@/components/form/modal";
 import Popup from "@/components/form/Popup";
 import { useSearchParams } from "next/navigation";
-interface OutsourceTypeProps {
+interface MaterialProps {
   popupHandler?: (data: any) => void;
   popupSetter?: (data: any) => void;
   render?: any[];
 }
 
-const OutsourceType: React.FC = ({
-  popupHandler,
-  popupSetter,
-}: OutsourceTypeProps) => {
+const Material: any = ({ popupHandler, popupSetter }: MaterialProps) => {
   const searchParams = useSearchParams();
   const id = searchParams.get("id");
   const { formData, handleChange, tableData, runFetchData } =
@@ -203,12 +200,6 @@ const OutsourceType: React.FC = ({
             <Grid item xs={6} md={4}>
               <NewTextField {...allProps} keyProp="name" />
             </Grid>
-            <Grid item xs={6} md={4}>
-              <NewRelation {...allProps} keyProp="parentOutsourceTypeId" />
-            </Grid>
-            <Grid item xs={6} md={4}>
-              <NewRelation {...allProps} keyProp="outsourceGroupId" />
-            </Grid>
           </Grid>
           <ButtonGroup
             variant="outlined"
@@ -261,4 +252,4 @@ const OutsourceType: React.FC = ({
   );
 };
 
-export default OutsourceType;
+export default Material;

@@ -56,27 +56,6 @@ const DyeColor: React.FC = ({ popupHandler, popupSetter }: DyeColorProps) => {
         });
     }
   }, [id]);
-  useEffect(() => {
-    const defaultValues = {
-      name: "",
-      debit: 0,
-      credit: 0,
-      outsource: false,
-      dye: false,
-      yarn: false,
-      buys: false,
-    };
-    if (!id) {
-      Object.keys(defaultValues).forEach((key) => {
-        handleChange({
-          target: {
-            name: key,
-            value: defaultValues[key as keyof typeof defaultValues],
-          },
-        } as React.ChangeEvent<{ name: string; value: any }>);
-      });
-    }
-  }, []);
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (id) {

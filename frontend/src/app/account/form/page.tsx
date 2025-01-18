@@ -61,7 +61,7 @@ const Account: React.FC = ({ popupHandler, popupSetter }: AccountProps) => {
       name: "",
       debit: 0,
       credit: 0,
-      outsource: false,
+
       dye: false,
       yarn: false,
       buys: false,

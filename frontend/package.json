@@ -30,6 +30,7 @@
     "react-chartjs-2": "^5.2.0",
     "react-countup": "^6.5.3",
     "react-dom": "^18",
+    "react-live-clock": "^6.1.25",
     "react-router-dom": "^7.1.1",
     "react-select": "^5.8.1",
     "sass": "^1.80.2"

@@ -5,6 +5,7 @@ import Customer from "@/app/customer/form/page";
 import TaxOffice from "@/app/tax-office/form/page";
 import Product from "@/app/product/form/page";
 import OutsourceGroup from "@/app/outsource-group/form/page";
+import MaterialCategory from "@/app/material-category/form/page";
 interface PopupFormsProps {
   parsedString: string;
   popupHandler: (data: any) => void;
@@ -35,6 +36,13 @@ const PopupForms: React.FC<any> = ({
       case "outsource-group":
         return (
           <OutsourceGroup
+            popupSetter={popupSetter}
+            popupHandler={popupHandler}
+          />
+        );
+      case "material-category":
+        return (
+          <MaterialCategory
             popupSetter={popupSetter}
             popupHandler={popupHandler}
           />

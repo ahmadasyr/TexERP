@@ -1,19 +1,8 @@
 import React, { useEffect } from "react";
 import { Box, Typography, Link, Button } from "@mui/material";
 import { Announcement, Campaign } from "@mui/icons-material";
-
+import Clock from "react-live-clock";
 const Footer = ({ darkMode }: { darkMode: boolean }) => {
-  const [liveTime, setLiveTime] = React.useState(
-    new Date().toLocaleTimeString("tr-TR")
-  );
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setLiveTime(new Date().toLocaleTimeString("tr-TR"));
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, []);
-
   return (
     <Box
       sx={{
@@ -46,7 +35,8 @@ const Footer = ({ darkMode }: { darkMode: boolean }) => {
           minWidth: "150px",
         }}
       >
-        {new Date().toLocaleDateString("tr-TR")} - {liveTime}
+        {new Date().toLocaleDateString("tr-TR")} -{" "}
+        <Clock format={"HH:mm:ss"} ticking />
       </Typography>
       <Typography
         variant="button"

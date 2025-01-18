@@ -1,5 +1,5 @@
 "use client";
-import { Data, formFields, tableName, title } from "../type";
+import { Data, formFields, tableName, title } from "../material";
 import React, { useEffect } from "react";
 import {
   Alert,
@@ -25,18 +25,16 @@ import { useFormData } from "@/components/form/utils";
 import { FormModal } from "@/components/form/modal";
 import Popup from "@/components/form/Popup";
 import { useSearchParams } from "next/navigation";
-interface OutsourceTypeProps {
+interface MaterialProps {
   popupHandler?: (data: any) => void;
   popupSetter?: (data: any) => void;
   render?: any[];
 }
 
-const OutsourceType: React.FC = ({
-  popupHandler,
-  popupSetter,
-}: OutsourceTypeProps) => {
+const Material: React.FC = ({ popupHandler, popupSetter }: MaterialProps) => {
   const searchParams = useSearchParams();
   const id = searchParams.get("id");
+  const categoryId = searchParams.get("categoryId");
   const { formData, handleChange, tableData, runFetchData } =
     useFormData<Data>(formFields);
   const [alertValue, setAlertValue] = React.useState<number>(0);
@@ -59,27 +57,26 @@ const OutsourceType: React.FC = ({
         });
     }
   }, [id]);
-  useEffect(() => {
-    const defaultValues = {
-      name: "",
-      debit: 0,
-      credit: 0,
 
-      dye: false,
-      yarn: false,
-      buys: false,
-    };
-    if (!id) {
-      Object.keys(defaultValues).forEach((key) => {
-        handleChange({
-          target: {
-            name: key,
-            value: defaultValues[key as keyof typeof defaultValues],
-          },
-        } as React.ChangeEvent<{ name: string; value: any }>);
-      });
-    }
-  }, []);
+  useEffect(() => {
+    handleChange({
+      target: { name: "categoryId", value: Number(categoryId) },
+    } as React.ChangeEvent<{ name: string; value: any }>);
+  }, [categoryId]);
+  const [oldFormData, setOldFormData] = React.useState<any>({});
+
+  useEffect(() => {
+    formFields.forEach((field) => {
+      if (
+        field.relation &&
+        oldFormData[field.name as keyof Data] !==
+          formData[field.name as keyof Data]
+      ) {
+        runFetchData();
+      }
+    });
+    setOldFormData(formData);
+  }, [formData]);
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (id) {
@@ -204,10 +201,10 @@ const OutsourceType: React.FC = ({
               <NewTextField {...allProps} keyProp="name" />
             </Grid>
             <Grid item xs={6} md={4}>
-              <NewRelation {...allProps} keyProp="parentOutsourceTypeId" />
+              <NewSelect {...allProps} keyProp="unit" />
             </Grid>
             <Grid item xs={6} md={4}>
-              <NewRelation {...allProps} keyProp="outsourceGroupId" />
+              <NewRelation {...allProps} keyProp="categoryId" />
             </Grid>
           </Grid>
           <ButtonGroup
@@ -261,4 +258,4 @@ const OutsourceType: React.FC = ({
   );
 };
 
-export default OutsourceType;
+export default Material;

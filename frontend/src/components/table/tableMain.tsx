@@ -428,7 +428,13 @@ export default function EnhancedTable({
             onClick={() => {
               if (conditions) {
                 if (checkConditions({}, "create")) {
-                  router.push(`${useTableName ? tableName : currentURI}/form`);
+                  if (customPath) {
+                    router.push(customPath);
+                  } else {
+                    router.push(
+                      `${useTableName ? tableName : currentURI}/form`
+                    );
+                  }
                 } else {
                   setResult({
                     code: 401,
@@ -439,7 +445,11 @@ export default function EnhancedTable({
                   code: 401,
                 });
               } else {
-                router.push(`${useTableName ? tableName : currentURI}/form`);
+                if (customPath) {
+                  router.push(customPath);
+                } else {
+                  router.push(`${useTableName ? tableName : currentURI}/form`);
+                }
               }
             }}
           >

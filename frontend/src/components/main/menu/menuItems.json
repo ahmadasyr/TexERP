@@ -493,34 +493,82 @@
     "allowedDepartments": ["yon", "muh", "stn", "admin"],
     "subItems": [
       {
-        "title": "Satın Alma Listesi",
-        "desc": "Satın alma listesi",
-        "icon": "list",
-        "link": "/"
+        "title": "Tedarıkçi İşlemleri",
+        "desc": "Tedarıkçi İşlemleri listesi",
+        "icon": "store",
+        "link": "/",
+        "subItems": [
+          {
+            "title": "Tedarikçi Listesi",
+            "desc": "Tedarikçi listesi",
+            "icon": "add_business",
+            "link": "/supplier"
+          },
+          {
+            "title": "Tedarikçi Fiyatları",
+            "desc": "Tedarikçi fiyatları listesi",
+            "icon": "attach_money",
+            "link": "/supplier-price"
+          },
+          {
+            "title": "Tedarikçi Değerlendirme Formu",
+            "desc": "Tedarikçi değerlendirme formu listesi",
+            "icon": "assignment",
+            "link": "/supplier-evulation"
+          }
+        ]
       },
       {
-        "title": "Satın Alma Talepleri",
-        "desc": "Satın alma talepleri listesi",
-        "icon": "list",
-        "link": "/"
+        "title": "Satın Alma Siparişleri",
+        "desc": "Satın alma siparişleri menüsü",
+        "icon": "shopping_cart",
+        "link": "/purchase-order",
+        "subItems": [
+          {
+            "title": "Satın Alma Talepleri",
+            "desc": "Satın alma talepleri listesi",
+            "icon": "shopping_basket",
+            "link": "/"
+          },
+          {
+            "title": "Satın Alma Siparişleri",
+            "desc": "Satın alma siparişleri listesi",
+            "icon": "request_quote",
+            "link": "/"
+          },
+          {
+            "title": "Satın Alma navlunları",
+            "desc": "Satın alma navlunları listesi",
+            "icon": "local_shipping",
+            "link": "/"
+          },
+          {
+            "title": "İade İrsaliyeleri",
+            "desc": "Satın alma iade irsaliyeleri listesi",
+            "icon": "keyboard_return",
+            "link": "/"
+          }
+        ]
       },
       {
-        "title": "Tedarike İade Edilenler",
-        "desc": "Tedarike iade edilenler listesi",
-        "icon": "list",
-        "link": "/"
-      },
-      {
-        "title": "Satın Alma Faturaları",
-        "desc": "Satın alma faturaları listesi",
-        "icon": "list",
-        "link": "/"
-      },
-      {
-        "title": "Tedarıkçi Üyum Raporları",
-        "desc": "Tedarikçi uyum raporları listesi",
-        "icon": "list",
-        "link": "/"
+        "title": "Malzeme İşlemleri",
+        "desc": "Malzeme işlemleri menüsü",
+        "icon": "inventory_2",
+        "link": "/",
+        "subItems": [
+          {
+            "title": "Malzeme Listesi",
+            "desc": "Malzeme listesi",
+            "icon": "label",
+            "link": "/material"
+          },
+          {
+            "title": "Malzeme Türleri",
+            "desc": "Malzeme türleri listesi",
+            "icon": "category",
+            "link": "/material-category"
+          }
+        ]
       }
     ]
   },
@@ -769,7 +817,7 @@
     "title": "Genel Muhasebe İşlemleri",
     "desc": "Diğer işlemler menüsü",
     "icon": "account_balance",
-    "allowedDepartments": ["muh", "yon", "admin", "sts"],
+    "allowedDepartments": ["muh", "yon", "admin", "sts", "stn"],
     "subItems": [
       {
         "title": "Hesaplar",
