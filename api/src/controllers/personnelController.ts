@@ -55,40 +55,6 @@ export const getSalesPersonnel = async (
 };
 
 // Create new personnel
-export const createPersonnel = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
-  const {
-    firstName,
-    lastName,
-    position,
-    department,
-    dateOfHire,
-    email,
-    phone,
-    handleComplaints,
-    handleSales,
-  } = req.body;
-  try {
-    const newPersonnel = await prisma.personnel.create({
-      data: {
-        firstName,
-        lastName,
-        position,
-        department,
-        dateOfHire,
-        email,
-        phone,
-        handleComplaints,
-        handleSales,
-      },
-    });
-    res.status(201).json(newPersonnel);
-  } catch (error) {
-    res.status(500).json({ error: "Error creating personnel" });
-  }
-};
 
 // Update personnel by ID
 export const updatePersonnel = async (
