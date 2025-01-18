@@ -114,6 +114,7 @@ export default function Menu(props: MenuProps) {
               title={item.desc}
               onClick={() => handleNavigation(item.link)}
               selected={pathname === item.link}
+              disabled={item.link === "/"}
               sx={{ pl: level * 2 + 2 }}
             >
               <ListItemIcon sx={{ minWidth: 36 }}>

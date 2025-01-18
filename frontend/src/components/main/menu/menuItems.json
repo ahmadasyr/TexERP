@@ -508,13 +508,13 @@
             "title": "Tedarikçi Fiyatları",
             "desc": "Tedarikçi fiyatları listesi",
             "icon": "attach_money",
-            "link": "/supplier-price"
+            "link": "/"
           },
           {
             "title": "Tedarikçi Değerlendirme Formu",
             "desc": "Tedarikçi değerlendirme formu listesi",
             "icon": "assignment",
-            "link": "/supplier-evulation"
+            "link": "/"
           }
         ]
       },
