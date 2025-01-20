@@ -89,11 +89,16 @@ export const NewSelect = ({
 }: FormFieldProps) => {
   const field = formFields.find((field) => field.name === keyProp);
   if (!field || !field.options) {
-    return null;
+    return "";
   }
   return (
     <FormControl fullWidth>
-      <InputLabel id={`${keyProp}-label`}>{field.label}</InputLabel>
+      <InputLabel
+        id={`${keyProp}-label`}
+        shrink={formData[keyProp] !== undefined && formData[keyProp] !== null}
+      >
+        {field.label}
+      </InputLabel>
       <Select
         required={field?.required}
         labelId={`${keyProp}-label`}
@@ -104,6 +109,7 @@ export const NewSelect = ({
             target: { name: keyProp, value: e.target.value },
           } as React.ChangeEvent<{ name?: string; value: unknown }>)
         }
+        // shrink label if value is not empty
         disabled={
           (field.dependant &&
             !formData[field.dependency as keyof typeof formData]) ||
@@ -312,8 +318,7 @@ export const NewRelation = ({
   togglePopup,
 }: FormFieldProps & { tableData: any[] }) => {
   const field = formFields.find((f) => f.name === keyProp);
-  if (!field) return null;
-
+  if (!field) return "";
   const [searchTerm, setSearchTerm] = useState("");
 
   const selectedTable = tableData.find((table) => table.name === field.table);
@@ -321,7 +326,7 @@ export const NewRelation = ({
     ? selectedTable.values.find(
         (value: any) => value[field.value] === formData[keyProp]
       )
-    : null;
+    : "";
 
   const filteredOptions: string[] = field.relationDependancy
     ? tableData
@@ -360,11 +365,20 @@ export const NewRelation = ({
       <FormControl fullWidth>
         <Autocomplete
           disabled={field?.disabled}
-          options={filteredOptions || []}
+          options={
+            field.sortBy
+              ? filteredOptions.sort((a: any, b: any) =>
+                  a[field.sortBy] > b[field.sortBy] ? 1 : -1
+                )
+              : filteredOptions || []
+          }
           getOptionLabel={(option: any) =>
             Array.isArray(field.displayValue)
               ? field.displayValue.map((item: any) => option[item]).join(" ")
               : option[field.displayValue]
+          }
+          groupBy={(option) =>
+            option[field.groupBy] ? option[field.groupBy] : `Ana ${field.label}`
           }
           renderInput={(params) => (
             <>
@@ -377,7 +391,7 @@ export const NewRelation = ({
               />
             </>
           )}
-          value={selectedValue || undefined}
+          value={selectedValue}
           onChange={(event, newValue) => {
             handleChange({
               target: {
@@ -400,7 +414,9 @@ export const NewRelation = ({
           Yeni {field.label} Ekle
           <AddIcon />
         </IconButton>
-      ) : null}
+      ) : (
+        ""
+      )}
     </>
   );
 };
@@ -414,7 +430,7 @@ export const NewMultiRelation = ({
   multiSelect,
 }: FormFieldProps & { tableData: any[] }) => {
   const field = formFields.find((f) => f.name === keyProp);
-  if (!field) return null;
+  if (!field) return "";
 
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -505,7 +521,9 @@ export const NewMultiRelation = ({
           Yeni {field.label} Ekle
           <AddIcon />
         </IconButton>
-      ) : null}
+      ) : (
+        ""
+      )}
     </>
   );
 };

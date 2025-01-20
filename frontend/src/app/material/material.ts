@@ -36,6 +36,8 @@ export const formFields = [
     value: "id",
     displayValue: ["name"],
     relation: true,
+    groupBy: "pCategory",
+    sortBy: "name",
   }),
 ];
 

@@ -1394,9 +1394,9 @@ model supplier {
   accountId              Int
   materials              String
   foreign                Boolean   @default(false)
-  suitable               Boolean   @default(false)
+  suitable               Boolean?  @default(false)
   supplierScore          Int
-  approved               Boolean   @default(false)
+  approved               Boolean?  @default(false)
   evaluationDate         DateTime
   createdAt              DateTime  @default(now())
   entryScore             Int?
@@ -1404,7 +1404,7 @@ model supplier {
   contractType           String?
   contractDate           DateTime?
   contractValidityPeriod Int?
-  selfPickup             Boolean   @default(false)
+  selfPickup             Boolean?
   address                String
   phone                  String?
   email                  String?
@@ -1467,9 +1467,13 @@ model supplierEvaluation {
 }
 
 model materialCategory {
-  id       Int        @id @default(autoincrement())
-  name     String     @unique
-  material material[]
+  id               Int                @id @default(autoincrement())
+  parentCategoryId Int?
+  name             String             @unique
+  material         material[]
+  // relations
+  parentCategory   materialCategory?  @relation("ParentCategoryRelation", fields: [parentCategoryId], references: [id])
+  childCategory    materialCategory[] @relation("ParentCategoryRelation")
 }
 
 enum materialUnit {

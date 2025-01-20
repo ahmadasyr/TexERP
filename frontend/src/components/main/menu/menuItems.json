@@ -286,17 +286,17 @@
             "title": "Makine Listesi",
             "desc": "Makine listesi",
             "icon": "list",
-            "link": "/"
+            "link": "#"
           },
           {
             "title": "Makine Arızaları",
-            "link": "/",
+            "link": "#",
             "desc": "Makine arızaları listesi",
             "icon": "report_problem"
           },
           {
             "title": "Makine Bakımları",
-            "link": "/",
+            "link": "#",
             "desc": "Makine bakımları listesi",
             "icon": "build"
           }
@@ -309,13 +309,13 @@
         "subItems": [
           {
             "title": "Çözgü Listesi",
-            "link": "/",
+            "link": "#",
             "desc": "Çözgü listesi",
             "icon": "list"
           },
           {
             "title": "Çözgü İş Emirleri",
-            "link": "/",
+            "link": "#",
             "desc": " Çözgü iş emirleri listesi",
             "icon": "precision_manufacturing"
           }
@@ -325,7 +325,7 @@
         "title": "Örme İş Emirleri",
         "desc ": "Örme iş emirleri listesi",
         "icon": "format_list_bulleted",
-        "link": "/"
+        "link": "#"
       }
     ]
   },
@@ -358,7 +358,7 @@
         "title": "Kumaş Satış Sevkiyatları",
         "desc": "Kumaş satış sevkiyatları menüsü",
         "icon": "format_list_bulleted",
-        "link": "/"
+        "link": "#"
       }
     ]
   },
@@ -372,25 +372,25 @@
         "title": "Kalite Kontrol İş Emirleri",
         "desc": "Kalite kontrol iş emirleri menüsü",
         "icon": "format_list_bulleted",
-        "link": "/"
+        "link": "#"
       },
       {
         "title": "Kalite Kontrol Raporları",
         "desc": "Kalite kontrol raporları menüsü",
         "icon": "description",
-        "link": "/"
+        "link": "#"
       },
       {
         "title": "Kalite Kontrol Rapor Konuları",
         "desc": "Kalite kontrol rapor konuları menüsü",
         "icon": "schema",
-        "link": "/"
+        "link": "#"
       },
       {
         "title": "Hatalı Kumaş listesi",
         "desc": "Hatalı kumaş listesi",
         "icon": "inventory_2",
-        "link": "/"
+        "link": "#"
       }
     ]
   },
@@ -414,13 +414,13 @@
         "title": "İplik Depo",
         "desc": "İplik depo işlemleri menüsü",
         "icon": "sports_volleyball",
-        "link": "/"
+        "link": "#"
       },
       {
         "title": "Çözgü Depo",
         "desc": "Çözgü depo işlemleri menüsü",
         "icon": "sync",
-        "link": "/"
+        "link": "#"
       },
       {
         "title": "Kumaş Depo",
@@ -431,55 +431,55 @@
             "title": "Kesim Depo",
             "desc": "Kesim depo işlemleri menüsü",
             "icon": "content_cut",
-            "link": "/"
+            "link": "#"
           },
           {
             "title": "Kalite Ham Depo",
             "desc": "Kalite ham depo işlemleri menüsü",
             "icon": "check",
-            "link": "/"
+            "link": "#"
           },
           {
             "title": "Ham Depo",
             "desc": "Ham depo işlemleri menüsü",
             "icon": "inventory_2",
-            "link": "/"
+            "link": "#"
           },
           {
             "title": "Boyaheden Gelen Kumaşlar",
             "desc": "Boyaheden gelen kumaşlar depo işlemleri menüsü",
             "icon": "inventory_2",
-            "link": "/"
+            "link": "#"
           },
           {
             "title": "Kalite Boyali Depo",
             "desc": "Kalite boyalı depo işlemleri menüsü",
             "icon": "check",
-            "link": "/"
+            "link": "#"
           },
           {
             "title": "Boyali Kumaş Depo",
             "desc": "Boyali kumaş depo işlemleri menüsü",
             "icon": "inventory_2",
-            "link": "/"
+            "link": "#"
           },
           {
             "title": "Örtü Kumaş Depo",
             "desc": "Örtü kumaş depo işlemleri menüsü",
             "icon": "inventory_2",
-            "link": "/"
+            "link": "#"
           },
           {
             "title": "Fasondan Gelenler",
             "desc": "Fasondan gelenler depo işlemleri menüsü",
             "icon": "inventory_2",
-            "link": "/"
+            "link": "#"
           },
           {
             "title": "Lamineli Kumaş Depo",
             "desc": "Lamineli kumaş depo işlemleri menüsü",
             "icon": "inventory_2",
-            "link": "/"
+            "link": "#"
           }
         ]
       }
@@ -496,7 +496,7 @@
         "title": "Tedarıkçi İşlemleri",
         "desc": "Tedarıkçi İşlemleri listesi",
         "icon": "store",
-        "link": "/",
+        "link": "#",
         "subItems": [
           {
             "title": "Tedarikçi Listesi",
@@ -508,13 +508,13 @@
             "title": "Tedarikçi Fiyatları",
             "desc": "Tedarikçi fiyatları listesi",
             "icon": "attach_money",
-            "link": "/"
+            "link": "#"
           },
           {
             "title": "Tedarikçi Değerlendirme Formu",
             "desc": "Tedarikçi değerlendirme formu listesi",
             "icon": "assignment",
-            "link": "/"
+            "link": "#"
           }
         ]
       },
@@ -528,25 +528,25 @@
             "title": "Satın Alma Talepleri",
             "desc": "Satın alma talepleri listesi",
             "icon": "shopping_basket",
-            "link": "/"
+            "link": "#"
           },
           {
             "title": "Satın Alma Siparişleri",
             "desc": "Satın alma siparişleri listesi",
             "icon": "request_quote",
-            "link": "/"
+            "link": "#"
           },
           {
             "title": "Satın Alma navlunları",
             "desc": "Satın alma navlunları listesi",
             "icon": "local_shipping",
-            "link": "/"
+            "link": "#"
           },
           {
             "title": "İade İrsaliyeleri",
             "desc": "Satın alma iade irsaliyeleri listesi",
             "icon": "keyboard_return",
-            "link": "/"
+            "link": "#"
           }
         ]
       },
@@ -554,7 +554,7 @@
         "title": "Malzeme İşlemleri",
         "desc": "Malzeme işlemleri menüsü",
         "icon": "inventory_2",
-        "link": "/",
+        "link": "#",
         "subItems": [
           {
             "title": "Malzeme Listesi",
@@ -587,13 +587,13 @@
             "title": "Hesap Listesi",
             "desc": "Hesap listesi",
             "icon": "list",
-            "link": "/"
+            "link": "#"
           },
           {
             "title": "Hesap Hareketleri",
             "desc": "Hesap hareketleri listesi",
             "icon": "list",
-            "link": "/"
+            "link": "#"
           }
         ]
       },
@@ -606,13 +606,13 @@
             "title": "Banka Listesi",
             "desc": "Banka listesi",
             "icon": "list",
-            "link": "/"
+            "link": "#"
           },
           {
             "title": "Banka Hareketleri",
             "desc": "Banka hareketleri listesi",
             "icon": "list",
-            "link": "/"
+            "link": "#"
           }
         ]
       },
@@ -620,7 +620,7 @@
         "title": "Vergi Daireleri",
         "desc": "Vergi daireleri menüsü",
         "icon": "domain",
-        "link": "/"
+        "link": "#"
       },
       {
         "title": "Faturalar",
@@ -631,13 +631,13 @@
             "title": "Fatura Listesi",
             "desc": "Fatura listesi",
             "icon": "list",
-            "link": "/"
+            "link": "#"
           },
           {
             "title": "Fatura Hareketleri",
             "desc": "Fatura hareketleri listesi",
             "icon": "list",
-            "link": "/"
+            "link": "#"
           }
         ]
       },
@@ -650,13 +650,13 @@
             "title": "Kasa Listesi",
             "desc": "Kasa listesi",
             "icon": "list",
-            "link": "/"
+            "link": "#"
           },
           {
             "title": "Kasa Hareketleri",
             "desc": "Kasa hareketleri listesi",
             "icon": "list",
-            "link": "/"
+            "link": "#"
           }
         ]
       }
@@ -677,25 +677,25 @@
             "title": "Personel Listesi",
             "desc": "Personel listesi",
             "icon": "list",
-            "link": "/"
+            "link": "#"
           },
           {
             "title": "Personel İzinleri",
             "desc": "Personel izinleri listesi",
             "icon": "list",
-            "link": "/"
+            "link": "#"
           },
           {
             "title": "Personel Maaşları",
             "desc": "Personel maaşları listesi",
             "icon": "list",
-            "link": "/"
+            "link": "#"
           },
           {
             "title": "Personel Departmanları",
             "desc": "Personel departmanları listesi",
             "icon": "list",
-            "link": "/"
+            "link": "#"
           }
         ]
       },
@@ -703,25 +703,25 @@
         "title": "İş Başvuruları",
         "desc: ": "İş başvuruları menüsü",
         "icon": "people",
-        "link": "/"
+        "link": "#"
       },
       {
         "title": "İş İlanları",
         "desc": "İş ilanları menüsü",
         "icon": "people",
-        "link": "/"
+        "link": "#"
       },
       {
         "title": "İşe Alım Süreçleri",
         "desc": "İşe alım süreçleri menüsü",
         "icon": "people",
-        "link": "/"
+        "link": "#"
       },
       {
         "title": "İşe Alım Raporları",
         "desc": "İşe alım raporları menüsü",
         "icon": "people",
-        "link": "/"
+        "link": "#"
       },
       {
         "title": "Puantaj",
@@ -732,13 +732,13 @@
             "title": "Puantaj Listesi",
             "desc": "Puantaj listesi",
             "icon": "list",
-            "link": "/"
+            "link": "#"
           },
           {
             "title": "Puantaj Raporları",
             "desc": "Puantaj raporları",
             "icon": "list",
-            "link": "/"
+            "link": "#"
           }
         ]
       }

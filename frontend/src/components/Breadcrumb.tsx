@@ -2,7 +2,7 @@
 import React from "react";
 import Breadcrumbs from "@mui/material/Breadcrumbs";
 import Link from "@mui/material/Link";
-import { usePathname, useRouter } from "next/navigation";
+import { useParams, usePathname, useRouter } from "next/navigation";
 import { Typography } from "@mui/material";
 interface MenuItem {
   title: string;
@@ -23,10 +23,19 @@ const BreadcrumbComponent: React.FC<BreadcrumbComponentProps> = ({
     if (currentPath.endsWith("/form")) {
       const basePath = currentPath.slice(0, -5); // Remove "/form" from the end
       const basePathBreadcrumb = findBreadcrumbPath(items, basePath);
+
+      // Parse the query parameters
+      const query = new URLSearchParams(window.location.search);
+      const isUpdate = query.get("id") !== null;
+
       if (basePathBreadcrumb.length) {
-        return [...basePathBreadcrumb, { title: "Form", link: currentPath }];
+        return [
+          ...basePathBreadcrumb,
+          { title: isUpdate ? "Güncelle" : "Yeni Oluştur", link: currentPath },
+        ];
       }
     }
+
     if (currentPath.endsWith("/view")) {
       const basePath = currentPath.slice(0, -5); // Remove "/form" from the end
       const basePathBreadcrumb = findBreadcrumbPath(items, basePath);

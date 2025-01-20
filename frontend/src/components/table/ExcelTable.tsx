@@ -182,6 +182,13 @@ export default function HandsontableEnhanced({
           </Typography>
         </Box>
       )}
+      <Box mt={2} color="info.main">
+        <Typography variant="body2">
+          <strong>UYARI:</strong> Bu özellik hala geliştirme aşamasında olup,
+          henüz tam olarak test edilmemiştir. Lütfen dikkatli bir şekilde
+          kullanınız.
+        </Typography>
+      </Box>
 
       <Dialog
         open={submit}

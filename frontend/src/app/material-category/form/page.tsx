@@ -200,6 +200,9 @@ const Material: any = ({ popupHandler, popupSetter }: MaterialProps) => {
             <Grid item xs={6} md={4}>
               <NewTextField {...allProps} keyProp="name" />
             </Grid>
+            <Grid item xs={6} md={4}>
+              <NewRelation {...allProps} keyProp="parentCategoryId" />
+            </Grid>
           </Grid>
           <ButtonGroup
             variant="outlined"

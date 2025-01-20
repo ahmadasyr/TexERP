@@ -184,7 +184,7 @@ const customer: React.FC<any> = ({
           </Typography>
           <Box display="flex" justifyContent="center">
             <Grid item xs={12} md={4}>
-              <NewCheckBox {...allProps} keyProp="foreign" />
+              <NewSelect {...allProps} keyProp="foreign" />
             </Grid>
             <Grid item xs={12} md={4}>
               <NewSelect {...allProps} keyProp="suitable" />

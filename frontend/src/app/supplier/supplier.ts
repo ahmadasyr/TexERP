@@ -51,7 +51,21 @@ export const formFields = [
     type: "text",
     required: true,
   }),
-  createField({ name: "foreign", label: "YURT İÇİ / DIŞI", type: "checkbox" }),
+  createField({
+    name: "foreign",
+    label: "YURT İÇİ / DIŞI",
+    type: "select",
+    options: [
+      {
+        label: "Yurt İçi",
+        value: false,
+      },
+      {
+        label: "Yurt Dışı",
+        value: true,
+      },
+    ],
+  }),
   createField({
     name: "suitable",
     label: "Tedarikçi Alım Onay Durumu",
@@ -221,7 +235,7 @@ export const headCells: HeadCell[] = [
     id: "foreign",
     numeric: false,
     disablePadding: false,
-    label: "YURT İÇİ / DIŞI",
+    label: "YURT DIŞI",
   },
   {
     id: "suitable",
@@ -291,7 +305,7 @@ export const headCells: HeadCell[] = [
     id: "selfPickup",
     numeric: false,
     disablePadding: false,
-    label: "Lojistik Tipi",
+    label: "Kendi Alımı",
   },
   { id: "address", numeric: false, disablePadding: false, label: "Adres" },
   { id: "phone", numeric: false, disablePadding: false, label: "Telefon" },
