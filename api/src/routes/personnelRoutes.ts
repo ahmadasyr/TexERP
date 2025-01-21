@@ -8,5 +8,6 @@ router.get("/sales", personnelController.getSalesPersonnel);
 router.get("/:id", personnelController.getPersonnelById);
 router.put("/:id", personnelController.updatePersonnel);
 router.delete("/:id", personnelController.deletePersonnel);
+router.get("/subordinates/:id", personnelController.getSubordinates);
 
 export default router;

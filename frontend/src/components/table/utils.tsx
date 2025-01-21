@@ -53,7 +53,10 @@ export interface HeadCell {
   boolean?: boolean;
   actionConditions?: any;
 }
-
+export interface conditions {
+  action: string[];
+  checks: { key: string; type: string; value: any }[];
+}
 export const handleDelete = async (tableName: string, selected: number[]) => {
   let failed: number[] = [];
   await Promise.all(

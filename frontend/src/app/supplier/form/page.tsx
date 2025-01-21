@@ -222,7 +222,7 @@ const customer: React.FC<any> = ({
               <NewDate {...allProps} keyProp="maxApprovalDate" />
             </Grid>
             <Grid item xs={12} md={4}>
-              <NewTextField {...allProps} keyProp="contractType" />
+              <NewSelect {...allProps} keyProp="contractType" />
             </Grid>
             <Grid item xs={12} md={4}>
               <NewDate {...allProps} keyProp="contractDate" />

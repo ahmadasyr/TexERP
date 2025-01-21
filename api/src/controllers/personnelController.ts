@@ -109,3 +109,22 @@ export const deletePersonnel = async (
     res.status(500).json({ error: "Error deleting personnel" });
   }
 };
+
+export const getSubordinates = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  const { id } = req.params;
+  try {
+    const personnel = await prisma.personnel.findMany({
+      where: { supervisorId: parseInt(id) },
+    });
+    if (personnel.length > 0) {
+      res.json(personnel);
+    } else {
+      res.status(500).json({ error: "No subordinates found" });
+    }
+  } catch (error) {
+    res.status(500).json({ error: "Error retrieving subordinates" });
+  }
+};

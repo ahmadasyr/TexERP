@@ -485,7 +485,20 @@
       }
     ]
   },
-
+  {
+    "title": "Yönetim İşlemleri",
+    "desc": "Yönetim işlemleri menüsü",
+    "icon": "supervisor_account",
+    "allowedDepartments": ["yon", "admin", "stn"],
+    "subItems": [
+      {
+        "title": "Satın Alma Talepleri",
+        "desc": "Satın alma talepleri menüsü",
+        "icon": "shopping_cart",
+        "link": "/purchase-request/management"
+      }
+    ]
+  },
   {
     "title": "Satın Alma",
     "desc": "Satın alma işlemleri menüsü",
@@ -522,13 +535,19 @@
         "title": "Satın Alma Siparişleri",
         "desc": "Satın alma siparişleri menüsü",
         "icon": "shopping_cart",
-        "link": "/purchase-order",
+        "link": "#",
         "subItems": [
           {
-            "title": "Satın Alma Talepleri",
+            "title": "Tüm Satın Alma Talepleri",
             "desc": "Satın alma talepleri listesi",
             "icon": "shopping_basket",
-            "link": "#"
+            "link": "/purchase-request"
+          },
+          {
+            "title": "Onay Bekleyen Satın Alma Talepleri",
+            "desc": "Onay bekleyen satın alma talepleri listesi",
+            "icon": "shopping_basket",
+            "link": "/purchase-request/purchasing"
           },
           {
             "title": "Satın Alma Siparişleri",
@@ -810,6 +829,12 @@
         "desc": "DÖF listesi",
         "icon": "engineering",
         "link": "/dof"
+      },
+      {
+        "title": "Satın Alma Taleplerim ",
+        "desc": "Satın alma talepleri listesi",
+        "icon": "shopping_cart",
+        "link": "/purchase-request/my-requests"
       }
     ]
   },

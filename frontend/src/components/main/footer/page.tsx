@@ -35,8 +35,9 @@ const Footer = ({ darkMode }: { darkMode: boolean }) => {
           minWidth: "150px",
         }}
       >
-        {new Date().toLocaleDateString("tr-TR")} -{" "}
-        <Clock format={"HH:mm:ss"} ticking />
+        {new Date().toLocaleDateString("tr-TR")}
+        {/* -{" "} */}
+        {/* <Clock format={"HH:mm:ss"} ticking /> */}
       </Typography>
       <Typography
         variant="button"

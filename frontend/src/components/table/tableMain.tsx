@@ -163,6 +163,7 @@ export default function EnhancedTable({
   const checkConditions = (row: any, action: string) => {
     let result = true;
     conditions?.forEach((condition: any) => {
+      console.log(condition);
       if (condition.action.includes(action)) {
         let check = false;
         condition.checks.forEach((checkCondition: any) => {
@@ -208,7 +209,7 @@ export default function EnhancedTable({
         return {
           field: cell.id + "_actions",
           headerName: cell.label,
-          width: cell.width || 130,
+          width: 205,
           hide: !cell.visible,
           type: cell.numeric ? "number" : "string",
           valueGetter: (params: any, row: any) => {
@@ -217,7 +218,11 @@ export default function EnhancedTable({
                 .map((key: string) => row[cell.id]?.[key])
                 .join(" ")}`;
             } else if (cell.boolean) {
-              return Boolean(row[cell.id]) ? "Evet" : "Hayır";
+              return Boolean(row[cell.id])
+                ? "Evet"
+                : !Boolean(row[cell.id]) && row[cell.id] !== null
+                ? "Hayır"
+                : null;
             } else {
               return row[cell.id];
             }
@@ -227,19 +232,53 @@ export default function EnhancedTable({
             const render = cell.actionConditions.find(
               (condition: any) => condition.value === params.value
             );
+
+            if (!render) {
+              return <span>No Action</span>;
+            }
+
+            const handleFetch = async (url: string) => {
+              try {
+                const response = await fetch(url, {
+                  method: "PUT",
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
+                });
+                if (!response.ok)
+                  throw new Error("Network response was not ok");
+                setRefresh(!refresh);
+              } catch (error) {
+                console.error("Error performing action:", error);
+              }
+            };
+
+            if (params.value === null) {
+              return (
+                <>
+                  {render.label?.map((label: string, index: number) => (
+                    <React.Fragment key={index}>
+                      <Button
+                        onClick={() =>
+                          handleFetch(
+                            `${render.action[index]}/${params.row.id}`
+                          )
+                        }
+                        style={{ marginRight: "0.5rem" }}
+                        variant="contained"
+                        color={render?.color[index] || "primary"}
+                      >
+                        {label}
+                      </Button>
+                    </React.Fragment>
+                  ))}
+                </>
+              );
+            }
+
             return (
               <Button
-                onClick={async () => {
-                  if (render.action) {
-                    await fetch(`${render.action}/${params.row.id}`, {
-                      method: "PUT",
-                      headers: {
-                        "Content-Type": "application/json",
-                      },
-                    });
-                    setRefresh(!refresh);
-                  }
-                }}
+                onClick={() => handleFetch(`${render.action}/${params.row.id}`)}
                 variant="contained"
                 color={render?.color || "primary"}
               >
@@ -278,7 +317,7 @@ export default function EnhancedTable({
               //   }}
               //   inputProps={{ "aria-label": "boolean value" }}
               // />
-              Boolean(value) ? "Evet" : "Hayır"
+              Boolean(value) ? "Evet" : Boolean(value) ? "Hayır" : ""
             );
           }
           if (cell.clickable && cell.displayValue) {
@@ -362,31 +401,33 @@ export default function EnhancedTable({
                   <Visibility />
                 </IconButton>
               )}
-              <IconButton
-                onClick={() => {
-                  if (conditions) {
-                    if (checkConditions(params.row, "edit")) {
+              {editable && (
+                <IconButton
+                  onClick={() => {
+                    if (conditions) {
+                      if (checkConditions(params.row, "edit")) {
+                        router.push(
+                          `${useTableName ? tableName : currentURI}/form/?id=${
+                            params.row.id
+                          }`
+                        );
+                      } else {
+                        setResult({
+                          code: 401,
+                        });
+                      }
+                    } else {
                       router.push(
                         `${useTableName ? tableName : currentURI}/form/?id=${
                           params.row.id
                         }`
                       );
-                    } else {
-                      setResult({
-                        code: 401,
-                      });
                     }
-                  } else {
-                    router.push(
-                      `${useTableName ? tableName : currentURI}/form/?id=${
-                        params.row.id
-                      }`
-                    );
-                  }
-                }}
-              >
-                <Edit />
-              </IconButton>
+                  }}
+                >
+                  <Edit />
+                </IconButton>
+              )}
             </div>
           );
         },
@@ -421,13 +462,26 @@ export default function EnhancedTable({
             />
           </Grid>
           <GridToolbarQuickFilter />
-
-          <Button
-            style={{ marginLeft: "auto" }}
-            variant="contained"
-            onClick={() => {
-              if (conditions) {
-                if (checkConditions({}, "create")) {
+          {createable && (
+            <Button
+              style={{ marginLeft: "auto" }}
+              variant="contained"
+              onClick={() => {
+                if (conditions) {
+                  if (checkConditions({}, "create")) {
+                    if (customPath) {
+                      router.push(customPath);
+                    } else {
+                      router.push(
+                        `${useTableName ? tableName : currentURI}/form`
+                      );
+                    }
+                  } else {
+                    setResult({
+                      code: 401,
+                    });
+                  }
+                } else {
                   if (customPath) {
                     router.push(customPath);
                   } else {
@@ -435,30 +489,17 @@ export default function EnhancedTable({
                       `${useTableName ? tableName : currentURI}/form`
                     );
                   }
-                } else {
-                  setResult({
-                    code: 401,
-                  });
                 }
-              } else if (!createable) {
-                setResult({
-                  code: 401,
-                });
-              } else {
-                if (customPath) {
-                  router.push(customPath);
-                } else {
-                  router.push(`${useTableName ? tableName : currentURI}/form`);
-                }
-              }
-            }}
-          >
-            Yeni Oluştur
-            <Add />
-          </Button>
+              }}
+            >
+              Yeni Oluştur
+              <Add />
+            </Button>
+          )}
 
           {selected.length === 0 && (
             <Button
+              style={!createable ? { marginLeft: "auto" } : {}}
               variant="outlined"
               color="secondary"
               onClick={() => {
@@ -538,38 +579,40 @@ export default function EnhancedTable({
                   <Visibility />
                 </Button>
               )}
-              <Button
-                variant="contained"
-                color="info"
-                onClick={() => {
-                  if (conditions) {
-                    if (
-                      checkConditions(
-                        rows.find((row) => row.id === selected[0]),
-                        "edit"
-                      )
-                    ) {
+              {editable && (
+                <Button
+                  variant="contained"
+                  color="info"
+                  onClick={() => {
+                    if (conditions) {
+                      if (
+                        checkConditions(
+                          rows.find((row) => row.id === selected[0]),
+                          "edit"
+                        )
+                      ) {
+                        router.push(
+                          `${useTableName ? tableName : currentURI}/form/?id=${
+                            selected[0]
+                          }`
+                        );
+                      } else {
+                        setResult({
+                          code: 401,
+                        });
+                      }
+                    } else {
                       router.push(
                         `${useTableName ? tableName : currentURI}/form/?id=${
                           selected[0]
                         }`
                       );
-                    } else {
-                      setResult({
-                        code: 401,
-                      });
                     }
-                  } else {
-                    router.push(
-                      `${useTableName ? tableName : currentURI}/form/?id=${
-                        selected[0]
-                      }`
-                    );
-                  }
-                }}
-              >
-                <Edit />
-              </Button>
+                  }}
+                >
+                  <Edit />
+                </Button>
+              )}
             </>
           )}
         </GridToolbarContainer>

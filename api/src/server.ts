@@ -52,6 +52,7 @@ import notificationRoutes from "./routes/notificationRoutes";
 import supplierRoutes from "./routes/supplierRoutes";
 import materialRoutes from "./routes/materialRoutes";
 import materialCategoryRoutes from "./routes/materialCategoryRoutes";
+import purchaseRequestRoutes from "./routes/purchaseRequestRoutes";
 const cors = require("cors");
 
 const app = express();
@@ -160,4 +161,6 @@ app.use("/supplier", supplierRoutes);
 app.use("/material", materialRoutes);
 // Use materialCategory routes
 app.use("/material-category", materialCategoryRoutes);
+// Use purchaseRequest routes
+app.use("/purchase-request", purchaseRequestRoutes);
 export default app;

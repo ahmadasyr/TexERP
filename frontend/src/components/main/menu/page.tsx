@@ -11,6 +11,7 @@ import ExpandLess from "@mui/icons-material/ExpandLess";
 import ExpandMore from "@mui/icons-material/ExpandMore";
 import menuItems from "./menuItems.json";
 import { usePathname, useRouter } from "next/navigation";
+import { getPersonnelInfo } from "@/contexts/auth";
 
 interface MenuItem {
   title: string;
@@ -175,12 +176,60 @@ export default function Menu(props: MenuProps) {
     );
   };
 
+  const renderDepartmentHeadMenu = () => {
+    return (
+      <>
+        <ListItemButton
+          title="Bölüm Müdürü"
+          onClick={() => handleClick("department-head")}
+          sx={{ pl: 2 }}
+        >
+          <ListItemIcon sx={{ minWidth: 36 }}>
+            <Icon fontSize="small">account_circle</Icon>
+          </ListItemIcon>
+          <ListItemText primary="Bölüm Müdürü" />
+          {openItems["department-head"] ? <ExpandLess /> : <ExpandMore />}
+        </ListItemButton>
+        <Collapse
+          in={openItems["department-head"]}
+          timeout="auto"
+          unmountOnExit
+        >
+          <List component="div" disablePadding>
+            <ListItemButton
+              title="Alt Çalışanlarım"
+              onClick={() => handleNavigation("/subbordinates")}
+              selected={pathname === "/subbordinates"}
+              sx={{ pl: 4 }}
+            >
+              <ListItemIcon sx={{ minWidth: 36 }}>
+                <Icon fontSize="small">group</Icon>
+              </ListItemIcon>
+              <ListItemText primary="Alt Çalışanlarım" />
+            </ListItemButton>
+            <ListItemButton
+              title="Satın Alma Talepleri"
+              onClick={() => handleNavigation("/purchase-request/supervisor")}
+              selected={pathname === "/purchase-request/supervisor"}
+              sx={{ pl: 4 }}
+            >
+              <ListItemIcon sx={{ minWidth: 36 }}>
+                <Icon fontSize="small">shopping_cart</Icon>
+              </ListItemIcon>
+              <ListItemText primary="Satın Alma Talepleri" />
+            </ListItemButton>
+          </List>
+        </Collapse>
+      </>
+    );
+  };
   const filteredMenuItems = filterMenuItems(menuItems);
   const isMobile = window.innerWidth < 600;
 
   return (
     <List component="nav">
       {renderMenuItems(filteredMenuItems)}
+      {getPersonnelInfo()?.isDepartmentHead && renderDepartmentHeadMenu()}
       {isMobile && renderMobileSettings()}
     </List>
   );

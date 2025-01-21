@@ -17,6 +17,7 @@ export const createField = ({
   relationDependancy = null as { field: string; value: string } | null,
   groupBy = null as string | null,
   sortBy = null as string | null,
+  defaultValue = null as string | null,
 }) => ({
   name,
   label,
@@ -35,6 +36,7 @@ export const createField = ({
   relationDependancy,
   groupBy,
   sortBy,
+  defaultValue,
 });
 
 export const fetchData = async (

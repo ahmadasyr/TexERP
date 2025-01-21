@@ -127,7 +127,8 @@ export const formFields = [
   createField({
     name: "contractType",
     label: "Sözleme Tipi",
-    type: "text",
+    type: "select",
+    options: ["Firmadan", "Tedarikçiden"],
   }),
   createField({
     name: "contractDate",
@@ -145,11 +146,11 @@ export const formFields = [
     type: "select",
     options: [
       {
-        label: "Gel Al",
+        label: "Firma",
         value: true,
       },
       {
-        label: "Tedarikçiden Teslim",
+        label: "Tedarikçi",
         value: false,
       },
     ],

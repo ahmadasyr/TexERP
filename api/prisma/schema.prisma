@@ -48,6 +48,7 @@ model personnel {
   password         String
   username         String?     @unique
   department       department?
+  isDepartmentHead Boolean?
 
   // Relations
   supervisor                personnel?                  @relation("supervisor", fields: [supervisorId], references: [id])
@@ -1562,10 +1563,12 @@ model purchaseRequest {
   createdAt                  DateTime              @default(now())
   department                 department
   personnelId                Int
-  approvalFromSupervisor     Boolean               @default(false)
-  approvalFromSupervisorDate DateTime
-  approvalFromManagement     Boolean               @default(false)
-  approvalFromManagementDate DateTime
+  approvalFromSupervisor     Boolean?
+  approvalFromSupervisorDate DateTime?
+  approvalFromPurchasing     Boolean?
+  approvalFromPurchasingDate DateTime?
+  approvalFromManagement     Boolean?
+  approvalFromManagementDate DateTime?
   // will include date, personnel who requested, personnel who resulted, management approval, status, description
   //Relations
   personnel                  personnel             @relation(fields: [personnelId], references: [id])
@@ -1580,6 +1583,7 @@ model purchaseRequestItem {
   purchaseRequestId Int
   material          String
   quantity          Float
+  unit              materialUnit
   requestedDate     DateTime
   description       String?
   // will include purchase request id, material id, quantity

@@ -392,11 +392,12 @@ export default function PrimaryAppBar({
                       variant="subtitle1"
                       sx={{
                         fontWeight: notification.read ? "normal" : "600",
+                        whiteSpace: "normal",
                       }}
                     >
                       {notification.title}
                     </Typography>
-                    <Typography variant="body2">
+                    <Typography sx={{ whiteSpace: "normal" }} variant="body2">
                       {notification.description}
                     </Typography>
                   </Box>

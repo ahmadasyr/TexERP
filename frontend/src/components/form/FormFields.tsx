@@ -103,7 +103,7 @@ export const NewSelect = ({
         required={field?.required}
         labelId={`${keyProp}-label`}
         name={keyProp}
-        value={formData[keyProp]}
+        value={formData[keyProp] ?? ""}
         onChange={(e) =>
           handleChange({
             target: { name: keyProp, value: e.target.value },
@@ -116,8 +116,8 @@ export const NewSelect = ({
           field.disabled
         }
       >
-        <MenuItem value="">
-          <em>None</em>
+        <MenuItem value={""}>
+          <em>Yok</em>
         </MenuItem>
         {field.dependant && formData[field.dependency as keyof typeof formData]
           ? field.multiOptions
@@ -366,9 +366,12 @@ export const NewRelation = ({
         <Autocomplete
           disabled={field?.disabled}
           options={
-            field.sortBy
-              ? filteredOptions.sort((a: any, b: any) =>
-                  a[field.sortBy] > b[field.sortBy] ? 1 : -1
+            field.groupBy
+              ? filteredOptions.sort(
+                  (a, b) =>
+                    -String(b[field.groupBy]).localeCompare(
+                      String(a[field.groupBy])
+                    )
                 )
               : filteredOptions || []
           }
