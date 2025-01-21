@@ -489,7 +489,7 @@
     "title": "Yönetim İşlemleri",
     "desc": "Yönetim işlemleri menüsü",
     "icon": "supervisor_account",
-    "allowedDepartments": ["yon", "admin", "stn"],
+    "allowedDepartments": ["yon", "admin"],
     "subItems": [
       {
         "title": "Satın Alma Talepleri",
