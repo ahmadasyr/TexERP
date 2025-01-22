@@ -49,6 +49,7 @@ model personnel {
   username         String?     @unique
   department       department?
   isDepartmentHead Boolean?
+  buyingLimit      Float?      @default(0)
 
   // Relations
   supervisor                personnel?                  @relation("supervisor", fields: [supervisorId], references: [id])
@@ -1567,8 +1568,6 @@ model purchaseRequest {
   approvalFromSupervisorDate DateTime?
   approvalFromPurchasing     Boolean?
   approvalFromPurchasingDate DateTime?
-  approvalFromManagement     Boolean?
-  approvalFromManagementDate DateTime?
   // will include date, personnel who requested, personnel who resulted, management approval, status, description
   //Relations
   personnel                  personnel             @relation(fields: [personnelId], references: [id])
@@ -1578,21 +1577,33 @@ model purchaseRequest {
 }
 
 model purchaseRequestItem {
-  id                Int             @id @default(autoincrement())
-  createdAt         DateTime        @default(now())
-  purchaseRequestId Int
-  material          String
-  quantity          Float
-  unit              materialUnit
-  requestedDate     DateTime
-  description       String?
+  id                 Int             @id @default(autoincrement())
+  createdAt          DateTime        @default(now())
+  purchaseRequestId  Int
+  material           String
+  quantity           Float
+  originalQuantity   Float
+  supervisorQuantity Float?
+  purchasingQuantity Float?
+  unit               materialUnit
+  requestedDate      DateTime
+  description        String?
   // will include purchase request id, material id, quantity
-  purchaseRequest   purchaseRequest @relation(fields: [purchaseRequestId], references: [id])
+  purchaseRequest    purchaseRequest @relation(fields: [purchaseRequestId], references: [id])
+}
+
+enum purchaseOrderStatus {
+  Pending
+  Approved
+  Rejected
+  Cancelled
+  Completed
+  Returned
 }
 
 model purchaseOrder {
-  id                Int      @id @default(autoincrement())
-  createdAt         DateTime @default(now())
+  id                Int                 @id @default(autoincrement())
+  createdAt         DateTime            @default(now())
   personnelId       Int
   supplierId        Int
   purchaseRequestId Int
@@ -1600,7 +1611,10 @@ model purchaseOrder {
   vade              Int?
   shippingType      String?
   deadline          DateTime
-
+  requiresApproval  Boolean             @default(true)
+  approved          Boolean             @default(false)
+  approvedDate      DateTime?
+  status            purchaseOrderStatus @default(Pending)
   // will include purchase request id, account from where we make the order, date, personnel who created the order, status, description, due date
   purchaseDelivery  purchaseDelivery[]
   // relations
@@ -1623,9 +1637,9 @@ model purchaseOrderItem {
   quantity        Float
   personnelId     Int
   unit            materialUnit
-  pricePerUnit    Float
-  currencyId      Int
-  vat             Float
+  pricePerUnit    Float?
+  currencyId      Int?
+  vat             Float?
   packagingTypeId Int?
   specification   String?
   description     String?
@@ -1635,7 +1649,7 @@ model purchaseOrderItem {
   purchaseOrder        purchaseOrder          @relation(fields: [purchaseOrderId], references: [id])
   material             material               @relation(fields: [materialId], references: [id])
   personnel            personnel              @relation(fields: [personnelId], references: [id])
-  currency             currency               @relation(fields: [currencyId], references: [id])
+  currency             currency?              @relation(fields: [currencyId], references: [id])
   packagingType        packagingType?         @relation(fields: [packagingTypeId], references: [id])
   purchaseDeliveryItem purchaseDeliveryItem[]
   materialStock        materialStock[]
@@ -1662,7 +1676,7 @@ model purchaseDelivery {
   deliveryNo        String?
   freightType       String?
   deliveryType      String?
-  CarId             Int?
+  carId             Int?
   shippingCarrierId Int?
   shippingCompanyId Int?
   km                Int?
@@ -1675,7 +1689,7 @@ model purchaseDelivery {
   purchaseOrder        purchaseOrder          @relation(fields: [purchaseOrderId], references: [id])
   personnel            personnel              @relation(fields: [personnelId], references: [id])
   shippingCarrier      shippingCarrier?       @relation(fields: [shippingCarrierId], references: [id])
-  shippingCar          shippingCar?           @relation(fields: [CarId], references: [id])
+  shippingCar          shippingCar?           @relation(fields: [carId], references: [id])
   shippingCompany      shippingCompany?       @relation(fields: [shippingCompanyId], references: [id])
   purchaseDeliveryItem purchaseDeliveryItem[]
 }

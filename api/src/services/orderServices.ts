@@ -276,7 +276,13 @@ export const getOrderByCustomerId = async (customerId: number) => {
     },
     include: {
       customer: true,
-      personnel: true,
+      personnel: {
+        select: {
+          firstName: true,
+          lastName: true,
+          department: true,
+        },
+      },
       orderItem: {
         include: {
           product: true,

@@ -6,11 +6,9 @@ import {
   updatePurchaseRequest,
   deletePurchaseRequest,
   supervisorApproval,
-  managementApproval,
   getPurchaseRequestsByPersonnel,
   getSubordinatesPurchaseRequests,
   getSupervisorApprovedPurchaseRequests,
-  getPurchaseRequestsForManagement,
   purchasingApproval,
 } from "../services/purchaseRequestServices";
 import { Request, Response } from "express";
@@ -121,51 +119,6 @@ export const supervisorApprovalFalseController = async (
     res.status(500).json({ message: error });
   }
 };
-export const managementApprovalController = async (
-  req: Request,
-  res: Response
-) => {
-  try {
-    const id = parseInt(req.params.id);
-    const data = req.body;
-    const result = await managementApproval(id, data);
-    res.status(200).json(result);
-  } catch (error) {
-    res.status(500).json({ message: error });
-  }
-};
-
-export const managementApprovalTrueController = async (
-  req: Request,
-  res: Response
-) => {
-  try {
-    const id = parseInt(req.params.id);
-    const data = req.body;
-    const result = await managementApproval(id, {
-      approvalFromManagement: true,
-    });
-    res.status(200).json(result);
-  } catch (error) {
-    res.status(500).json({ message: error });
-  }
-};
-
-export const managementApprovalFalseController = async (
-  req: Request,
-  res: Response
-) => {
-  try {
-    const id = parseInt(req.params.id);
-    const data = req.body;
-    const result = await managementApproval(id, {
-      approvalFromManagement: false,
-    });
-    res.status(200).json(result);
-  } catch (error) {
-    res.status(500).json({ message: error });
-  }
-};
 
 export const getPurchaseRequestsByPersonnelController = async (
   req: Request,
@@ -202,18 +155,6 @@ export const getSupervisorApprovedPurchaseRequestsController = async (
     res.status(200).json(result);
   } catch (error) {
     console.log(error);
-    res.status(500).json({ message: error });
-  }
-};
-
-export const getPurchaseRequestsForManagementController = async (
-  req: Request,
-  res: Response
-) => {
-  try {
-    const result = await getPurchaseRequestsForManagement();
-    res.status(200).json(result);
-  } catch (error) {
     res.status(500).json({ message: error });
   }
 };

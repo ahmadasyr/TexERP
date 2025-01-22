@@ -6,12 +6,9 @@ import {
   deletePurchaseRequestController,
   supervisorApprovalTrueController,
   supervisorApprovalFalseController,
-  managementApprovalFalseController,
-  managementApprovalTrueController,
   getPurchaseRequestsByPersonnelController,
   getSubordinatesPurchaseRequestsController,
   getSupervisorApprovedPurchaseRequestsController,
-  getPurchaseRequestsForManagementController,
   purchasingApprovalFalseController,
   purchasingApprovalTrueController,
 } from "../controllers/purchaseRequestController";
@@ -24,7 +21,6 @@ router.get(
   "/supervisor-approved",
   getSupervisorApprovedPurchaseRequestsController
 );
-router.get("/management", getPurchaseRequestsForManagementController);
 router.get("/:id", getPurchaseRequestController);
 router.get("/", getAllPurchaseRequestsController);
 router.get("/personnel/:personnelId", getPurchaseRequestsByPersonnelController);
@@ -34,8 +30,6 @@ router.get(
 );
 router.put("/:id", updatePurchaseRequestController);
 router.delete("/:id", deletePurchaseRequestController);
-router.put("/management/false/:id", managementApprovalFalseController);
-router.put("/management/true/:id", managementApprovalTrueController);
 router.put("/supervisor/false/:id", supervisorApprovalFalseController);
 router.put("/supervisor/true/:id", supervisorApprovalTrueController);
 router.put("/purchasing/false/:id", purchasingApprovalFalseController);

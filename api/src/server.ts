@@ -53,6 +53,10 @@ import supplierRoutes from "./routes/supplierRoutes";
 import materialRoutes from "./routes/materialRoutes";
 import materialCategoryRoutes from "./routes/materialCategoryRoutes";
 import purchaseRequestRoutes from "./routes/purchaseRequestRoutes";
+import purchaseOrderRoutes from "./routes/purchaseOrderRoutes";
+import packagingTypeRoutes from "./routes/packagingTypeRoutes";
+import warehouseRoutes from "./routes/warehouseRoutes";
+import purchaseDeliveryRoutes from "./routes/purchaseDeliveryRoutes";
 const cors = require("cors");
 
 const app = express();
@@ -163,4 +167,12 @@ app.use("/material", materialRoutes);
 app.use("/material-category", materialCategoryRoutes);
 // Use purchaseRequest routes
 app.use("/purchase-request", purchaseRequestRoutes);
+// Use purchaseOrder routes
+app.use("/purchase-order", purchaseOrderRoutes);
+// Use packagingType routes
+app.use("/packaging-type", packagingTypeRoutes);
+// Use warehouse routes
+app.use("/warehouse", warehouseRoutes);
+// Use purchaseDelivery routes
+app.use("/purchase-delivery", purchaseDeliveryRoutes);
 export default app;

@@ -36,7 +36,13 @@ export const getWrapOrderById = async (id: number) => {
       wrapType: true,
       yarnType: true,
       machine: true,
-      personnel: true,
+      personnel: {
+        select: {
+          firstName: true,
+          lastName: true,
+          department: true,
+        },
+      },
       wrapStock: true,
     },
   });
@@ -48,7 +54,13 @@ export const getWrapOrders = async () => {
       wrapType: true,
       yarnType: true,
       machine: true,
-      personnel: true,
+      personnel: {
+        select: {
+          firstName: true,
+          lastName: true,
+          department: true,
+        },
+      },
       wrapStock: true,
     },
   });

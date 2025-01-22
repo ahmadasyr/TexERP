@@ -64,7 +64,13 @@ export const getAllYarnOrderShipmentSent = async () => {
       yarnOrderShipment: true,
       yarnOrderItem: true,
       yarnStockEntry: true,
-      personnel: true,
+      personnel: {
+        select: {
+          firstName: true,
+          lastName: true,
+          department: true,
+        },
+      },
     },
   });
 };

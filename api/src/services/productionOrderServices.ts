@@ -7,7 +7,13 @@ export const getAllProductionOrders = async () => {
     include: {
       machine: true,
       product: true,
-      personnel: true,
+      personnel: {
+        select: {
+          firstName: true,
+          lastName: true,
+          department: true,
+        },
+      },
       wraps: true,
       productionOrderWrap: true,
       cutStock: true,
@@ -21,7 +27,13 @@ export const getProductionOrderById = async (id: number) => {
     include: {
       machine: true,
       product: true,
-      personnel: true,
+      personnel: {
+        select: {
+          firstName: true,
+          lastName: true,
+          department: true,
+        },
+      },
       wraps: true,
       productionOrderWrap: true,
       cutStock: true,

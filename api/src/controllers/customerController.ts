@@ -13,7 +13,13 @@ export const getAllCustomers = async (
         taxOffice: true,
         bank: true,
         currency: true,
-        personnel: true,
+        personnel: {
+          select: {
+            firstName: true,
+            lastName: true,
+            department: true,
+          },
+        },
         account: true,
       },
     });
@@ -35,7 +41,13 @@ export const getCustomerById = async (
         taxOffice: true,
         bank: true,
         currency: true,
-        personnel: true,
+        personnel: {
+          select: {
+            firstName: true,
+            lastName: true,
+            department: true,
+          },
+        },
       },
     });
     if (customer) {

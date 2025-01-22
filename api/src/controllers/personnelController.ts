@@ -25,6 +25,21 @@ export const getPersonnelById = async (
   try {
     const personnel = await prisma.personnel.findUnique({
       where: { id: parseInt(id) },
+      select: {
+        id: true,
+        firstName: true,
+        lastName: true,
+        position: true,
+        department: true,
+        dateOfHire: true,
+        email: true,
+        phone: true,
+        handleComplaints: true,
+        handleSales: true,
+        supervisorId: true,
+        isDepartmentHead: true,
+        buyingLimit: true,
+      },
     });
     if (personnel) {
       res.json(personnel);
@@ -43,6 +58,11 @@ export const getSalesPersonnel = async (
   try {
     const personnel = await prisma.personnel.findMany({
       where: { handleSales: true },
+      select: {
+        id: true,
+        firstName: true,
+        lastName: true,
+      },
     });
     if (personnel.length > 0) {
       res.json(personnel);

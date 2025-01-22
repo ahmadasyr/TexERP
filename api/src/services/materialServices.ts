@@ -37,9 +37,13 @@ export const getMaterialById = async (id: number) => {
 };
 
 export const getAllMaterials = async () => {
-  return await prisma.material.findMany({
+  const materials = await prisma.material.findMany({
     include: { materialCategory: true },
   });
+  return materials.map((material) => ({
+    ...material,
+    category: material.materialCategory.name,
+  }));
 };
 
 export const updateMaterial = async (

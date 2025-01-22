@@ -4,7 +4,16 @@ const prisma = new PrismaClient();
 
 export const getAllYarnTypes = async () => {
   return await prisma.yarnType.findMany({
-    include: { personnel: true, currency: true },
+    include: {
+      personnel: {
+        select: {
+          firstName: true,
+          lastName: true,
+          department: true,
+        },
+      },
+      currency: true,
+    },
   });
 };
 
@@ -12,7 +21,13 @@ export const getYarnTypeById = async (id: number) => {
   return await prisma.yarnType.findUnique({
     where: { id },
     include: {
-      personnel: true,
+      personnel: {
+        select: {
+          firstName: true,
+          lastName: true,
+          department: true,
+        },
+      },
       currency: true,
       yarnOrderItem: {
         include: {
@@ -24,7 +39,13 @@ export const getYarnTypeById = async (id: number) => {
           yarnType: true,
           yarnOrder: true,
           account: true,
-          personnel: true,
+          personnel: {
+            select: {
+              firstName: true,
+              lastName: true,
+              department: true,
+            },
+          },
         },
       },
     },

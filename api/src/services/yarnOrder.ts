@@ -64,7 +64,13 @@ export const getYarnOrderById = async (id: number) => {
           shippingCompany: true,
         },
       },
-      personnel: true,
+      personnel: {
+        select: {
+          firstName: true,
+          lastName: true,
+          department: true,
+        },
+      },
     },
   });
 };
@@ -162,7 +168,13 @@ export const getAllYarnOrders = async () => {
     include: {
       yarnOrderItem: true,
       yarnOrderShipment: true,
-      personnel: true,
+      personnel: {
+        select: {
+          firstName: true,
+          lastName: true,
+          department: true,
+        },
+      },
       account: true,
     },
   });
@@ -193,7 +205,13 @@ export const getYarnOrdersBySale = async (sale: boolean) => {
     include: {
       yarnOrderItem: true,
       yarnOrderShipment: true,
-      personnel: true,
+      personnel: {
+        select: {
+          firstName: true,
+          lastName: true,
+          department: true,
+        },
+      },
       account: true,
     },
   });

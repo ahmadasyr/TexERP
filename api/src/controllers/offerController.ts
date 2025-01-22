@@ -8,7 +8,13 @@ export const getAllOffers = async (req: Request, res: Response) => {
     const offers = await prisma.offer.findMany({
       include: {
         order: true,
-        personnel: true,
+        personnel: {
+          select: {
+            firstName: true,
+            lastName: true,
+            department: true,
+          },
+        },
       },
     });
     res.status(200).json(offers);
@@ -24,7 +30,13 @@ export const getOfferById = async (req: Request, res: Response) => {
       where: { id: Number(id) },
       include: {
         order: true,
-        personnel: true,
+        personnel: {
+          select: {
+            firstName: true,
+            lastName: true,
+            department: true,
+          },
+        },
         offerItem: true,
       },
     });

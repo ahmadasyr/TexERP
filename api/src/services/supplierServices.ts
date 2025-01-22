@@ -64,7 +64,9 @@ export const createSupplier = async (data: {
       authorizedPerson: data.authorizedPerson,
       authorizedPersonPhone: data.authorizedPersonPhone,
       authorizedPersonEmail: data.authorizedPersonEmail,
-      taxOffice: { connect: { id: data.taxOfficeId } },
+      taxOffice: data.taxOfficeId
+        ? { connect: { id: data.taxOfficeId } }
+        : undefined,
       taxNumber: data.taxNumber,
       vade: data.vade,
       iso9001Status: data.iso9001Status || false,
@@ -131,7 +133,9 @@ export const updateSupplier = async (
       authorizedPerson: data.authorizedPerson,
       authorizedPersonPhone: data.authorizedPersonPhone,
       authorizedPersonEmail: data.authorizedPersonEmail,
-      taxOffice: { connect: { id: data.taxOfficeId } },
+      taxOffice: data.taxOfficeId
+        ? { connect: { id: data.taxOfficeId } }
+        : { disconnect: true },
       taxNumber: data.taxNumber,
       vade: data.vade,
       iso9001Status: data.iso9001Status,

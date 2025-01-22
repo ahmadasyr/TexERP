@@ -8,7 +8,13 @@ export const getAllYarnStockEntries = async () => {
       yarnType: true,
       yarnOrder: true,
       account: true,
-      personnel: true,
+      personnel: {
+        select: {
+          firstName: true,
+          lastName: true,
+          department: true,
+        },
+      },
     },
   });
 };
@@ -20,7 +26,13 @@ export const getYarnStockEntryById = async (id: number) => {
       yarnType: true,
       yarnOrder: true,
       account: true,
-      personnel: true,
+      personnel: {
+        select: {
+          firstName: true,
+          lastName: true,
+          department: true,
+        },
+      },
     },
   });
 };

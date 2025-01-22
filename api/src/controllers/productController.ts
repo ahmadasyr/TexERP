@@ -21,7 +21,13 @@ export const getProductById = async (req: Request, res: Response) => {
         productPrice: {
           include: {
             currency: true,
-            personnel: true,
+            personnel: {
+              select: {
+                firstName: true,
+                lastName: true,
+                department: true,
+              },
+            },
           },
         },
         customerPrice: {

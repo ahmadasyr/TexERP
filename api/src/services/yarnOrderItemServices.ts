@@ -47,7 +47,13 @@ export const getYarnOrderItems = async () => {
       yarnOrder: true,
       yarnType: true,
       currency: true,
-      personnel: true,
+      personnel: {
+        select: {
+          firstName: true,
+          lastName: true,
+          department: true,
+        },
+      },
       yarnOrderShipmentItem: true,
     },
   });
@@ -60,7 +66,13 @@ export const getYarnOrderItemById = async (id: number) => {
       yarnOrder: true,
       yarnType: true,
       currency: true,
-      personnel: true,
+      personnel: {
+        select: {
+          firstName: true,
+          lastName: true,
+          department: true,
+        },
+      },
       yarnOrderShipmentItem: true,
     },
   });

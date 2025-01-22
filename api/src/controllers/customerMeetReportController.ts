@@ -9,7 +9,16 @@ export const getAllCustomerMeetReports = async (
 ) => {
   try {
     const reports = await prisma.customerMeetReport.findMany({
-      include: { customer: true, personnel: true },
+      include: {
+        customer: true,
+        personnel: {
+          select: {
+            firstName: true,
+            lastName: true,
+            department: true,
+          },
+        },
+      },
     });
     res.status(200).json(reports);
   } catch (error) {
