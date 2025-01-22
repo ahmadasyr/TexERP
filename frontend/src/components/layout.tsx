@@ -27,6 +27,7 @@ import { lightPalette, darkPalette } from "./theme";
 import PrimarySearchAppBar from "./navbar";
 import Login from "../app/login/page";
 import Footer from "./main/footer/page";
+import { getPersonnelInfo } from "@/contexts/auth";
 const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [darkMode, setDarkMode] = useState(false);
   const [token, setToken] = useState<string | null>(null);

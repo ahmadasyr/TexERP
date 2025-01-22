@@ -261,40 +261,14 @@ const Page: React.FC = ({ popupHandler, popupSetter }: Page) => {
               marginBottom: 2,
             }}
           />
-          <Alert
-            severity={
-              formData.approvalFromManagement === true
-                ? "success"
-                : formData.approvalFromManagement === false
-                ? "error"
-                : "warning"
-            }
-          >
-            Üst Yönetim Tarafından{" "}
-            {formData.approvalFromManagement
-              ? `${new Date(
-                  formData.approvalFromManagementDate
-                ).toLocaleDateString("tr-TR")} Tarihinde  `
-              : ""}
-            {formData.approvalFromManagement === true
-              ? "Onaylandı"
-              : formData.approvalFromManagement === false
-              ? "Reddedildi"
-              : "Beklemede"}
-          </Alert>
-          <Divider
-            sx={{
-              marginTop: 5,
-              marginBottom: 5,
-            }}
-          />
-          {formData.approvalFromManagement && (
+
+          {formData.approvalFromSupervisor && (
             <Button
               variant="contained"
               color="primary"
               style={{ float: "right", marginBottom: "1rem" }}
               onClick={(e) => {
-                router.push("/purchase-order/?requestId=" + id);
+                router.push("/purchase-order/form/?purchaseRequestId=" + id);
               }}
             >
               Sipariş Oluştur

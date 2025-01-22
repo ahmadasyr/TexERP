@@ -183,7 +183,10 @@ export default function Sheet(props: SheetProps) {
       .then((response) => response.json())
       .then((data) => {
         setProducts(
-          data.map((value: any) => ({ value: value.id, label: value.name }))
+          data.map((value: any) => ({
+            value: value.id,
+            label: value.name,
+          }))
         );
       });
     fetch("/api/dye-color")

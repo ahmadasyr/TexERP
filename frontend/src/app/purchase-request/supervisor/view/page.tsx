@@ -263,33 +263,7 @@ const Page: React.FC = ({ popupHandler, popupSetter }: Page) => {
               marginBottom: 2,
             }}
           />
-          <Alert
-            severity={
-              formData.approvalFromManagement === true
-                ? "success"
-                : formData.approvalFromManagement === false
-                ? "error"
-                : "warning"
-            }
-          >
-            Üst Yönetim Tarafından{" "}
-            {formData.approvalFromManagement
-              ? `${new Date(
-                  formData.approvalFromManagementDate
-                ).toLocaleDateString("tr-TR")} Tarihinde  `
-              : ""}
-            {formData.approvalFromManagement === true
-              ? "Onaylandı"
-              : formData.approvalFromManagement === false
-              ? "Reddedildi"
-              : "Beklemede"}
-          </Alert>
-          <Divider
-            sx={{
-              marginTop: 5,
-              marginBottom: 5,
-            }}
-          />
+
           {formData.approvalFromPurchasing === null && (
             <Box display="flex" justifyContent="flex-end" mb={2}>
               {formData.approvalFromSupervisor === null ||

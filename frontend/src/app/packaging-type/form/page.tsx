@@ -1,7 +1,16 @@
 "use client";
-import { Data, formFields, tableName, title } from "../request";
+import { Data, formFields, tableName, title } from "../packaging";
 import React, { useEffect } from "react";
-import { Alert, Box, Button, Grid, Modal, Typography } from "@mui/material";
+import {
+  Alert,
+  Box,
+  Button,
+  Grid,
+  Modal,
+  Typography,
+  ButtonGroup,
+  Tooltip,
+} from "@mui/material";
 import {
   NewTextField,
   NewSelect,
@@ -16,15 +25,13 @@ import { useFormData } from "@/components/form/utils";
 import { FormModal } from "@/components/form/modal";
 import Popup from "@/components/form/Popup";
 import { useSearchParams } from "next/navigation";
-import Sheet from "./sheet";
-import { getPersonnelInfo, usePersonnelId } from "@/contexts/auth";
-interface Page {
+interface DyeColorProps {
   popupHandler?: (data: any) => void;
   popupSetter?: (data: any) => void;
   render?: any[];
 }
 
-const Page: React.FC = ({ popupHandler, popupSetter }: Page) => {
+const DyeColor: React.FC = ({ popupHandler, popupSetter }: DyeColorProps) => {
   const searchParams = useSearchParams();
   const id = searchParams.get("id");
   const { formData, handleChange, tableData, runFetchData } =
@@ -35,42 +42,22 @@ const Page: React.FC = ({ popupHandler, popupSetter }: Page) => {
     table: "",
     column: "",
   });
-  const [refresh, setRefresh] = React.useState<boolean>(false);
+
   useEffect(() => {
     if (id && !popupHandler) {
       fetch(`/api/${tableName}/${id}`)
         .then((response) => response.json())
         .then((data) => {
           Object.keys(data).forEach((key) => {
-            if (key !== "purchaseRequestItem") {
-              handleChange({
-                target: { name: key, value: data[key] },
-              } as React.ChangeEvent<{ name: string; value: any }>);
-            }
+            handleChange({
+              target: { name: key, value: data[key] },
+            } as React.ChangeEvent<{ name: string; value: any }>);
           });
-          setSubRows(data.purchaseRequestItem || []);
-          setRefresh(!refresh);
         });
     }
   }, [id]);
-  useEffect(() => {
-    handleChange({
-      target: { name: "personnelId", value: getPersonnelInfo().id },
-    } as React.ChangeEvent<{ name: string; value: any }>);
-    handleChange({
-      target: { name: "createdAt", value: new Date().toISOString() },
-    } as React.ChangeEvent<{ name: string; value: any }>);
-    handleChange({
-      target: { name: "department", value: getPersonnelInfo().department },
-    } as React.ChangeEvent<{ name: string; value: any }>);
-  }, []);
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const rows = subRows.map(({ isNew, purchaseRequestId, ...rest }) => {
-      if (rest.isNew) delete rest.id;
-      return rest;
-    });
-
     if (id) {
       try {
         const response = await fetch(`/api/${tableName}/${id}`, {
@@ -78,10 +65,7 @@ const Page: React.FC = ({ popupHandler, popupSetter }: Page) => {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({
-            ...formData,
-            purchaseRequestItem: rows,
-          }),
+          body: JSON.stringify(formData),
         });
 
         if (!response.ok) {
@@ -98,16 +82,12 @@ const Page: React.FC = ({ popupHandler, popupSetter }: Page) => {
       }
     } else {
       try {
-        const personnelId = usePersonnelId();
         const response = await fetch(`/api/${tableName}`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({
-            ...formData,
-            purchaseRequestItem: rows,
-          }),
+          body: JSON.stringify(formData),
         });
 
         if (!response.ok) {
@@ -158,21 +138,6 @@ const Page: React.FC = ({ popupHandler, popupSetter }: Page) => {
     });
   }
 
-  const [oldFormData, setOldFormData] = React.useState<any>({});
-
-  useEffect(() => {
-    formFields.forEach((field) => {
-      if (
-        field.relation &&
-        oldFormData[field.name as keyof Data] !==
-          formData[field.name as keyof Data]
-      ) {
-        runFetchData();
-      }
-    });
-    setOldFormData(formData);
-  }, [formData]);
-  const [subRows, setSubRows] = React.useState<any[]>([]);
   return (
     <>
       <Popup
@@ -211,39 +176,59 @@ const Page: React.FC = ({ popupHandler, popupSetter }: Page) => {
             {title}
           </Typography>
           <Grid container spacing={1}>
-            <Grid container spacing={1}>
-              <Grid item xs={12} md={4}>
-                <NewDate {...allProps} keyProp="createdAt" />
-              </Grid>
-              <Grid item xs={12} md={4}>
-                <NewSelect {...allProps} keyProp="department" />
-              </Grid>
-              <Grid item xs={12} md={4}>
-                <NewRelation {...allProps} keyProp="personnelId" />
-              </Grid>
+            <Grid item xs={6} md={4}>
+              <NewTextField {...allProps} keyProp="name" />
             </Grid>
-            <Grid container spacing={1}>
-              <Grid item xs={12} md={12}>
-                <Sheet
-                  refresh={refresh}
-                  subRows={subRows}
-                  setSubRows={setSubRows}
-                />
-              </Grid>
-            </Grid>
-            <Button
-              style={{ marginTop: "1rem" }}
-              type="submit"
-              variant="contained"
-              color="primary"
-            >
-              Kaydet
-            </Button>
           </Grid>
+          <ButtonGroup
+            variant="outlined"
+            aria-label="Loading button group"
+            style={{ display: "flex", justifyContent: "right" }}
+          >
+            {/* Save Button */}
+            <Tooltip title="Kaydetmek için tıklayın">
+              <Button
+                type="submit"
+                variant="contained"
+                color="primary"
+                size="large"
+              >
+                Kaydet
+              </Button>
+            </Tooltip>
+
+            {/* Restore Button */}
+            <Tooltip title="Formu yerel verilerle geri yükle">
+              <Button
+                onClick={() => {
+                  setAlertValue(-2);
+                }}
+                variant="contained"
+                color="secondary"
+                size="large"
+              >
+                Geri Yükle
+              </Button>
+            </Tooltip>
+
+            {/* Reset Button */}
+            <Tooltip title="Formu sıfırla">
+              <Button
+                onClick={() => {
+                  setAlertValue(-1);
+                }}
+                variant="text"
+                color="error"
+                size="large"
+              >
+                Sıfırla
+              </Button>
+            </Tooltip>
+          </ButtonGroup>
         </Box>
       </form>
     </>
   );
 };
 
-export default Page;
+export default DyeColor;

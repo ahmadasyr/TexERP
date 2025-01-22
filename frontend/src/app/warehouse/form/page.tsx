@@ -1,5 +1,5 @@
 "use client";
-import { Data, formFields, tableName, title } from "../request";
+import { Data, formFields, tableName, title } from "../warehouse";
 import React, { useEffect } from "react";
 import { Alert, Box, Button, Grid, Modal, Typography } from "@mui/material";
 import {
@@ -16,15 +16,14 @@ import { useFormData } from "@/components/form/utils";
 import { FormModal } from "@/components/form/modal";
 import Popup from "@/components/form/Popup";
 import { useSearchParams } from "next/navigation";
-import Sheet from "./sheet";
 import { getPersonnelInfo, usePersonnelId } from "@/contexts/auth";
-interface Page {
+interface PageProps {
   popupHandler?: (data: any) => void;
   popupSetter?: (data: any) => void;
   render?: any[];
 }
 
-const Page: React.FC = ({ popupHandler, popupSetter }: Page) => {
+const Page: React.FC<any> = ({ popupHandler, popupSetter }: PageProps) => {
   const searchParams = useSearchParams();
   const id = searchParams.get("id");
   const { formData, handleChange, tableData, runFetchData } =
@@ -35,41 +34,22 @@ const Page: React.FC = ({ popupHandler, popupSetter }: Page) => {
     table: "",
     column: "",
   });
-  const [refresh, setRefresh] = React.useState<boolean>(false);
+
   useEffect(() => {
     if (id && !popupHandler) {
       fetch(`/api/${tableName}/${id}`)
         .then((response) => response.json())
         .then((data) => {
           Object.keys(data).forEach((key) => {
-            if (key !== "purchaseRequestItem") {
-              handleChange({
-                target: { name: key, value: data[key] },
-              } as React.ChangeEvent<{ name: string; value: any }>);
-            }
+            handleChange({
+              target: { name: key, value: data[key] },
+            } as React.ChangeEvent<{ name: string; value: any }>);
           });
-          setSubRows(data.purchaseRequestItem || []);
-          setRefresh(!refresh);
         });
     }
   }, [id]);
-  useEffect(() => {
-    handleChange({
-      target: { name: "personnelId", value: getPersonnelInfo().id },
-    } as React.ChangeEvent<{ name: string; value: any }>);
-    handleChange({
-      target: { name: "createdAt", value: new Date().toISOString() },
-    } as React.ChangeEvent<{ name: string; value: any }>);
-    handleChange({
-      target: { name: "department", value: getPersonnelInfo().department },
-    } as React.ChangeEvent<{ name: string; value: any }>);
-  }, []);
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const rows = subRows.map((row) => {
-      const { isNew, yarnOrderId, ...rest } = row;
-      return rest;
-    });
     if (id) {
       try {
         const response = await fetch(`/api/${tableName}/${id}`, {
@@ -77,10 +57,7 @@ const Page: React.FC = ({ popupHandler, popupSetter }: Page) => {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({
-            ...formData,
-            purchaseRequestItem: rows,
-          }),
+          body: JSON.stringify(formData),
         });
 
         if (!response.ok) {
@@ -97,16 +74,12 @@ const Page: React.FC = ({ popupHandler, popupSetter }: Page) => {
       }
     } else {
       try {
-        const personnelId = usePersonnelId();
         const response = await fetch(`/api/${tableName}`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({
-            ...formData,
-            purchaseRequestItem: rows,
-          }),
+          body: JSON.stringify(formData),
         });
 
         if (!response.ok) {
@@ -171,7 +144,12 @@ const Page: React.FC = ({ popupHandler, popupSetter }: Page) => {
     });
     setOldFormData(formData);
   }, [formData]);
-  const [subRows, setSubRows] = React.useState<any[]>([]);
+  useEffect(() => {
+    handleChange({
+      target: { name: "personnelId", value: getPersonnelInfo().id },
+    } as React.ChangeEvent<{ name: string; value: any }>);
+  }, []);
+
   return (
     <>
       <Popup
@@ -210,28 +188,23 @@ const Page: React.FC = ({ popupHandler, popupSetter }: Page) => {
             {title}
           </Typography>
           <Grid container spacing={1}>
-            <Grid container spacing={1}>
-              <Grid item xs={12} md={4}>
-                <NewDate {...allProps} keyProp="createdAt" />
-              </Grid>
-              <Grid item xs={12} md={4}>
-                <NewSelect {...allProps} keyProp="department" />
-              </Grid>
-              <Grid item xs={12} md={4}>
-                <NewRelation {...allProps} keyProp="personnelId" />
-              </Grid>
+            <Grid item xs={6}>
+              <NewTextField {...allProps} keyProp="name" />
             </Grid>
-            <Grid container spacing={1}>
-              <Grid item xs={12} md={12}>
-                <Sheet
-                  refresh={refresh}
-                  subRows={subRows}
-                  setSubRows={setSubRows}
-                />
-              </Grid>
+            <Grid item xs={6}>
+              <NewTextField {...allProps} keyProp="address" />
+            </Grid>
+            <Grid item xs={6}>
+              <NewRelation {...allProps} keyProp="parentWarehouseId" />
+            </Grid>
+
+            <Grid item xs={6}>
+              <NewRelation {...allProps} keyProp="personnelId" />
             </Grid>
             <Button
-              style={{ marginTop: "1rem" }}
+              style={{
+                marginTop: "1rem",
+              }}
               type="submit"
               variant="contained"
               color="primary"

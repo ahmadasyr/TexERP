@@ -46,12 +46,11 @@ interface EditToolbarProps {
 interface SheetProps {
   refresh: boolean;
   subRows: any[];
-  setSubRows: React.Dispatch<React.SetStateAction<any[]>>;
 }
 
 export default function Sheet(props: SheetProps) {
-  const { refresh, subRows, setSubRows } = props;
-  const [rows, setRows] = React.useState(initialRows);
+  const { refresh, subRows } = props;
+  const [rows, setRows] = React.useState(subRows);
   const [rowModesModel, setRowModesModel] = React.useState<GridRowModesModel>(
     {}
   );
@@ -103,30 +102,39 @@ export default function Sheet(props: SheetProps) {
 
   const [alert, setAlert] = React.useState(false);
 
-  React.useEffect(() => {
-    if (subRows.length > 0) {
-      setRows(subRows);
-    }
-  }, [refresh]);
-
-  React.useEffect(() => {
-    setSubRows([...rows]);
-  }, [rows]);
-
   const columns: GridColDef[] = [
-    { field: "material", headerName: "Malzeme", width: 200, editable: true },
+    { field: "material", headerName: "Malzeme", width: 200 },
     {
       field: "quantity",
       headerName: "Miktar",
       width: 150,
-      editable: true,
+
       type: "number",
     },
+    {
+      field: "originalQuantity",
+      headerName: "İstenen Miktar",
+      width: 150,
+      type: "number",
+    },
+    {
+      field: "supervisorQuantity",
+      headerName: "Bölüm Müdürü Miktarı",
+      width: 150,
+      type: "number",
+    },
+    {
+      field: "purchasingQuantity",
+      headerName: "Satın Alma Miktarı",
+      width: 150,
+      type: "number",
+    },
+
     {
       field: "unit",
       headerName: "Birim",
       width: 150,
-      editable: true,
+
       type: "singleSelect",
       valueOptions: [
         {
@@ -167,7 +175,7 @@ export default function Sheet(props: SheetProps) {
       field: "requestedDate",
       headerName: "İhtiyaç Tarihi",
       width: 200,
-      editable: true,
+
       type: "date",
       valueGetter: (params) => {
         return params ? new Date(params) : null;
@@ -177,7 +185,6 @@ export default function Sheet(props: SheetProps) {
       field: "description",
       headerName: "Açıklama",
       width: 200,
-      editable: true,
     },
   ];
   function EditToolbar(props: EditToolbarProps) {
@@ -228,7 +235,6 @@ export default function Sheet(props: SheetProps) {
         <DataGrid
           rows={rows}
           columns={columns}
-          editMode="row"
           localeText={trTR.components.MuiDataGrid.defaultProps.localeText}
         />
       </Box>

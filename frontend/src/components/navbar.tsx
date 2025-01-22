@@ -142,14 +142,15 @@ export default function PrimaryAppBar({
     fetch("/api/notification/personnel/" + personnel?.id)
       .then((res) => res.json())
       .then((data) => {
-        console.log(data);
         setNotifications(data || []);
         setUnreadNotifications(
           data.filter((notification: Notifications) => !notification.read)
             .length
         );
       })
-      .catch((err) => console.error("Error fetching notifications:", err));
+      .catch((err) => {
+        return 0;
+      });
   };
   React.useEffect(() => {
     if (personnel?.department === "sts") {
@@ -158,7 +159,9 @@ export default function PrimaryAppBar({
         .then((data) => {
           setCustomers(data || []);
         })
-        .catch((err) => console.error("Error fetching customers:", err));
+        .catch((err) => {
+          return 0;
+        });
     }
     fetchNotifications();
   }, []);
@@ -185,7 +188,9 @@ export default function PrimaryAppBar({
           )
         );
       })
-      .catch((err) => console.error("Error updating notification:", err));
+      .catch((err) => {
+        return 0;
+      });
   };
   const handleNotificationDelete = (id: number) => {
     fetch("/api/notification/" + id, {
@@ -196,7 +201,9 @@ export default function PrimaryAppBar({
           notifications.filter((notification) => notification.id !== id)
         );
       })
-      .catch((err) => console.error("Error deleting notification:", err));
+      .catch((err) => {
+        return 0;
+      });
   };
   const markAllAsRead = () => {
     fetch("/api/notification/markAllAsRead", {
@@ -215,7 +222,9 @@ export default function PrimaryAppBar({
         );
         setUnreadNotifications(0);
       })
-      .catch((err) => console.error("Error updating notifications:", err));
+      .catch((err) => {
+        return 0;
+      });
   };
   const renderNotifications = () => {
     return (

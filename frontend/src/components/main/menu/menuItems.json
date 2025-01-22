@@ -553,7 +553,7 @@
             "title": "Satın Alma Siparişleri",
             "desc": "Satın alma siparişleri listesi",
             "icon": "request_quote",
-            "link": "#"
+            "link": "/purchase-order"
           },
           {
             "title": "Satın Alma navlunları",
@@ -569,6 +569,7 @@
           }
         ]
       },
+
       {
         "title": "Malzeme İşlemleri",
         "desc": "Malzeme işlemleri menüsü",
@@ -586,6 +587,20 @@
             "desc": "Malzeme türleri listesi",
             "icon": "category",
             "link": "/material-category"
+          }
+        ]
+      },
+      {
+        "title": "Diğer İşlemler",
+        "desc": "Diğer işlemler menüsü",
+        "icon": "settings",
+        "link": "#",
+        "subItems": [
+          {
+            "title": "Ambalaj Türleri",
+            "desc": "Ambalaj türleri listesi",
+            "icon": "category",
+            "link": "/packaging-type"
           }
         ]
       }

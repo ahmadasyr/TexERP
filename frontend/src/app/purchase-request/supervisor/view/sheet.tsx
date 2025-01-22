@@ -123,6 +123,24 @@ export default function Sheet(props: SheetProps) {
       type: "number",
     },
     {
+      field: "originalQuantity",
+      headerName: "İstenen Miktar",
+      width: 150,
+      type: "number",
+    },
+    {
+      field: "supervisorQuantity",
+      headerName: "Bölüm Müdürü Miktarı",
+      width: 150,
+      type: "number",
+    },
+    {
+      field: "purchasingQuantity",
+      headerName: "Satın Alma Miktarı",
+      width: 150,
+      type: "number",
+    },
+    {
       field: "unit",
       headerName: "Birim",
       width: 150,

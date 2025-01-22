@@ -259,18 +259,17 @@ export function reverseMappedRows(
 }
 
 export function CustomAutocomplete(props: any) {
-  const { value, onChange, valueKey, displayValueKey, values, label } = props;
+  const { value, onChange, valueKey, displayValueKey, values, label, groupBy } =
+    props;
 
-  const handleOnChange = (event: any, newValue: string | null) => {
-    const selectedValue = values.find(
-      (item: any) => item[displayValueKey] === newValue
-    )?.[valueKey];
-    onChange(selectedValue);
+  const handleOnChange = (event: any, newValue: any) => {
+    onChange(newValue ? newValue[valueKey] : null);
   };
 
-  const selectedOption = values.find((item: any) => item[valueKey] === value)?.[
-    displayValueKey
-  ];
+  // Find the currently selected value or default to null
+  const selectedOption =
+    values.find((item: any) => item[valueKey] === value)?.[displayValueKey] ||
+    null;
 
   return (
     <Autocomplete
@@ -281,12 +280,21 @@ export function CustomAutocomplete(props: any) {
       }}
       disablePortal
       id="values-id"
-      options={values.map((item: any) => item[displayValueKey])}
-      getOptionLabel={(option: any) => option}
-      value={selectedOption || ""} // Ensure value matches the options
+      groupBy={groupBy ? (option: any) => option[groupBy] : undefined}
+      options={values} // Pass objects as options
+      getOptionLabel={(option: any) => option[displayValueKey]} // Map to displayValueKey
+      isOptionEqualToValue={
+        (option: any, value: any) => option[valueKey] === value[valueKey] // Compare by valueKey
+      }
+      value={
+        selectedOption !== null
+          ? values.find((item: any) => item[displayValueKey] === selectedOption)
+          : null
+      } // Ensure value is never undefined
       onChange={handleOnChange}
       renderInput={(params) => (
         <TextField
+          label={label} // Add a label if required
           style={{ border: "none !important", borderRadius: "0" }}
           {...params}
         />

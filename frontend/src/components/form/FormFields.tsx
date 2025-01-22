@@ -318,17 +318,17 @@ export const NewRelation = ({
   togglePopup,
 }: FormFieldProps & { tableData: any[] }) => {
   const field = formFields.find((f) => f.name === keyProp);
-  if (!field) return "";
+  if (!field) return null; // Return null for clarity
+
   const [searchTerm, setSearchTerm] = useState("");
 
   const selectedTable = tableData.find((table) => table.name === field.table);
-  const selectedValue = selectedTable
-    ? selectedTable.values.find(
-        (value: any) => value[field.value] === formData[keyProp]
-      )
-    : "";
+  const selectedValue =
+    selectedTable?.values.find(
+      (value: any) => value[field.value] === formData[keyProp]
+    ) || null; // Ensure it defaults to null
 
-  const filteredOptions: string[] = field.relationDependancy
+  const filteredOptions: any[] = field.relationDependancy
     ? tableData
         .find((table) => table.name === field.table)
         ?.values?.filter((value: any) =>
@@ -381,18 +381,20 @@ export const NewRelation = ({
               : option[field.displayValue]
           }
           groupBy={(option) =>
-            option[field.groupBy] ? option[field.groupBy] : `Ana ${field.label}`
+            field.groupBy
+              ? option[field.groupBy]
+                ? option[field.groupBy]
+                : `Ana ${field.label}`
+              : undefined
           }
           renderInput={(params) => (
-            <>
-              <TextField
-                required={field?.required}
-                {...params}
-                label={field.label}
-                placeholder="Ara..."
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-            </>
+            <TextField
+              required={field?.required}
+              {...params}
+              label={field.label}
+              placeholder="Ara..."
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
           )}
           value={selectedValue}
           onChange={(event, newValue) => {
@@ -406,7 +408,7 @@ export const NewRelation = ({
         />
       </FormControl>
 
-      {field?.creatable ? (
+      {field?.creatable && (
         <IconButton
           style={{ fontSize: "1rem" }}
           color="primary"
@@ -417,12 +419,11 @@ export const NewRelation = ({
           Yeni {field.label} Ekle
           <AddIcon />
         </IconButton>
-      ) : (
-        ""
       )}
     </>
   );
 };
+
 export const NewMultiRelation = ({
   keyProp,
   formFields,

@@ -13,8 +13,7 @@ export interface Data {
   personnelId: number;
   approvalFromSupervisor: boolean;
   approvalFromSupervisorDate: string;
-  approvalFromManagement: boolean;
-  approvalFromManagementDate: string;
+
   approvalFromPurchasing: boolean;
   approvalFromPurchasingDate: string;
   personnel: {
@@ -117,20 +116,6 @@ export const headCells: HeadCell[] = [
     numeric: false,
     disablePadding: false,
     label: "Satın Alma Birimi Tarafından Onay Tarihi",
-    date: true,
-  },
-  {
-    id: "approvalFromManagement",
-    numeric: false,
-    disablePadding: false,
-    label: "üst Yönetimden Onay",
-    boolean: true,
-  },
-  {
-    id: "approvalFromManagementDate",
-    numeric: false,
-    disablePadding: false,
-    label: "üst Yönetimden Onay Tarihi",
     date: true,
   },
 ];
