@@ -262,54 +262,52 @@ const Page: React.FC = ({ popupHandler, popupSetter }: Page) => {
             }}
           />
 
-          {formData.approvalFromManagement === null && (
-            <Box display="flex" justifyContent="flex-end" mb={2}>
-              {formData.approvalFromPurchasing === null ||
-              formData.approvalFromPurchasing === false ? (
-                <Button
-                  variant="contained"
-                  color="primary"
-                  size="large"
-                  sx={{ ml: 2 }}
-                  onClick={() => {
-                    fetch(`/api/purchase-request/purchasing/true/` + id, {
-                      method: "PUT",
-                      headers: {
-                        "Content-Type": "application/json",
-                      },
-                    });
-                    setDataRefresh(!dataRefresh);
-                  }}
-                >
-                  Onayla
-                </Button>
-              ) : (
-                ""
-              )}
-              {formData.approvalFromPurchasing === null ||
-              formData.approvalFromPurchasing === true ? (
-                <Button
-                  variant="contained"
-                  color="error"
-                  size="large"
-                  sx={{ ml: 2 }}
-                  onClick={() => {
-                    fetch(`/api/purchase-request/purchasing/false/` + id, {
-                      method: "PUT",
-                      headers: {
-                        "Content-Type": "application/json",
-                      },
-                    });
-                    setDataRefresh(!dataRefresh);
-                  }}
-                >
-                  Reddet
-                </Button>
-              ) : (
-                ""
-              )}
-            </Box>
-          )}
+          <Box display="flex" justifyContent="flex-end" mb={2}>
+            {formData.approvalFromPurchasing === null ||
+            formData.approvalFromPurchasing === false ? (
+              <Button
+                variant="contained"
+                color="primary"
+                size="large"
+                sx={{ ml: 2 }}
+                onClick={() => {
+                  fetch(`/api/purchase-request/purchasing/true/` + id, {
+                    method: "PUT",
+                    headers: {
+                      "Content-Type": "application/json",
+                    },
+                  });
+                  setDataRefresh(!dataRefresh);
+                }}
+              >
+                Onayla
+              </Button>
+            ) : (
+              ""
+            )}
+            {formData.approvalFromPurchasing === null ||
+            formData.approvalFromPurchasing === true ? (
+              <Button
+                variant="contained"
+                color="error"
+                size="large"
+                sx={{ ml: 2 }}
+                onClick={() => {
+                  fetch(`/api/purchase-request/purchasing/false/` + id, {
+                    method: "PUT",
+                    headers: {
+                      "Content-Type": "application/json",
+                    },
+                  });
+                  setDataRefresh(!dataRefresh);
+                }}
+              >
+                Reddet
+              </Button>
+            ) : (
+              ""
+            )}
+          </Box>
           <Grid container spacing={1}>
             <Grid container spacing={1}>
               <Grid item xs={12} md={4}>
