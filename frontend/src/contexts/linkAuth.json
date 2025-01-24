@@ -1,0 +1,235 @@
+[
+  {
+    "link": "/dashboard",
+    "allowedDepartments": null
+  },
+  {
+    "link": "/customer",
+    "allowedDepartments": ["sts", "admin"]
+  },
+  {
+    "link": "/customer-price",
+    "allowedDepartments": ["sts", "admin"]
+  },
+  {
+    "link": "/customer-meet-plan",
+    "allowedDepartments": ["sts", "admin"]
+  },
+  {
+    "link": "/customer-meet-report",
+    "allowedDepartments": ["sts", "admin"]
+  },
+  {
+    "link": "/customer-complaint",
+    "allowedDepartments": ["sts", "admin"]
+  },
+  {
+    "link": "/offer",
+    "allowedDepartments": ["sts", "admin"]
+  },
+  {
+    "link": "/order",
+    "allowedDepartments": ["sts", "admin"]
+  },
+  {
+    "link": "/product-feasibility-form",
+    "allowedDepartments": ["sts", "admin"]
+  },
+  {
+    "link": "/sales-product",
+    "allowedDepartments": ["sts", "admin"]
+  },
+  {
+    "link": "/competitor-report",
+    "allowedDepartments": ["sts", "admin"]
+  },
+  {
+    "link": "/competitor-report-subject",
+    "allowedDepartments": ["sts", "admin"]
+  },
+  {
+    "link": "/competitor",
+    "allowedDepartments": ["sts", "admin"]
+  },
+  {
+    "link": "/yarn-type",
+    "allowedDepartments": ["pln", "urt", "admin"]
+  },
+  {
+    "link": "/yarn-order",
+    "allowedDepartments": ["pln", "urt", "admin"]
+  },
+  {
+    "link": "/yarn-sale",
+    "allowedDepartments": ["pln", "urt", "admin"]
+  },
+  {
+    "link": "/dyeing-order",
+    "allowedDepartments": ["pln", "urt", "admin"]
+  },
+  {
+    "link": "/dyeing-draw-list",
+    "allowedDepartments": ["pln", "urt", "admin"]
+  },
+  {
+    "link": "/dyeing-receipt",
+    "allowedDepartments": ["pln", "urt", "admin"]
+  },
+  {
+    "link": "/outsourcing-order",
+    "allowedDepartments": ["pln", "urt", "admin"]
+  },
+  {
+    "link": "/outsourcing-draw-list",
+    "allowedDepartments": ["pln", "urt", "admin"]
+  },
+  {
+    "link": "/outsourcing-receipt",
+    "allowedDepartments": ["pln", "urt", "admin"]
+  },
+  {
+    "link": "/sales-order",
+    "allowedDepartments": ["pln", "urt", "admin"]
+  },
+  {
+    "link": "/sales-order-report",
+    "allowedDepartments": ["pln", "urt", "admin"]
+  },
+  {
+    "link": "/shipment-order",
+    "allowedDepartments": ["pln", "urt", "admin"]
+  },
+  {
+    "link": "/sales-draw-list",
+    "allowedDepartments": ["pln", "urt", "admin"]
+  },
+  {
+    "link": "/sales-return-receipt",
+    "allowedDepartments": ["pln", "urt", "admin"]
+  },
+  {
+    "link": "/product",
+    "allowedDepartments": ["urt", "admin"]
+  },
+  {
+    "link": "/dye-color",
+    "allowedDepartments": ["urt", "admin"]
+  },
+  {
+    "link": "/lamination-color",
+    "allowedDepartments": ["urt", "admin"]
+  },
+  {
+    "link": "/item-type",
+    "allowedDepartments": ["urt", "admin"]
+  },
+  {
+    "link": "/outsource-type",
+    "allowedDepartments": ["urt", "admin"]
+  },
+  {
+    "link": "/outsource-group",
+    "allowedDepartments": ["urt", "admin"]
+  },
+  {
+    "link": "/yarn-order-shipment",
+    "allowedDepartments": ["sev", "urt", "pln", "admin", "sts"]
+  },
+  {
+    "link": "/yarn-order-shipment-sent",
+    "allowedDepartments": ["sev", "urt", "pln", "admin", "sts"]
+  },
+
+  {
+    "link": "/supplier",
+    "allowedDepartments": ["yon", "muh", "stn", "admin"]
+  },
+  {
+    "link": "/purchase-request",
+    "allowedDepartments": ["yon", "muh", "stn", "admin"]
+  },
+  {
+    "link": "/purchase-request/purchasing",
+    "allowedDepartments": ["yon", "muh", "stn", "admin"]
+  },
+  {
+    "link": "/purchase-order",
+    "allowedDepartments": ["yon", "muh", "stn", "admin"]
+  },
+  {
+    "link": "/material",
+    "allowedDepartments": ["yon", "muh", "stn", "admin"]
+  },
+  {
+    "link": "/material-category",
+    "allowedDepartments": ["yon", "muh", "stn", "admin"]
+  },
+  {
+    "link": "/packaging-type",
+    "allowedDepartments": ["yon", "muh", "stn", "admin"]
+  },
+  {
+    "link": "/dashboard/?department=sts",
+    "allowedDepartments": ["yon", "muh", "admin"]
+  },
+  {
+    "link": "/dashboard/?department=urt",
+    "allowedDepartments": ["yon", "muh", "admin"]
+  },
+  {
+    "link": "/dashboard/?department=pln",
+    "allowedDepartments": ["yon", "muh", "admin"]
+  },
+  {
+    "link": "/dashboard/?department=dep",
+    "allowedDepartments": ["yon", "muh", "admin"]
+  },
+  {
+    "link": "/dashboard/?department=kal",
+    "allowedDepartments": ["yon", "muh", "admin"]
+  },
+  {
+    "link": "/dashboard/?department=stn",
+    "allowedDepartments": ["yon", "muh", "admin"]
+  },
+  {
+    "link": "/dashboard/?department=ik",
+    "allowedDepartments": ["yon", "muh", "admin"]
+  },
+  {
+    "link": "/dashboard/?department=muh",
+    "allowedDepartments": ["yon", "muh", "admin"]
+  },
+  {
+    "link": "/dof",
+    "allowedDepartments": null
+  },
+  {
+    "link": "/my-requests",
+    "allowedDepartments": null
+  },
+  {
+    "link": "/account",
+    "allowedDepartments": ["muh", "yon", "admin", "sts", "stn"]
+  },
+  {
+    "link": "/bank",
+    "allowedDepartments": ["muh", "yon", "admin", "sts", "stn"]
+  },
+  {
+    "link": "/tax-office",
+    "allowedDepartments": ["muh", "yon", "admin", "sts", "stn"]
+  },
+  {
+    "link": "/purchase-delivery",
+    "allowedDepartments": ["muh", "yon", "admin", "stn"]
+  },
+  {
+    "link": "/material-stock",
+    "allowedDepartments": ["muh", "yon", "admin", "stn", "urt"]
+  },
+  {
+    "link": "/warehouse",
+    "allowedDepartments": ["muh", "yon", "admin", "stn", "urt"]
+  }
+]

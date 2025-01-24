@@ -72,3 +72,26 @@ export const getMaterialByCategory = async (categoryId: number) => {
     include: { materialCategory: true },
   });
 };
+
+export const getMaterialsInOrder = async (orderId: number) => {
+  return await prisma.material.findMany({
+    where: {
+      purchaseOrderItem: {
+        some: {
+          purchaseOrderId: orderId,
+        },
+      },
+    },
+    include: {
+      purchaseOrderItem: {
+        select: {
+          id: true,
+          quantity: true,
+        },
+        where: {
+          purchaseOrderId: orderId,
+        },
+      },
+    },
+  });
+};

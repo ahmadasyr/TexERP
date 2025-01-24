@@ -34,9 +34,11 @@ import { FormModal } from "@/components/form/modal";
 import Popup from "@/components/form/Popup";
 import { useRouter, useSearchParams } from "next/navigation";
 import Sheet from "./sheet";
+import Stock from "./stock";
 import OrderSheet from "./orderSheet";
 import { getPersonnelInfo, usePersonnelId } from "@/contexts/auth";
 import Receipt from "./print-request/page";
+import { json } from "stream/consumers";
 interface Page {
   popupHandler?: (data: any) => void;
   popupSetter?: (data: any) => void;
@@ -47,6 +49,8 @@ const Page: React.FC = ({ popupHandler, popupSetter }: Page) => {
   const searchParams = useSearchParams();
   const id = searchParams.get("id");
   const purchaseRequestId = searchParams.get("purchaseRequestId");
+  const isManagement = getPersonnelInfo().department === "yon";
+  const [stockRows, setStockRows] = React.useState<any[]>([]);
   const { formData, handleChange, tableData, runFetchData } =
     useFormData<Data>(formFields);
   const [alertValue, setAlertValue] = React.useState<number>(0);
@@ -72,6 +76,12 @@ const Page: React.FC = ({ popupHandler, popupSetter }: Page) => {
           setSubRows(data.purchaseOrderItem || []);
           setRequest(data.purchaseRequest);
           setRefresh(!refresh);
+        });
+      fetch(`/api/material-stock/purchase-order/${id}`)
+        .then((response) => response.json())
+        .then((data) => {
+          console.log(data);
+          setStockRows(data);
         });
     }
   }, [id, fetchRefresh]);
@@ -260,7 +270,8 @@ const Page: React.FC = ({ popupHandler, popupSetter }: Page) => {
     { value: "Completed", color: "success" },
     { value: "Returned", color: "error" },
   ];
-
+  const [selectedItem, setSelectedItem] = React.useState<any>();
+  const [stockEntry, setStockEntry] = React.useState<boolean>(false);
   return (
     <>
       <Popup
@@ -299,29 +310,79 @@ const Page: React.FC = ({ popupHandler, popupSetter }: Page) => {
               display: "grid",
             }}
           >
-            <ButtonGroup
-              sx={{
-                marginBottom: 2,
-              }}
-            >
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={() =>
-                  router.push(`/purchase-order/view/print-request/?id=${id}`)
-                }
+            {!isManagement && (
+              <ButtonGroup
+                sx={{
+                  marginBottom: 2,
+                }}
               >
-                Teklif İstem Sayfasına Git
-              </Button>
-              <Button
-                variant="contained"
-                color="info"
-                onClick={() => router.push(`/purchase-order/form/?id=${id}`)}
-              >
-                Düzenle
-              </Button>
-            </ButtonGroup>
-            {formData.approved && formData.status === "Approved" && (
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={() =>
+                    router.push(`/purchase-order/view/print-request/?id=${id}`)
+                  }
+                >
+                  Teklif İstem Sayfasına Git
+                </Button>
+                <Button
+                  variant="contained"
+                  color="info"
+                  onClick={() => router.push(`/purchase-order/form/?id=${id}`)}
+                >
+                  Düzenle
+                </Button>
+              </ButtonGroup>
+            )}
+            {!isManagement &&
+              formData.approved &&
+              formData.status === "Approved" && (
+                <ButtonGroup
+                  sx={{
+                    marginBottom: 2,
+                  }}
+                >
+                  <Button
+                    variant="outlined"
+                    color="success"
+                    onClick={() =>
+                      fetch(`/api/purchase-order/status/${id}/`, {
+                        method: "PUT",
+                        headers: {
+                          "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({
+                          status: "completed",
+                        }),
+                      }).then(() => {
+                        setFetchRefresh(!fetchRefresh);
+                      })
+                    }
+                  >
+                    Siparişi Tamamla
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    color="error"
+                    onClick={() =>
+                      fetch(`/api/purchase-order/status/${id}`, {
+                        method: "PUT",
+                        headers: {
+                          "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({
+                          status: "cancelled",
+                        }),
+                      }).then(() => {
+                        setFetchRefresh(!fetchRefresh);
+                      })
+                    }
+                  >
+                    Siparişi İptal Et
+                  </Button>
+                </ButtonGroup>
+              )}
+            {isManagement && (
               <ButtonGroup
                 sx={{
                   marginBottom: 2,
@@ -337,14 +398,14 @@ const Page: React.FC = ({ popupHandler, popupSetter }: Page) => {
                         "Content-Type": "application/json",
                       },
                       body: JSON.stringify({
-                        status: "completed",
+                        status: "approved",
                       }),
                     }).then(() => {
                       setFetchRefresh(!fetchRefresh);
                     })
                   }
                 >
-                  Siparişi Tamamla
+                  Siparişi Onayla
                 </Button>
                 <Button
                   variant="outlined"
@@ -356,15 +417,47 @@ const Page: React.FC = ({ popupHandler, popupSetter }: Page) => {
                         "Content-Type": "application/json",
                       },
                       body: JSON.stringify({
-                        status: "cancelled",
+                        status: "rejected",
                       }),
                     }).then(() => {
                       setFetchRefresh(!fetchRefresh);
                     })
                   }
                 >
-                  Siparişi İptal Et
+                  Siparişi Reddet
                 </Button>
+              </ButtonGroup>
+            )}
+            {formData.status === "Completed" && (
+              <ButtonGroup>
+                <Button
+                  variant="outlined"
+                  color="info"
+                  onClick={() =>
+                    router.push(
+                      `/purchase-delivery/form/?purchaseOrderId=${id}`
+                    )
+                  }
+                >
+                  Navlun Bilgilerini Gir
+                </Button>
+                {selectedItem && (
+                  <Button
+                    variant="outlined"
+                    color="warning"
+                    onClick={() => {
+                      router.push(
+                        `/material-stock/form/?purchaseOrderItemId=${selectedItem.id}`
+                      );
+                    }}
+                  >
+                    {
+                      subRows.find((row) => row.id === selectedItem.id)
+                        ?.material.name
+                    }{" "}
+                    Stok Girişi
+                  </Button>
+                )}
               </ButtonGroup>
             )}
           </Box>
@@ -434,7 +527,7 @@ const Page: React.FC = ({ popupHandler, popupSetter }: Page) => {
                 Vade: <b>{formData.vade || "-"}</b>
               </Typography>
             </Grid>
-            <Grid item xs={12} md={2}>
+            <Grid item xs={12} md={4}>
               <Typography variant="body1">
                 Lojistik Tipi: <b>{formData.shippingType || "-"}</b>
               </Typography>
@@ -460,6 +553,7 @@ const Page: React.FC = ({ popupHandler, popupSetter }: Page) => {
           >
             <Tab value={1} label="Satın Alma Sipariş Kalemleri" />
             <Tab value={0} label="Satın Alma Talep Detayları" />
+            <Tab value={2} label="Stok Girişleri" />
           </Tabs>
           <Grid container spacing={1}>
             {tab === 0 ? (
@@ -506,9 +600,11 @@ const Page: React.FC = ({ popupHandler, popupSetter }: Page) => {
                   height: "max-content",
                 }}
               >
+                {}
                 <OrderSheet
                   refresh={refresh}
                   subRows={subRows}
+                  setSelectedItemId={setSelectedItem}
                   setSubRows={setSubRows}
                 />{" "}
                 <Table>
@@ -521,6 +617,8 @@ const Page: React.FC = ({ popupHandler, popupSetter }: Page) => {
                   </TableBody>
                 </Table>
               </Grid>
+            ) : tab === 2 ? (
+              <Stock refresh={refresh} subRows={stockRows} />
             ) : null}
           </Grid>
         </Box>

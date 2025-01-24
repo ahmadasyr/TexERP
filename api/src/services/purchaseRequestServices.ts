@@ -84,7 +84,7 @@ export const createPurchaseRequest = async (data: {
           description: `${personnel?.firstName} ${personnel?.lastName} tarafından yeni bir satın alma talebi oluşturuldu.`,
           title: `Yeni bir satın alma talebi onayınızı bekliyor.`,
           category: "Personnel",
-          link: "/purchase-request/supervisor/view/?id=" + res.id,
+          link: "/subordinate-requests/view/?id=" + res.id,
         },
       });
     }
@@ -309,7 +309,7 @@ const supervisorApprovalNotification = async (
         }.`,
         title: `Satın alma talebiniz ${approval ? "onaylandı" : "reddedildi"}.`,
         category: "Personnel",
-        link: "/purchase-request/my-requests/view/?id=" + id,
+        link: "/my-requests/view/?id=" + id,
       },
     });
   }
@@ -323,7 +323,7 @@ const supervisorApprovalNotification = async (
           supervisor?.lastName
         } tarafından ${approval ? "onaylandı" : "reddedildi"}.`,
         category: "Personnel",
-        link: "/purchase-request/purchasing/view/?id=" + id,
+        link: "/supervisor-requests/view/?id=" + id,
       })),
     });
   }
@@ -374,7 +374,7 @@ const purchasingApprovalNotification = async (
         }.`,
         title: `Satın alma talebiniz ${approval ? "onaylandı" : "reddedildi"}.`,
         category: "Personnel",
-        link: "/purchase-request/my-requests/view/?id=" + id,
+        link: "/my-requests/view/?id=" + id,
       },
     });
   }
@@ -424,6 +424,53 @@ export const getPurchaseRequestsByPersonnel = async (personnelId: number) => {
           firstName: true,
           lastName: true,
           department: true,
+        },
+      },
+    },
+  });
+};
+
+export const getPurchaseRequestForPersonnel = async (id: number) => {
+  return await prisma.purchaseRequest.findUnique({
+    where: {
+      id,
+    },
+    include: {
+      personnel: {
+        select: {
+          firstName: true,
+          lastName: true,
+          department: true,
+        },
+      },
+      purchaseRequestItem: true,
+      purchaseOrder: {
+        select: {
+          id: true,
+          createdAt: true,
+          status: true,
+          deadline: true,
+          personnel: {
+            select: {
+              firstName: true,
+              lastName: true,
+            },
+          },
+          purchaseOrderItem: {
+            select: {
+              id: true,
+              quantity: true,
+              specification: true,
+              description: true,
+              unit: true,
+              material: {
+                select: {
+                  id: true,
+                  name: true,
+                },
+              },
+            },
+          },
         },
       },
     },

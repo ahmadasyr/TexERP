@@ -198,8 +198,8 @@ export default function Menu(props: MenuProps) {
           <List component="div" disablePadding>
             <ListItemButton
               title="Alt Çalışanlarım"
-              onClick={() => handleNavigation("/subbordinates")}
-              selected={pathname === "/subbordinates"}
+              onClick={() => handleNavigation("/my-subordinates")}
+              selected={pathname === "/my-subordinates"}
               sx={{ pl: 4 }}
             >
               <ListItemIcon sx={{ minWidth: 36 }}>
@@ -209,8 +209,8 @@ export default function Menu(props: MenuProps) {
             </ListItemButton>
             <ListItemButton
               title="Satın Alma Talepleri"
-              onClick={() => handleNavigation("/purchase-request/supervisor")}
-              selected={pathname === "/purchase-request/supervisor"}
+              onClick={() => handleNavigation("/subordinate-requests")}
+              selected={pathname === "/subordinate-requests"}
               sx={{ pl: 4 }}
             >
               <ListItemIcon sx={{ minWidth: 36 }}>

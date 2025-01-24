@@ -1,5 +1,8 @@
-import { HeadCell } from "../../../components/table/utils";
-import { createField } from "../../../components/form/utils";
+import {
+  conditions as tableConditions,
+  HeadCell,
+} from "../../components/table/utils";
+import { createField } from "../../components/form/utils";
 import { getPersonnelInfo } from "@/contexts/auth";
 export const tableName = "purchase-request";
 
@@ -75,36 +78,6 @@ export const headCells: HeadCell[] = [
     date: true,
   },
   {
-    id: "approvalFromPurchasing",
-    numeric: false,
-    disablePadding: false,
-    label: "ONAY",
-    boolean: true,
-    actionConditions: [
-      {
-        value: "Evet",
-        label: "Reddet",
-        color: "error",
-        action: "/api/purchase-request/purchasing/false",
-      },
-      {
-        value: "Hayır",
-        label: "Onayla",
-        color: "success",
-        action: "/api/purchase-request/purchasing/true",
-      },
-      {
-        value: null,
-        label: ["Onayla", "Reddet"],
-        color: ["success", "error"],
-        action: [
-          "/api/purchase-request/purchasing/true",
-          "/api/purchase-request/purchasing/false",
-        ],
-      },
-    ],
-  },
-  {
     id: "department",
     numeric: false,
     disablePadding: false,
@@ -149,12 +122,12 @@ export const headCells: HeadCell[] = [
 
 export const title = " Satın Alma Talebi";
 
-export const conditions = [
+export const conditions: tableConditions[] = [
   {
     action: ["edit"],
     checks: [
       {
-        key: "approvalFromManagement",
+        key: "approvalFromSupervisor",
         type: "equal",
         value: null,
       },
@@ -167,6 +140,11 @@ export const conditions = [
         key: "personnelId",
         type: "equal",
         value: getPersonnelInfo().id,
+      },
+      {
+        key: "approvalFromSupervisor",
+        type: "equal",
+        value: null,
       },
     ],
   },

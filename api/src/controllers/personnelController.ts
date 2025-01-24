@@ -138,6 +138,16 @@ export const getSubordinates = async (
   try {
     const personnel = await prisma.personnel.findMany({
       where: { supervisorId: parseInt(id) },
+      select: {
+        id: true,
+        firstName: true,
+        lastName: true,
+        position: true,
+        department: true,
+        dateOfHire: true,
+        email: true,
+        phone: true,
+      },
     });
     if (personnel.length > 0) {
       res.json(personnel);

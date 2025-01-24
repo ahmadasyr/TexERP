@@ -48,7 +48,7 @@ export const createPurchaseDelivery = async (data: {
   deliveryNo?: string;
   freightType?: string;
   deliveryType?: string;
-  carId?: number;
+  shippingCarId?: number;
   shippingCarrierId?: number;
   shippingCompanyId?: number;
   km?: number;
@@ -65,14 +65,14 @@ export const createPurchaseDelivery = async (data: {
   return prisma.purchaseDelivery.create({
     data: {
       purchaseOrder: { connect: { id: data.purchaseOrderId } },
-      date: data.date,
+      date: new Date(data.date),
       personnel: { connect: { id: data.personnelId } },
       deliveryNo: data.deliveryNo,
       freightType: data.freightType,
       deliveryType: data.deliveryType,
       shippingCar: {
         connect: {
-          id: data.carId,
+          id: data.shippingCarId,
         },
       },
       shippingCarrier: {
@@ -127,8 +127,23 @@ export const getPurchaseDeliveryById = async (id: number) => {
   return prisma.purchaseDelivery.findUnique({
     where: { id },
     include: {
-      purchaseOrder: true,
-      personnel: true,
+      purchaseOrder: {
+        include: {
+          purchaseOrderItem: {
+            include: {
+              material: true,
+              currency: true,
+              packagingType: true,
+            },
+          },
+        },
+      },
+      personnel: {
+        select: {
+          firstName: true,
+          lastName: true,
+        },
+      },
       shippingCar: true,
       shippingCarrier: true,
       shippingCompany: true,

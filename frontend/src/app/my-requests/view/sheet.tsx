@@ -46,11 +46,10 @@ interface EditToolbarProps {
 interface SheetProps {
   refresh: boolean;
   subRows: any[];
-  setSubRows: React.Dispatch<React.SetStateAction<any[]>>;
 }
 
 export default function Sheet(props: SheetProps) {
-  const { refresh, subRows, setSubRows } = props;
+  const { refresh, subRows } = props;
   const [rows, setRows] = React.useState(initialRows);
   const [rowModesModel, setRowModesModel] = React.useState<GridRowModesModel>(
     {}
@@ -104,14 +103,10 @@ export default function Sheet(props: SheetProps) {
   const [alert, setAlert] = React.useState(false);
 
   React.useEffect(() => {
-    if (subRows.length > 0) {
+    if (subRows?.length > 0) {
       setRows(subRows);
     }
   }, [refresh]);
-
-  React.useEffect(() => {
-    setSubRows([...rows]);
-  }, [rows]);
 
   const columns: GridColDef[] = [
     { field: "material", headerName: "Malzeme", width: 200, editable: true },

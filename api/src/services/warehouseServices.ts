@@ -18,11 +18,17 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 export const getAllWarehouses = async () => {
-  return await prisma.warehouse.findMany({
+  const warehouse = await prisma.warehouse.findMany({
     include: {
       personnel: true,
       parentWarehouse: true,
     },
+  });
+  return warehouse.map((w) => {
+    return {
+      ...w,
+      parent: w.parentWarehouse ? w.parentWarehouse.name : "",
+    };
   });
 };
 

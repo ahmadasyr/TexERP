@@ -1,8 +1,8 @@
 import {
   conditions as tableConditions,
   HeadCell,
-} from "../../../components/table/utils";
-import { createField } from "../../../components/form/utils";
+} from "../../components/table/utils";
+import { createField } from "../../components/form/utils";
 import { getPersonnelInfo } from "@/contexts/auth";
 export const tableName = "purchase-request";
 
@@ -76,36 +76,6 @@ export const headCells: HeadCell[] = [
     disablePadding: false,
     label: "Tarih",
     date: true,
-  },
-  {
-    id: "approvalFromSupervisor",
-    numeric: false,
-    disablePadding: false,
-    label: "ONAY",
-    boolean: true,
-    actionConditions: [
-      {
-        value: "Evet",
-        label: "Reddet",
-        color: "error",
-        action: "/api/purchase-request/supervisor/false",
-      },
-      {
-        value: "Hayır",
-        label: "Onayla",
-        color: "success",
-        action: "/api/purchase-request/supervisor/true",
-      },
-      {
-        value: null,
-        label: ["Onayla", "Reddet"],
-        color: ["success", "error"],
-        action: [
-          "/api/purchase-request/supervisor/true",
-          "/api/purchase-request/supervisor/false",
-        ],
-      },
-    ],
   },
   {
     id: "department",

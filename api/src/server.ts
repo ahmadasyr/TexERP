@@ -57,6 +57,7 @@ import purchaseOrderRoutes from "./routes/purchaseOrderRoutes";
 import packagingTypeRoutes from "./routes/packagingTypeRoutes";
 import warehouseRoutes from "./routes/warehouseRoutes";
 import purchaseDeliveryRoutes from "./routes/purchaseDeliveryRoutes";
+import materialStockRoutes from "./routes/materialStockRoutes";
 const cors = require("cors");
 
 const app = express();
@@ -175,4 +176,6 @@ app.use("/packaging-type", packagingTypeRoutes);
 app.use("/warehouse", warehouseRoutes);
 // Use purchaseDelivery routes
 app.use("/purchase-delivery", purchaseDeliveryRoutes);
+// Use materialStock routes
+app.use("/material-stock", materialStockRoutes);
 export default app;

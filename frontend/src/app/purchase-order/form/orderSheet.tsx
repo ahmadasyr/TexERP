@@ -224,7 +224,7 @@ export default function Sheet(props: SheetProps) {
       editable: false,
       type: "number",
       valueFormatter: (params, row) =>
-        (row.quantity * row.pricePerUnit * (1 + row.vat / 100)).toFixed(2),
+        (row.quantity || 0) * (row.pricePerUnit || 0) * (1 + row.vat / 100),
     },
     {
       field: "currencyId",

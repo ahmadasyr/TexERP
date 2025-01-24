@@ -21,6 +21,8 @@ import {
   GridRowEditStopReasons,
   GridSlots,
   GridRenderEditCellParams,
+  useGridApiContext,
+  useGridApiRef,
 } from "@mui/x-data-grid";
 import { Alert } from "@mui/material";
 import { trTR } from "@/components/trTrGrid";
@@ -56,10 +58,11 @@ interface SheetProps {
   refresh: boolean;
   subRows: any[];
   setSubRows: React.Dispatch<React.SetStateAction<any[]>>;
+  setSelectedItemId?: React.Dispatch<React.SetStateAction<any>>;
 }
 
 export default function Sheet(props: SheetProps) {
-  const { refresh, subRows, setSubRows } = props;
+  const { refresh, subRows, setSubRows, setSelectedItemId } = props;
   const [rows, setRows] = React.useState(subRows);
   const [rowModesModel, setRowModesModel] = React.useState<GridRowModesModel>(
     {}
@@ -109,6 +112,12 @@ export default function Sheet(props: SheetProps) {
 
   const handleRowModesModelChange = (newRowModesModel: GridRowModesModel) => {
     setRowModesModel(newRowModesModel);
+  };
+
+  const handleRowSelect = (row: any) => {
+    if (setSelectedItemId) {
+      setSelectedItemId(row);
+    }
   };
 
   const [alert, setAlert] = React.useState(false);
@@ -224,7 +233,7 @@ export default function Sheet(props: SheetProps) {
       editable: false,
       type: "number",
       valueGetter: (params, row) =>
-        row.quantity * row.pricePerUnit * (1 + row.vat / 100),
+        (row.quantity || 0) * (row.pricePerUnit || 0) * (1 + row.vat / 100),
     },
     {
       field: "currencyId",
@@ -293,7 +302,7 @@ export default function Sheet(props: SheetProps) {
       </GridToolbarContainer>
     );
   }
-
+  const apiRef = useGridApiRef();
   return (
     <>
       <Box
@@ -312,6 +321,10 @@ export default function Sheet(props: SheetProps) {
           rows={rows}
           columns={columns}
           localeText={trTR.components.MuiDataGrid.defaultProps.localeText}
+          onRowClick={(params) => handleRowSelect(params.row)}
+          onRowDoubleClick={(params) => {
+            handleRowSelect(null);
+          }}
         />
       </Box>
       {alert ? <Alert severity="error">En az 1 satır olmalıdır.</Alert> : null}

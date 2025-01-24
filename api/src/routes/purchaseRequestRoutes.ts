@@ -11,6 +11,7 @@ import {
   getSupervisorApprovedPurchaseRequestsController,
   purchasingApprovalFalseController,
   purchasingApprovalTrueController,
+  getPurchaseRequestForPersonnelController,
 } from "../controllers/purchaseRequestController";
 import { Router } from "express";
 
@@ -23,6 +24,7 @@ router.get(
 );
 router.get("/:id", getPurchaseRequestController);
 router.get("/", getAllPurchaseRequestsController);
+router.get("/personnel-request/:id", getPurchaseRequestForPersonnelController);
 router.get("/personnel/:personnelId", getPurchaseRequestsByPersonnelController);
 router.get(
   "/subordinates/:personnelId",

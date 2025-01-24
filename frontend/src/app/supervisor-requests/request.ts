@@ -1,8 +1,5 @@
-import {
-  conditions as tableConditions,
-  HeadCell,
-} from "../../../components/table/utils";
-import { createField } from "../../../components/form/utils";
+import { HeadCell } from "../../components/table/utils";
+import { createField } from "../../components/form/utils";
 import { getPersonnelInfo } from "@/contexts/auth";
 export const tableName = "purchase-request";
 
@@ -122,17 +119,7 @@ export const headCells: HeadCell[] = [
 
 export const title = " Satın Alma Talebi";
 
-export const conditions: tableConditions[] = [
-  {
-    action: ["edit"],
-    checks: [
-      {
-        key: "approvalFromSupervisor",
-        type: "equal",
-        value: null,
-      },
-    ],
-  },
+export const conditions = [
   {
     action: ["delete"],
     checks: [
@@ -140,11 +127,6 @@ export const conditions: tableConditions[] = [
         key: "personnelId",
         type: "equal",
         value: getPersonnelInfo().id,
-      },
-      {
-        key: "approvalFromSupervisor",
-        type: "equal",
-        value: null,
       },
     ],
   },

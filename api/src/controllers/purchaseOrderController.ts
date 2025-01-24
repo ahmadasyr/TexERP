@@ -8,6 +8,9 @@ import {
   completePurchaseOrder,
   rejectPurchaseOrder,
   returnPurchaseOrder,
+  approvePurchaseOrder,
+  getPurchaseOrdersByPersonnel,
+  getItemDetails,
 } from "../services/purchaseOrderServices";
 
 import { Request, Response } from "express";
@@ -92,6 +95,9 @@ export const setPurchaseOrderStatusController = async (
       case "cancelled":
         await cancelPurchaseOrder(parseInt(id));
         break;
+      case "approved":
+        await approvePurchaseOrder(parseInt(id));
+        break;
       case "completed":
         await completePurchaseOrder(parseInt(id));
         break;
@@ -108,5 +114,33 @@ export const setPurchaseOrderStatusController = async (
     res.status(200).end();
   } catch (error) {
     res.status(500).json({ error: "Failed to update purchase order status" });
+  }
+};
+
+export const getPurchaseOrdersByPersonnelController = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  const { personnelId } = req.params;
+  try {
+    const purchaseOrders = await getPurchaseOrdersByPersonnel(
+      parseInt(personnelId)
+    );
+    res.status(200).json(purchaseOrders);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch purchase orders" });
+  }
+};
+
+export const getItemDetailsController = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  const { id } = req.params;
+  try {
+    const itemDetails = await getItemDetails(parseInt(id));
+    res.status(200).json(itemDetails);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch item details" });
   }
 };

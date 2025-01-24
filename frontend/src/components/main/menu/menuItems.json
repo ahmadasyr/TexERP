@@ -411,6 +411,12 @@
     ],
     "subItems": [
       {
+        "title": "Depo Alanları",
+        "desc": "Depo alanları menüsü",
+        "icon": "warehouse",
+        "link": "/warehouse"
+      },
+      {
         "title": "İplik Depo",
         "desc": "İplik depo işlemleri menüsü",
         "icon": "sports_volleyball",
@@ -482,6 +488,12 @@
             "link": "#"
           }
         ]
+      },
+      {
+        "title": "Malzeme Depo",
+        "desc": "Malzeme depo işlemleri menüsü",
+        "icon": "inventory_2",
+        "link": "/material-stock"
       }
     ]
   },
@@ -495,7 +507,7 @@
         "title": "Satın Alma Talepleri",
         "desc": "Satın alma talepleri menüsü",
         "icon": "shopping_cart",
-        "link": "/purchase-request/management"
+        "link": "/purchase-order"
       }
     ]
   },
@@ -547,7 +559,7 @@
             "title": "Onay Bekleyen Satın Alma Talepleri",
             "desc": "Onay bekleyen satın alma talepleri listesi",
             "icon": "shopping_basket",
-            "link": "/purchase-request/purchasing"
+            "link": "/supervisor-requests"
           },
           {
             "title": "Satın Alma Siparişleri",
@@ -559,7 +571,7 @@
             "title": "Satın Alma navlunları",
             "desc": "Satın alma navlunları listesi",
             "icon": "local_shipping",
-            "link": "#"
+            "link": "/purchase-delivery"
           },
           {
             "title": "İade İrsaliyeleri",
@@ -849,7 +861,7 @@
         "title": "Satın Alma Taleplerim ",
         "desc": "Satın alma talepleri listesi",
         "icon": "shopping_cart",
-        "link": "/purchase-request/my-requests"
+        "link": "/my-requests"
       }
     ]
   },

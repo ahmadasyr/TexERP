@@ -20,19 +20,28 @@ import {
   GridRowModel,
   GridRowEditStopReasons,
   GridSlots,
+  GridRenderEditCellParams,
 } from "@mui/x-data-grid";
 import { Alert } from "@mui/material";
 import { trTR } from "@/components/trTrGrid";
-import { usePersonnelId } from "@/contexts/auth";
+import { getPersonnelInfo, usePersonnelId } from "@/contexts/auth";
+import { sub } from "date-fns";
+import { CustomAutocomplete } from "@/components/table/utils";
 
 const initialRows: GridRowsProp = [
   {
-    id: 0,
-    material: "",
-    quantity: 0,
+    id: 0, // Use a unique value instead of null
+    materialId: null,
+    quantity: undefined,
+    personnelId: getPersonnelInfo().id,
     unit: "",
-    requestedDate: "",
+    pricePerUnit: undefined,
+    currencyId: undefined,
+    vat: 0,
+    packagingTypeId: null,
+    specification: "",
     description: "",
+    isNew: true,
   },
 ];
 
@@ -46,17 +55,17 @@ interface EditToolbarProps {
 interface SheetProps {
   refresh: boolean;
   subRows: any[];
-  setSubRows: React.Dispatch<React.SetStateAction<any[]>>;
 }
 
 export default function Sheet(props: SheetProps) {
-  const { refresh, subRows, setSubRows } = props;
-  const [rows, setRows] = React.useState(initialRows);
+  const { refresh, subRows } = props;
+  const [rows, setRows] = React.useState(subRows);
   const [rowModesModel, setRowModesModel] = React.useState<GridRowModesModel>(
     {}
   );
-  const [yarnTypes, setYarnTypes] = React.useState<any[]>([]);
+  const [materials, setMaterials] = React.useState<any[]>([]);
   const [currencies, setCurrencies] = React.useState<any[]>([]);
+  const [packagingTypes, setPackagingTypes] = React.useState<any[]>([]);
 
   const handleRowEditStop: GridEventListener<"rowEditStop"> = (
     params,
@@ -110,114 +119,104 @@ export default function Sheet(props: SheetProps) {
   }, [refresh]);
 
   React.useEffect(() => {
-    setSubRows([...rows]);
-  }, [rows]);
+    fetch("/api/material")
+      .then((response) => response.json())
+      .then((data) =>
+        setMaterials(
+          data.map((value: any) => ({
+            value: value.id,
+            label: value.name,
+            category: value.category,
+          }))
+        )
+      );
+    fetch("/api/currency")
+      .then((response) => response.json())
+      .then((data) =>
+        setCurrencies(
+          data.map((value: any) => ({ value: value.id, label: value.name }))
+        )
+      );
+    fetch("/api/packaging-type")
+      .then((response) => response.json())
+      .then((data) =>
+        setPackagingTypes(
+          data.map((value: any) => ({ value: value.id, label: value.name }))
+        )
+      );
+  }, []);
 
   const columns: GridColDef[] = [
-    { field: "material", headerName: "Malzeme", width: 200, editable: true },
+    {
+      field: "material",
+      headerName: "Malzeme",
+      width: 200,
+      type: "string",
+      valueFormatter: (params, row) => row.material?.name,
+    },
     {
       field: "quantity",
       headerName: "Miktar",
-      width: 150,
-      editable: true,
-      type: "number",
-    },
-    {
-      field: "originalQuantity",
-      headerName: "İstenen Miktar",
-      width: 150,
-      type: "number",
-    },
-    {
-      field: "supervisorQuantity",
-      headerName: "Bölüm Müdürü Miktarı",
-      width: 150,
-      type: "number",
-    },
-    {
-      field: "purchasingQuantity",
-      headerName: "Satın Alma Miktarı",
-      width: 150,
+      width: 110,
+
       type: "number",
     },
     {
       field: "unit",
       headerName: "Birim",
-      width: 150,
-      editable: true,
+      width: 110,
+
       type: "singleSelect",
       valueOptions: [
-        {
-          label: "KG",
-          value: "KG",
-        },
-        {
-          label: "Metre",
-          value: "metre",
-        },
-        {
-          label: "Adet",
-          value: "adet",
-        },
-        {
-          label: "Litre",
-          value: "litre",
-        },
-        {
-          label: "Paket",
-          value: "paket",
-        },
-        {
-          label: "Kutu",
-          value: "kutu",
-        },
-        {
-          label: "Ton",
-          value: "ton",
-        },
-        {
-          label: "Koli",
-          value: "koli",
-        },
+        { label: "KG", value: "KG" },
+        { label: "Metre", value: "metre" },
+        { label: "Adet", value: "adet" },
+        { label: "Litre", value: "litre" },
+        { label: "Paket", value: "paket" },
+        { label: "Kutu", value: "kutu" },
+        { label: "Ton", value: "ton" },
+        { label: "Koli", value: "koli" },
       ],
     },
     {
-      field: "requestedDate",
-      headerName: "İhtiyaç Tarihi",
+      field: "specification",
+      headerName: "Spesifikasyon",
       width: 200,
-      editable: true,
-      type: "date",
-      valueGetter: (params) => {
-        return params ? new Date(params) : null;
-      },
     },
     {
       field: "description",
       headerName: "Açıklama",
       width: 200,
-      editable: true,
     },
   ];
+
   function EditToolbar(props: EditToolbarProps) {
     const { setRows, setRowModesModel } = props;
 
     const handleClick = () => {
-      let index = rows.length;
+      const newId =
+        rows.length > 0 ? Math.max(...rows.map((row) => row.id)) + 1 : 0;
       setRows((oldRows) => [
         ...oldRows,
         {
-          index: oldRows.length,
-          id: null,
-          material: "",
+          id: newId,
+          purchaseOrderId: 0,
+          materialId: 0,
           quantity: 0,
+          personnelId: getPersonnelInfo().id,
           unit: "",
-          requestedDate: "",
+          pricePerUnit: 0,
+          currencyId: 0,
+          vat: 0,
+          packagingTypeId: null,
+          specification: "",
           description: "",
+          isNew: true,
         },
       ]);
       setRowModesModel((oldModel) => ({
         ...oldModel,
-        [index]: { mode: GridRowModes.Edit, fieldToFocus: "id" },
+        [newId]: { mode: GridRowModes.Edit, fieldToFocus: "material" },
       }));
     };
 
@@ -229,6 +228,7 @@ export default function Sheet(props: SheetProps) {
       </GridToolbarContainer>
     );
   }
+
   return (
     <>
       <Box
@@ -246,7 +246,6 @@ export default function Sheet(props: SheetProps) {
         <DataGrid
           rows={rows}
           columns={columns}
-          editMode="row"
           localeText={trTR.components.MuiDataGrid.defaultProps.localeText}
         />
       </Box>

@@ -273,6 +273,45 @@ export const getPurchaseOrders = async () => {
   });
 };
 
+export const getPurchaseOrdersByPersonnel = async (personnelId: number) => {
+  return await prisma.purchaseOrder.findMany({
+    where: {
+      purchaseRequest: {
+        personnelId: personnelId,
+      },
+    },
+    include: {
+      personnel: {
+        select: {
+          firstName: true,
+          lastName: true,
+          department: true,
+        },
+      },
+      purchaseRequest: true,
+      purchaseOrderItem: {
+        include: {
+          material: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+          personnel: {
+            select: {
+              firstName: true,
+              lastName: true,
+              department: true,
+            },
+          },
+          currency: true,
+          packagingType: true,
+        },
+      },
+    },
+  });
+};
+
 export const approvePurchaseOrder = async (id: number) => {
   return await prisma.purchaseOrder.update({
     where: { id },
@@ -386,4 +425,29 @@ const sendPersonnelNotification = async (id: number) => {
     },
   });
   return notification;
+};
+export const getItemDetails = async (id: number) => {
+  return await prisma.purchaseOrderItem.findUnique({
+    where: { id },
+    select: {
+      id: true,
+      unit: true,
+      quantity: true,
+      materialId: true,
+      material: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+      personnel: {
+        select: {
+          firstName: true,
+          lastName: true,
+        },
+      },
+      packagingType: true,
+      purchaseDeliveryItem: true,
+    },
+  });
 };

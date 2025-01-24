@@ -5,6 +5,7 @@ import {
   updateMaterial,
   deleteMaterial,
   getMaterialByCategory,
+  getMaterialsInOrder,
 } from "../services/materialServices";
 import { Request, Response } from "express";
 
@@ -77,6 +78,18 @@ export const getMaterialByCategoryController = async (
     const materials = await getMaterialByCategory(
       Number(req.params.categoryId)
     );
+    res.status(200).json(materials);
+  } catch (error) {
+    res.status(500).json({ error: error });
+  }
+};
+
+export const getMaterialsInOrderController = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const materials = await getMaterialsInOrder(Number(req.params.orderId));
     res.status(200).json(materials);
   } catch (error) {
     res.status(500).json({ error: error });

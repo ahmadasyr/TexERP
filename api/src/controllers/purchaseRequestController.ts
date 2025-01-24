@@ -10,6 +10,7 @@ import {
   getSubordinatesPurchaseRequests,
   getSupervisorApprovedPurchaseRequests,
   purchasingApproval,
+  getPurchaseRequestForPersonnel,
 } from "../services/purchaseRequestServices";
 import { Request, Response } from "express";
 
@@ -181,6 +182,20 @@ export const purchasingApprovalFalseController = async (
     const result = await purchasingApproval(id, false);
     res.status(200).json(result);
   } catch (error) {
+    res.status(500).json({ message: error });
+  }
+};
+
+export const getPurchaseRequestForPersonnelController = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const personnelId = parseInt(req.params.id);
+    const result = await getPurchaseRequestForPersonnel(personnelId);
+    res.status(200).json(result);
+  } catch (error) {
+    console.log(error);
     res.status(500).json({ message: error });
   }
 };

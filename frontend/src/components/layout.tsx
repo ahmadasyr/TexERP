@@ -19,6 +19,7 @@ import {
   useMediaQuery,
   Paper,
 } from "@mui/material";
+import linkAuth from "../contexts/linkAuth.json";
 import SendIcon from "@mui/icons-material/Send";
 import MenuIcon from "@mui/icons-material/Menu";
 import { ThemeProvider as EmotionThemeProvider } from "@emotion/react";
@@ -28,9 +29,31 @@ import PrimarySearchAppBar from "./navbar";
 import Login from "../app/login/page";
 import Footer from "./main/footer/page";
 import { getPersonnelInfo } from "@/contexts/auth";
+import { ErrorSharp } from "@mui/icons-material";
+import {
+  BrowserRouter as Router,
+  Route,
+  Routes,
+  useLocation,
+} from "react-router-dom";
+import { usePathname } from "next/navigation";
+import { link } from "fs";
+import { get } from "http";
+
+interface LinkAuth {
+  link: string;
+  allowedDepartments?: string[] | null;
+}
+[];
+
 const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [darkMode, setDarkMode] = useState(false);
   const [token, setToken] = useState<string | null>(null);
+  const [open, setOpen] = useState(false);
+
+  const userDepartment = getPersonnelInfo()?.department || "";
+  const currentPath = usePathname().toString();
+
   useEffect(() => {
     const handleTokenChange = () => {
       if (localStorage.token) {
@@ -38,7 +61,6 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       }
     };
     handleTokenChange();
-    // Listen for logout events
     window.addEventListener("logout", handleTokenChange);
     window.addEventListener("login", handleTokenChange);
     return () => {
@@ -56,45 +78,43 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   };
 
   useEffect(() => {
-    if (window) {
-      localStorage.setItem("darkMode", JSON.stringify(darkMode));
-    }
+    localStorage.setItem("darkMode", JSON.stringify(darkMode));
   }, [darkMode]);
+
   const theme = createTheme({
     palette: {
       mode: darkMode ? "dark" : "light",
       primary: {
-        main: darkMode ? "#E3CBA8" : "#F05A29", // Brighter primary color
+        main: darkMode ? "#E3CBA8" : "#F05A29",
       },
       secondary: {
-        main: darkMode ? "#58A6A6" : "#22868A", // More vibrant secondary color
+        main: darkMode ? "#58A6A6" : "#22868A",
       },
       background: {
-        default: darkMode ? "#202020" : "#F9F9F9", // Slightly darker/lighter for contrast
+        default: darkMode ? "#202020" : "#F9F9F9",
         paper: darkMode ? "#2C2C2C" : "#FFFFFF",
       },
       text: {
-        primary: darkMode ? "#FFFFFF" : "#222222", // Ensure high contrast
+        primary: darkMode ? "#FFFFFF" : "#222222",
         secondary: darkMode ? "#AAAAAA" : "#555555",
       },
     },
     typography: {
       fontFamily: "Poppins",
-
       h1: {
         fontWeight: 700,
         fontSize: "3rem",
-        color: darkMode ? "#FFFFFF" : "#222222", // High-contrast heading
+        color: darkMode ? "#FFFFFF" : "#222222",
       },
       h2: {
         fontWeight: 600,
         fontSize: "2.5rem",
-        color: darkMode ? "#E3CBA8" : "#F05A29", // Use primary color for emphasis
+        color: darkMode ? "#E3CBA8" : "#F05A29",
       },
       h3: {
         fontWeight: 500,
         fontSize: "2rem",
-        color: darkMode ? "#E3CBA8" : "#22868A", // Match secondary color
+        color: darkMode ? "#E3CBA8" : "#22868A",
       },
       body1: {
         fontWeight: 400,
@@ -107,19 +127,19 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     },
     components: {
       MuiCssBaseline: {
-        styleOverrides: (theme) => ({
+        styleOverrides: {
           form: {
-            backgroundColor: theme.palette.background.paper,
+            backgroundColor: darkMode ? "#2C2C2C" : "#FFFFFF",
           },
           footer: {
             backgroundColor: darkMode ? "#FFFFFF" : "#2C2C2C",
           },
-        }),
+        },
       },
       MuiCard: {
         styleOverrides: {
           root: {
-            border: darkMode ? "1px solid #444" : "1px solid #DDD", // Subtle border for separation
+            border: darkMode ? "1px solid #444" : "1px solid #DDD",
             boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.2)",
           },
         },
@@ -127,8 +147,8 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       MuiButton: {
         styleOverrides: {
           root: {
-            textTransform: "none", // Avoid all caps for better readability
-            fontWeight: 600, // Bold buttons
+            textTransform: "none",
+            fontWeight: 600,
             boxShadow: "0px 3px 5px rgba(0, 0, 0, 0.2)",
           },
         },
@@ -144,17 +164,59 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       },
     },
   });
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-  const [open, setOpen] = useState(isMobile ? false : true);
 
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  useEffect(() => {
+    setOpen(!isMobile);
+  }, [isMobile]);
+  const specialUnAuthPaths = [
+    {
+      link: "/login",
+      condition: token,
+    },
+    {
+      link: "/register",
+      condition: token,
+    },
+    {
+      link: "/forgot-password",
+      condition: token,
+    },
+    {
+      link: "/my-subordinates",
+      condition: getPersonnelInfo()?.isDepartmentHead === false,
+    },
+    {
+      link: "/subordinate-requests",
+      condition: getPersonnelInfo()?.isDepartmentHead === false,
+    },
+  ];
+
+  const allowedLinks = [
+    ...linkAuth
+      .filter((link: LinkAuth) => {
+        // Exclude links where allowedDepartments is null or undefined
+        if (
+          link.allowedDepartments === null ||
+          link.allowedDepartments === undefined
+        ) {
+          return false;
+        }
+        return !link.allowedDepartments.includes(userDepartment);
+      })
+      .map((link: LinkAuth) => link.link),
+    ...specialUnAuthPaths
+      .filter((link) => link.condition)
+      .map((link) => link.link),
+  ];
+
+  console.log(allowedLinks);
   return (
     <EmotionThemeProvider theme={theme}>
-      <ThemeProvider theme={theme} defaultMode="dark">
+      <ThemeProvider theme={theme}>
         <CssBaseline />
         {token ? (
           <Grid container>
-            {/* Drawer Section */}
-
             <Grid
               item
               xs={open ? 12 : 0}
@@ -164,12 +226,12 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                 open
                   ? {
                       backgroundColor: theme.palette.background.paper,
-                      overflow: "auto", // Prevent content spill
+                      overflow: "auto",
                       width: "100%",
                       boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.2)",
-                      height: "100vh", // Ensure the drawer takes full viewport height
-                      position: "sticky", // Make the drawer sticky on scroll
-                      top: 0, // Keep it at the top of the viewport
+                      height: "100vh",
+                      position: "sticky",
+                      top: 0,
                       "&::-webkit-scrollbar": {
                         width: "0.4em",
                       },
@@ -194,13 +256,13 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                 PaperProps={{
                   style: {
                     transition: "all 0.3s ease",
-                    overflowY: "auto", // Enable smooth scrolling for drawer content
-                    width: "inherit", // Inherit the width of the parent drawer
+                    overflowY: "auto",
+                    width: "inherit",
                     display: isMobile ? "block" : "contents",
                   },
                   sx: {
                     "&::-webkit-scrollbar": {
-                      display: "none", // Hide scrollbar for modern browsers
+                      display: "none",
                     },
                   },
                 }}
@@ -221,7 +283,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                     alt="Logo"
                     style={{
                       width: "100%",
-                      maxWidth: "100%", // Ensure responsiveness
+                      maxWidth: "100%",
                       height: "auto",
                     }}
                   />
@@ -230,7 +292,6 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
               </Drawer>
             </Grid>
 
-            {/* Main Content Section */}
             <Grid
               item
               xs={12}
@@ -240,8 +301,8 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
               justifyContent="center"
               alignItems="center"
               style={{
-                overflow: "hidden", // Ensure no pushing or overlapping
-                boxSizing: "border-box", // Include padding in width/height calculation
+                overflow: "hidden",
+                boxSizing: "border-box",
                 display: "block",
               }}
             >
@@ -252,15 +313,37 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                 theme={darkMode}
                 setTheme={setDarkMode}
               />
-              <Box
-                sx={{
-                  paddingBottom: "4rem",
-                }}
-              >
-                {children}
-              </Box>
-              {window.location.pathname !== "/login" &&
-                window.innerWidth > 600 && <Footer darkMode={darkMode} />}
+
+              {!allowedLinks.includes(currentPath) ? (
+                <Box
+                  sx={{
+                    paddingBottom: "4rem",
+                  }}
+                >
+                  {children}
+                </Box>
+              ) : (
+                <Box
+                  display="flex"
+                  flexDirection="column"
+                  justifyContent="center"
+                  alignItems="center"
+                  height="100vh"
+                  textAlign="center"
+                >
+                  <ErrorSharp color="error" sx={{ fontSize: "10rem" }} />
+                  <Typography color="error" variant="h2">
+                    Yetkisiz Erişim
+                  </Typography>
+                  <Typography variant="body1">
+                    Bu sayfaya erişim izniniz yok.
+                  </Typography>
+                </Box>
+              )}
+
+              {location.pathname !== "/login" && window.innerWidth > 600 && (
+                <Footer darkMode={darkMode} />
+              )}
             </Grid>
           </Grid>
         ) : (

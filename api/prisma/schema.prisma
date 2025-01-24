@@ -1540,7 +1540,7 @@ model materialStock {
   // purchase order id, purchase order item id, personnel who added the stock, and if moved which stock it was moved from, and personnel who moved the stock
   materialId          Int
   warehouseId         Int?
-  amount              Float
+  quantity            Float
   unit                materialUnit
   createdAt           DateTime     @default(now())
   purchaseOrderItemId Int?
