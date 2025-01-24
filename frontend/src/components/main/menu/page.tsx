@@ -36,7 +36,7 @@ export default function Menu(props: MenuProps) {
 
   // Load open items state from localStorage on mount
   React.useEffect(() => {
-    const savedState = localStorage.getItem("openItems");
+    const savedState = localStorage ? localStorage.getItem("openItems") : null;
     if (savedState) {
       setOpenItems(JSON.parse(savedState));
     }
@@ -44,7 +44,9 @@ export default function Menu(props: MenuProps) {
 
   // Save open items state to localStorage on change
   React.useEffect(() => {
-    localStorage.setItem("openItems", JSON.stringify(openItems));
+    if (localStorage) {
+      localStorage.setItem("openItems", JSON.stringify(openItems));
+    }
   }, [openItems]);
 
   const handleClick = (itemTitle: string) => {
@@ -63,7 +65,7 @@ export default function Menu(props: MenuProps) {
     }
   };
 
-  const personnel = JSON.parse(localStorage.getItem("personnel") || "{}");
+  const personnel = getPersonnelInfo();
   const userDepartment = personnel.department;
 
   const filterMenuItems = (items: MenuItem[]): MenuItem[] => {

@@ -30,6 +30,7 @@ import {
 
 import Sts from "./departments/sts";
 import { useSearchParams } from "next/navigation";
+import { getPersonnelInfo } from "@/contexts/auth";
 
 // Register Chart.js components
 ChartJS.register(
@@ -54,7 +55,7 @@ const Dashboard = () => {
     new Date().toISOString().split("T")[0]
   );
   const [filterType, setFilterType] = useState("date");
-  const personnel = JSON.parse(localStorage.getItem("personnel") || "{}");
+  const personnel = getPersonnelInfo();
   const [userDepartment, setUserDepartment] = useState(
     department || personnel.department
   );

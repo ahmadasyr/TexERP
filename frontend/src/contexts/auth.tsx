@@ -1,17 +1,24 @@
 "use client";
-import { useEffect, useState } from "react";
+// Removed unused imports
 
 // Helper functions for localStorage operations
 const setLocalStorageItem = (key: string, value: any) => {
-  localStorage.setItem(key, JSON.stringify(value));
+  if (typeof window !== "undefined") {
+    localStorage.setItem(key, JSON.stringify(value));
+  }
 };
 const getLocalStorageItem = (key: string) => {
-  const value = localStorage.getItem(key);
-  return value ? JSON.parse(value) : null;
+  if (typeof window !== "undefined") {
+    const value = localStorage.getItem(key);
+    return value ? JSON.parse(value) : null;
+  }
+  return null;
 };
 
 const removeLocalStorageItem = (key: string) => {
-  localStorage.removeItem(key);
+  if (typeof window !== "undefined") {
+    localStorage.removeItem(key);
+  }
 };
 
 // Authentication handlers
@@ -102,21 +109,23 @@ const fetchProtectedData = async (): Promise<void> => {
     const token = getLocalStorageItem("token");
 
     const response = await fetch("/api/protected", {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+      headers: { Authorization: `Bearer ${token}` },
     });
 
     if (response.ok) {
       const data = await response.json();
+      console.log("Protected data fetched successfully", data);
     } else {
+      console.error("Failed to fetch protected data");
     }
-  } catch (error) {}
+  } catch (error) {
+    console.error("An error occurred while fetching protected data", error);
+  }
 };
 
-// React state and hooks
 export const usePersonnelId = (): number => {
-  return localStorage.personnel.id;
+  const personnel = getLocalStorageItem("personnel");
+  return personnel.id;
 };
 
 const getPersonnelInfo = (): any => {

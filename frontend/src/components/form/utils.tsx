@@ -114,5 +114,7 @@ export const useFormData = <Data extends {}>(formFields: any[]) => {
 
 function saveFormDataToCookiesBasedOnTable(formData: any, route: string) {
   const data = JSON.stringify(formData);
-  localStorage.setItem(route, data);
+  if (localStorage) {
+    localStorage.setItem(route, data);
+  }
 }

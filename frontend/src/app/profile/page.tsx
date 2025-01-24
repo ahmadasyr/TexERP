@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { Box, Card, CardContent, Typography, Grid, Paper } from "@mui/material";
 import departments from "./departments.json";
+import { getPersonnelInfo } from "@/contexts/auth";
 interface Personnel {
   id: number;
   firstName: string;
@@ -20,7 +21,7 @@ const ProfilePage: React.FC = () => {
   const [personnel, setPersonnel] = useState<Personnel | null>(null);
 
   useEffect(() => {
-    const storedPersonnel = localStorage.getItem("personnel");
+    const storedPersonnel = getPersonnelInfo();
     if (storedPersonnel) {
       setPersonnel(JSON.parse(storedPersonnel));
     }

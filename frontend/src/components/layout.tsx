@@ -78,7 +78,9 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   };
 
   useEffect(() => {
-    localStorage.setItem("darkMode", JSON.stringify(darkMode));
+    if (localStorage) {
+      localStorage.setItem("darkMode", JSON.stringify(darkMode));
+    }
   }, [darkMode]);
 
   const theme = createTheme({

@@ -463,7 +463,9 @@ export default function PrimaryAppBar({
     const newTheme = theme === true ? false : true;
     setTheme(newTheme);
     toggleTheme();
-    localStorage.setItem("darkMode", JSON.stringify(newTheme));
+    if (localStorage) {
+      localStorage.setItem("darkMode", JSON.stringify(newTheme));
+    }
   };
 
   const handleCustomerSelect = (event: any, value: { id: string } | null) => {
