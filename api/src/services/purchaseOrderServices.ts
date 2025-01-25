@@ -92,7 +92,7 @@ export const createPurchaseOrder = async (data: {
       vade: data.vade,
       shippingType: data.shippingType,
       deadline: new Date(data.deadline),
-      requiresApproval: data.requiresApproval,
+      requiresApproval: data?.requiresApproval ? data?.requiresApproval : false,
       approved: data.requiresApproval ? false : true,
       approvedDate: !data.requiresApproval ? new Date() : null,
       status: data.requiresApproval ? "Pending" : "Approved",
@@ -114,7 +114,7 @@ export const createPurchaseOrder = async (data: {
       },
     },
   });
-  if (data.requiresApproval) {
+  if (data?.requiresApproval) {
     await sendManagementNotification(order.id);
     await sendPersonnelNotification(order.id);
   } else {
@@ -161,7 +161,7 @@ export const updatePurchaseOrder = async (
       vade: data.vade,
       shippingType: data.shippingType,
       deadline: data.deadline,
-      requiresApproval: data.requiresApproval,
+      requiresApproval: data?.requiresApproval ? data?.requiresApproval : false,
       approved: data.requiresApproval ? false : true,
       approvedDate: !data.requiresApproval ? new Date() : null,
       status: data.requiresApproval ? "Pending" : "Approved",
@@ -190,6 +190,9 @@ export const updatePurchaseOrder = async (
 };
 
 export const deletePurchaseOrder = async (id: number) => {
+  const deleteItems = await prisma.purchaseOrderItem.deleteMany({
+    where: { purchaseOrderId: id },
+  });
   return await prisma.purchaseOrder.delete({
     where: { id },
   });
