@@ -4,19 +4,19 @@ import React from "react";
 import { Button } from "@mui/material";
 import { useRouter } from "next/navigation";
 import EnhancedTable from "@/components/table/tableMain";
-import { headCells, tableName } from "./orderShipment";
-import { Data } from "./orderShipment";
+import { headCells, tableName } from "./order";
+import { Data } from "./order";
 
 const Page: React.FC = () => {
   const router = useRouter();
   return (
     <div>
       <EnhancedTable
-        title="İplik Sevkiyatları"
+        title="Satış Siparişleri"
         headCells={headCells}
-        tableName={tableName}
+        tableName={"order"}
         viewable={true}
-        URI={"/yarn-order-shipment"}
+        URI={"/order"}
       />
     </div>
   );

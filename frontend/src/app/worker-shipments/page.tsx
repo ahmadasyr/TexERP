@@ -12,11 +12,15 @@ const Page: React.FC = () => {
   return (
     <div>
       <EnhancedTable
-        title="İplik Sevkiyatları"
+        title="Sevk Emirleri"
         headCells={headCells}
         tableName={tableName}
         viewable={true}
-        URI={"/yarn-order-shipment"}
+        createable={false}
+        editable={false}
+        deleteable={false}
+        URI={"/order-shipment/opened"}
+        disableColumnMenu={true}
       />
     </div>
   );

@@ -229,6 +229,26 @@
     ]
   },
   {
+    "title": "Satış Siparişleri",
+    "desc": "Satış siparişleri menüsü",
+    "icon": "shopping_cart",
+    "allowedDepartments": ["pln", "urt", "admin"],
+    "subItems": [
+      {
+        "title": "Satış Siparişleri",
+        "link": "/sales-order",
+        "desc": "Satış sipariş listesi",
+        "icon": "shopping_cart"
+      },
+      {
+        "title": "Sevk Emirleri",
+        "link": "/order-shipment",
+        "desc": "Sevk emir listesi",
+        "icon": "local_shipping"
+      }
+    ]
+  },
+  {
     "title": "Üretim",
     "desc": "Üretim işlemleri menüsü",
     "icon": "build",

@@ -12,6 +12,7 @@ import ExpandMore from "@mui/icons-material/ExpandMore";
 import menuItems from "./menuItems.json";
 import { usePathname, useRouter } from "next/navigation";
 import { getPersonnelInfo } from "@/contexts/auth";
+import { set } from "date-fns";
 
 interface MenuItem {
   title: string;
@@ -33,13 +34,17 @@ export default function Menu(props: MenuProps) {
   const [openItems, setOpenItems] = React.useState<{ [key: string]: boolean }>(
     {}
   );
-
+  const [userDepartment, setUserDepartment] = React.useState<string | null>(
+    null
+  );
   // Load open items state from localStorage on mount
   React.useEffect(() => {
     const savedState = localStorage ? localStorage.getItem("openItems") : null;
     if (savedState) {
       setOpenItems(JSON.parse(savedState));
     }
+    const personnel = getPersonnelInfo() || {};
+    setUserDepartment(personnel?.department);
   }, []);
 
   // Save open items state to localStorage on change
@@ -65,15 +70,12 @@ export default function Menu(props: MenuProps) {
     }
   };
 
-  const personnel = getPersonnelInfo();
-  const userDepartment = personnel.department;
-
   const filterMenuItems = (items: MenuItem[]): MenuItem[] => {
     return items
       .filter(
         (item) =>
           !item.allowedDepartments ||
-          item.allowedDepartments.includes(userDepartment)
+          (userDepartment && item.allowedDepartments.includes(userDepartment))
       )
       .map((item) => ({
         ...item,

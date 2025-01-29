@@ -65,43 +65,41 @@ model personnel {
   order                     order[]
   orderShipmentItem         orderShipmentItem[]
   orderShipmentConfirmation orderShipmentConfirmation[]
-  cutStock                  cutStock[]
-  rawQualityControlStock    rawQualityControlStock[]
-  rawStock                  rawStock[]
-  dyeOrderItem              dyeOrderItem[]
-  dyeReturnStock            dyeReturnStock[]
-  dyeStock                  dyeStock[]
-  outsourceOrderItem        outsourceOrderItem[]
-  outsourceReturnStock      outsourceReturnStock[]
-  orderShipment             orderShipment[]
-  wrapStock                 wrapStock[]
-  yarnStockEntry            yarnStockEntry[]
-  yarnType                  yarnType[]
-  yarnOrderItem             yarnOrderItem[]
-  yarnOrderShipment         yarnOrderShipment[]
-  yarnOrderShipmentItem     yarnOrderShipmentItem[]
-  yarnOrder                 yarnOrder[]
-  yarnOrderShipmentSent     yarnOrderShipmentSent[]
-  productPrice              productPrice[]
-  customerPrice             customerPrice[]
-  fromPersonnel             dofiRequest[]               @relation("fromPersonnelRelation")
-  toPersonnel               dofiRequest[]               @relation("toPersonnelRelation")
-  followedPersonnel         dofiRequest[]               @relation("followedPersonnelRelation")
-  log                       log[]
-  offer                     offer[]
-  notification              notification[]
-  customerMeetPlanAttendee  customerMeetPlanAttendee[]
-  reportIssue               reportIssue[]
-  purchaseDelivery          purchaseDelivery[]
-  purchaseDeliveryItem      purchaseDeliveryItem[]
-  subordinate               personnel[]                 @relation("supervisor")
-  purchaseOrder             purchaseOrder[]
-  purchaseOrderItem         purchaseOrderItem[]
-  warehouse                 warehouse[]
-  materialStock             materialStock[]
-  movedMaterialStock        materialStock[]             @relation("MovedPersonnelRelation")
-  supplierEvaluation        supplierEvaluation[]
-  purchaseRequest           purchaseRequest[]
+
+  dyeOrderItem dyeOrderItem[]
+
+  outsourceOrderItem outsourceOrderItem[]
+
+  orderShipment            orderShipment[]
+  wrapStock                wrapStock[]
+  yarnStockEntry           yarnStockEntry[]
+  yarnType                 yarnType[]
+  yarnOrderItem            yarnOrderItem[]
+  yarnOrderShipment        yarnOrderShipment[]
+  yarnOrderShipmentItem    yarnOrderShipmentItem[]
+  yarnOrder                yarnOrder[]
+  yarnOrderShipmentSent    yarnOrderShipmentSent[]
+  productPrice             productPrice[]
+  customerPrice            customerPrice[]
+  fromPersonnel            dofiRequest[]              @relation("fromPersonnelRelation")
+  toPersonnel              dofiRequest[]              @relation("toPersonnelRelation")
+  followedPersonnel        dofiRequest[]              @relation("followedPersonnelRelation")
+  log                      log[]
+  offer                    offer[]
+  notification             notification[]
+  customerMeetPlanAttendee customerMeetPlanAttendee[]
+  reportIssue              reportIssue[]
+  purchaseDelivery         purchaseDelivery[]
+  purchaseDeliveryItem     purchaseDeliveryItem[]
+  subordinate              personnel[]                @relation("supervisor")
+  purchaseOrder            purchaseOrder[]
+  purchaseOrderItem        purchaseOrderItem[]
+  warehouse                warehouse[]
+  materialStock            materialStock[]
+  movedMaterialStock       materialStock[]            @relation("MovedPersonnelRelation")
+  supplierEvaluation       supplierEvaluation[]
+  purchaseRequest          purchaseRequest[]
+  stock                    stock[]
 }
 
 // GENERAL SECTION
@@ -509,25 +507,21 @@ model productType {
 }
 
 model product {
-  id                     Int                      @id @default(autoincrement())
-  name                   String
-  productTypeId          Int?
-  specs                  Json? // object with keys from productType.specsGroup
-  customerPrice          customerPrice[]
-  customerComplaint      customerComplaint[]
-  productionOrder        productionOrder[]
-  cutStock               cutStock[]
-  rawQualityControlStock rawQualityControlStock[]
-  rawStock               rawStock[]
-  dyeOrder               dyeOrder[]
-  dyeReturnStock         dyeReturnStock[]
-  dyeStock               dyeStock[]
-  outsourceOrderItem     outsourceOrderItem[]
-  outsourceReturnStock   outsourceReturnStock[]
-  orderItem              orderItem[]
-  productPrice           productPrice[]
-  productWrap            productWrap[]
-  productType            productType?             @relation(fields: [productTypeId], references: [id])
+  id                Int                 @id @default(autoincrement())
+  name              String
+  productTypeId     Int?
+  specs             Json? // object with keys from productType.specsGroup
+  customerPrice     customerPrice[]
+  customerComplaint customerComplaint[]
+  productionOrder   productionOrder[]
+
+  outsourceOrderItem outsourceOrderItem[]
+
+  orderItem    orderItem[]
+  productPrice productPrice[]
+  productWrap  productWrap[]
+  productType  productType?   @relation(fields: [productTypeId], references: [id])
+  stock        stock[]
 }
 
 enum ProductionSide {
@@ -802,10 +796,9 @@ model productionOrder {
   product   product   @relation(fields: [productId], references: [id])
   personnel personnel @relation(fields: [personnelId], references: [id])
 
-  wraps                  wrapStock[]
-  productionOrderWrap    productionOrderWrap[]
-  cutStock               cutStock[]
-  rawQualityControlStock rawQualityControlStock[]
+  wraps               wrapStock[]
+  productionOrderWrap productionOrderWrap[]
+  stock               stock[]
 }
 
 model productionOrderWrap {
@@ -824,101 +817,118 @@ enum cutStockStatus {
 }
 
 enum stockStatus {
-  Depoda
-  CikisYapildi
+  PRE_CUT
+  RAW_PRE_QUALITY
+  RAW_QUALITY
+  DYE_HOUSE
+  DYE_PRE_QUALITY
+  DYE_QUALITY
+  OUTSOURCING
+  LAMINATED_PRE_QUALITY
+  LAMINATED_QUALITY
 }
 
 // Stock Section
-// cut stock is for the products that are to be cut from the production order
-model cutStock {
-  id                Int            @id @default(autoincrement())
-  createdAt         DateTime       @default(now())
+model stock {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+
+  // product data
   productId         Int
   lot               String
-  productionOrderId Int
   meter             Float
   kg                Float
-  status            cutStockStatus
-  exitDate          DateTime?
-  shelf             String?
-  counted           Boolean?
-  countDate         DateTime?
-  personnelId       Int
-
-  // Relations
-  product                product                  @relation(fields: [productId], references: [id])
-  productionOrder        productionOrder          @relation(fields: [productionOrderId], references: [id])
-  rawQualityControlStock rawQualityControlStock[]
-  personnel              personnel                @relation(fields: [personnelId], references: [id])
-}
-
-// raw quality control stock is for the products that are to be quality controlled
-model rawQualityControlStock {
-  id                Int            @id @default(autoincrement())
-  createdAt         DateTime       @default(now())
-  cutStockId        Int?
-  productId         Int
-  productionOrderId Int?
-  lot               String?
   yon               Boolean?
-  meter             Float
-  kg                Float
-  shelf             String?
-  status            cutStockStatus
-  counted           Boolean?
-  countDate         DateTime?
-  personnelId       Int
+  status            stockStatus
+  quality           Int?
+  qualityNote       String?
+  dyeColorId        Int?
+  dyeTypeId         Int?
+  laminationColorId Int?
+  productionOrderId Int?
+
+  // warehouse data
+  counted   Boolean?
+  countDate DateTime?
+  shelf     String?
+  barcode   String?   @unique
+  sold      Boolean?  @default(false)
+  kazanNo   String?
+
+  // general data
+  note        String?
+  personnelId Int
 
   // Relations
-  product         product          @relation(fields: [productId], references: [id])
-  productionOrder productionOrder? @relation(fields: [productionOrderId], references: [id])
-  cutStock        cutStock?        @relation(fields: [cutStockId], references: [id])
-  rawStock        rawStock[]
-  personnel       personnel        @relation(fields: [personnelId], references: [id])
+  product                   product                     @relation(fields: [productId], references: [id])
+  personnel                 personnel                   @relation(fields: [personnelId], references: [id])
+  dyeColor                  dyeColor?                   @relation(fields: [dyeColorId], references: [id])
+  dyeType                   dyeType?                    @relation(fields: [dyeTypeId], references: [id])
+  laminationColor           laminationColor?            @relation(fields: [laminationColorId], references: [id])
+  productionOrder           productionOrder?            @relation(fields: [productionOrderId], references: [id])
+  orderShipmentConfirmation orderShipmentConfirmation[]
+  stockSpecifications       stockSpecifications[]
 }
 
-// raw stock is for the fabrics that are to be dyed or sold after quality control
-model rawStock {
-  id                       Int         @id @default(autoincrement())
-  barcode                  String
-  createdAt                DateTime    @default(now())
-  productId                Int
-  yon                      Boolean?
-  lot                      String
-  rawQualityControlStockId Int
-  status                   stockStatus
-  counted                  Boolean?
-  countDate                DateTime?
-  meter                    Float
-  kg                       Float
-  quality                  Int
-  qualityNote              String?
-  shelf                    String?
-  personnelId              Int
+model stockSpecifications {
+  id          Int @id @default(autoincrement())
+  stockId     Int
+  outsourceId Int
 
   // Relations
-  product                product                @relation(fields: [productId], references: [id])
-  rawQualityControlStock rawQualityControlStock @relation(fields: [rawQualityControlStockId], references: [id])
-  dyeShipmentItem        dyeShipmentItem[]
-  personnel              personnel              @relation(fields: [personnelId], references: [id])
+  stock     stock         @relation(fields: [stockId], references: [id])
+  outsource outsourceType @relation(fields: [outsourceId], references: [id])
+
+  @@unique([stockId, outsourceId])
 }
 
-// Dye Section
+// Outsource Section
+
 model dyeType {
-  id             Int              @id @default(autoincrement())
-  name           String
-  dyeOrderItem   dyeOrderItem[]
-  dyeReturnStock dyeReturnStock[]
+  id           Int            @id @default(autoincrement())
+  name         String
+  dyeOrderItem dyeOrderItem[]
+  stock        stock[]
 }
 
 model dyeColor {
-  id                   Int                    @id @default(autoincrement())
-  name                 String
-  dyeOrderItem         dyeOrderItem[]
-  dyeReturnStock       dyeReturnStock[]
-  dyeStock             dyeStock[]
-  outsourceReturnStock outsourceReturnStock[]
-  orderItem            orderItem[]
+  id           Int            @id @default(autoincrement())
+  name         String
+  dyeOrderItem dyeOrderItem[]
+  orderItem    orderItem[]
+  stock        stock[]
+}
+
+model outsourceGroup {
+  id            Int             @id @default(autoincrement())
+  name          String
+  outsourceType outsourceType[]
+}
+
+model outsourceType {
+  id                    Int    @id @default(autoincrement())
+  name                  String
+  parentOutsourceTypeId Int?
+  outsourceGroupId      Int?
+
+  // Relations
+  outsourceOrder      outsourceOrder[]
+  orderItemSpecs      orderItemSpecification[]
+  outsourceGroup      outsourceGroup?          @relation(fields: [outsourceGroupId], references: [id])
+  parentOutsourceType outsourceType?           @relation("parentOutsourceType", fields: [parentOutsourceTypeId], references: [id])
+
+  outsourceType       outsourceType[]       @relation("parentOutsourceType")
+  productPrice        productPrice[]
+  customerPrice       customerPrice[]
+  stockSpecifications stockSpecifications[]
+}
+
+model laminationColor {
+  id   Int    @id @default(autoincrement())
+  name String
+
+  orderItem orderItem[]
+  stock     stock[]
 }
 
 model dyeOrder {
@@ -932,7 +942,6 @@ model dyeOrder {
 
   // Relations
   account      account        @relation(fields: [accountId], references: [id])
-  product      product        @relation(fields: [productId], references: [id])
   personnel    personnel      @relation(fields: [personnelId], references: [id])
   dyeOrderItem dyeOrderItem[]
   dyeShipment  dyeShipment[]
@@ -959,12 +968,11 @@ model dyeOrderItem {
   note        String
   personnelId Int
 
-  dyeOrder       dyeOrder         @relation(fields: [dyeOrderId], references: [id])
-  dyeColor       dyeColor         @relation(fields: [dyeColorId], references: [id])
-  dyeType        dyeType          @relation(fields: [dyeTypeId], references: [id])
-  currency       currency?        @relation(fields: [currencyId], references: [id])
-  dyeReturnStock dyeReturnStock[]
-  personnel      personnel        @relation(fields: [personnelId], references: [id])
+  dyeOrder  dyeOrder  @relation(fields: [dyeOrderId], references: [id])
+  dyeColor  dyeColor  @relation(fields: [dyeColorId], references: [id])
+  dyeType   dyeType   @relation(fields: [dyeTypeId], references: [id])
+  currency  currency? @relation(fields: [currencyId], references: [id])
+  personnel personnel @relation(fields: [personnelId], references: [id])
 }
 
 model dyeShipment {
@@ -987,87 +995,6 @@ model dyeShipmentItem {
   // Relations
   personnel     personnel   @relation(fields: [personnelId], references: [id])
   dyeShipment   dyeShipment @relation(fields: [dyeShipmentId], references: [id])
-  rawStock      rawStock    @relation(fields: [rawStockId], references: [id])
-}
-
-// Dye return stock is for the products that are returned from the dyeing process to be quality controlled
-model dyeReturnStock {
-  id             Int         @id @default(autoincrement())
-  createdAt      DateTime    @default(now())
-  dyeOrderItemId Int
-  shippingNo     String
-  kazanNo        String
-  productId      Int
-  dyeColorId     Int
-  dyeTypeId      Int
-  lot            String
-  yon            Boolean?
-  count          Int
-  meter          Float
-  kg             Float
-  status         stockStatus
-  personnelId    Int
-
-  // Relations
-  dyeOrderItem dyeOrderItem @relation(fields: [dyeOrderItemId], references: [id])
-  product      product      @relation(fields: [productId], references: [id])
-  dyeColor     dyeColor     @relation(fields: [dyeColorId], references: [id])
-  dyeType      dyeType      @relation(fields: [dyeTypeId], references: [id])
-  personnel    personnel    @relation(fields: [personnelId], references: [id])
-}
-
-// Dye stock is for the products that are dyed and ready to be sold (main stock)
-model dyeStock {
-  id                    Int                     @id @default(autoincrement())
-  createdAt             DateTime                @default(now())
-  productId             Int
-  dyeColorId            Int
-  lot                   String
-  meter                 Float
-  kg                    Float
-  status                stockStatus
-  counted               Boolean?
-  countDate             DateTime?
-  quality               Int
-  qualityNote           String?
-  shelf                 String?
-  outsourceTypeId       Int?
-  laminationColorId     Int?
-  note                  String?
-  barcode               String
-  personnelId           Int
-  // Relations
-  product               product                 @relation(fields: [productId], references: [id])
-  dyeColor              dyeColor                @relation(fields: [dyeColorId], references: [id])
-  outsourceType         outsourceType?          @relation(fields: [outsourceTypeId], references: [id])
-  outsourceShipmentItem outsourceShipmentItem[]
-  laminationColor       laminationColor?        @relation(fields: [laminationColorId], references: [id])
-  personnel             personnel               @relation(fields: [personnelId], references: [id])
-}
-
-// Outsource Section
-model outsourceGroup {
-  id            Int             @id @default(autoincrement())
-  name          String
-  outsourceType outsourceType[]
-}
-
-model outsourceType {
-  id                    Int    @id @default(autoincrement())
-  name                  String
-  parentOutsourceTypeId Int?
-  outsourceGroupId      Int?
-
-  // Relations
-  dyeStock            dyeStock[]
-  outsourceOrder      outsourceOrder[]
-  orderItemSpecs      orderItemSpecification[]
-  outsourceGroup      outsourceGroup?          @relation(fields: [outsourceGroupId], references: [id])
-  parentOutsourceType outsourceType?           @relation("parentOutsourceType", fields: [parentOutsourceTypeId], references: [id])
-
-  outsourceType outsourceType[] @relation("parentOutsourceType")
-  productPrice  productPrice[]
-  customerPrice customerPrice[]
 }
 
 model outsourceOrder {
@@ -1086,36 +1013,28 @@ model outsourceOrder {
   outsourceShipment  outsourceShipment[]
 }
 
-model laminationColor {
-  id        Int         @id @default(autoincrement())
-  name      String
-  dyeStock  dyeStock[]
-  orderItem orderItem[]
-}
-
 model outsourceOrderItem {
-  id                   Int                    @id @default(autoincrement())
-  outsourceOrderId     Int
-  productId            Int
-  dyeColorId           Int
-  laminationColorId    Int
-  lot                  String
-  quantity             Float
-  unit                 unit
-  sentMeter            Float
-  sentKg               Float
-  sentCount            Int
-  returnMeter          Float
-  returnKg             Float
-  returnCount          Int
-  open                 Boolean                @default(true)
-  note                 String
-  personnelId          Int
+  id                Int            @id @default(autoincrement())
+  outsourceOrderId  Int
+  productId         Int
+  dyeColorId        Int
+  laminationColorId Int
+  lot               String
+  quantity          Float
+  unit              unit
+  sentMeter         Float
+  sentKg            Float
+  sentCount         Int
+  returnMeter       Float
+  returnKg          Float
+  returnCount       Int
+  open              Boolean        @default(true)
+  note              String
+  personnelId       Int
   // Relations
-  outsourceOrder       outsourceOrder         @relation(fields: [outsourceOrderId], references: [id])
-  product              product                @relation(fields: [productId], references: [id])
-  outsourceReturnStock outsourceReturnStock[]
-  personnel            personnel              @relation(fields: [personnelId], references: [id])
+  outsourceOrder    outsourceOrder @relation(fields: [outsourceOrderId], references: [id])
+  product           product        @relation(fields: [productId], references: [id])
+  personnel         personnel      @relation(fields: [personnelId], references: [id])
 }
 
 model outsourceShipment {
@@ -1138,39 +1057,13 @@ model outsourceShipmentItem {
 
   // Relations
   personnel         personnel         @relation(fields: [personnelId], references: [id])
-  dyeStock          dyeStock          @relation(fields: [dyeStockId], references: [id])
   outsourceShipment outsourceShipment @relation(fields: [outsourceShipmentId], references: [id])
-}
-
-model outsourceReturnStock {
-  id              Int         @id @default(autoincrement())
-  createdAt       DateTime    @default(now())
-  productId       Int
-  dyeColorId      Int
-  outsourceItemId Int
-  shippingNo      String
-  lot             String
-  shelf           String
-  count           Int
-  counted         Boolean?
-  countDate       DateTime?
-  meter           Float
-  kg              Float
-  status          stockStatus
-  personnelId     Int
-
-  // Relations
-  outsourceOrderItem outsourceOrderItem @relation(fields: [outsourceItemId], references: [id])
-  product            product            @relation(fields: [productId], references: [id])
-  dyeColor           dyeColor           @relation(fields: [dyeColorId], references: [id])
-  personnel          personnel          @relation(fields: [personnelId], references: [id])
 }
 
 // Order Section
 model itemType {
-  id        Int         @id @default(autoincrement())
-  name      String
-  orderItem orderItem[]
+  id   Int    @id @default(autoincrement())
+  name String
 }
 
 model order {
@@ -1190,26 +1083,26 @@ model order {
 }
 
 model orderItem {
-  id                Int     @id @default(autoincrement())
+  id                Int         @id @default(autoincrement())
   orderId           Int
   productId         Int
   dyeColorId        Int?
   laminationColorId Int?
-  itemTypeId        Int?
+  itemType          stockStatus
   description       String?
   personnelId       Int
   meter             Float
   kg                Float
 
   // Relations
-  order                  order                    @relation(fields: [orderId], references: [id])
-  product                product                  @relation(fields: [productId], references: [id])
-  dyeColor               dyeColor?                @relation(fields: [dyeColorId], references: [id])
-  laminationColor        laminationColor?         @relation(fields: [laminationColorId], references: [id])
-  itemType               itemType?                @relation(fields: [itemTypeId], references: [id])
-  orderShipmentItem      orderShipmentItem[]
-  offerItem              offerItem[]
-  orderItemSpecification orderItemSpecification[]
+  order                     order                       @relation(fields: [orderId], references: [id])
+  product                   product                     @relation(fields: [productId], references: [id])
+  dyeColor                  dyeColor?                   @relation(fields: [dyeColorId], references: [id])
+  laminationColor           laminationColor?            @relation(fields: [laminationColorId], references: [id])
+  orderShipmentItem         orderShipmentItem[]
+  offerItem                 offerItem[]
+  orderItemSpecification    orderItemSpecification[]
+  orderShipmentConfirmation orderShipmentConfirmation[]
 }
 
 model orderItemSpecification {
@@ -1275,40 +1168,46 @@ model orderShipment {
   personnelId       Int
 
   // Relations
-  order             order               @relation(fields: [orderId], references: [id])
-  shippingCompany   shippingCompany?    @relation(fields: [shippingCompanyId], references: [id])
-  shippingCarrier   shippingCarrier?    @relation(fields: [shippingCarrierId], references: [id])
-  shippingCar       shippingCar?        @relation(fields: [shippingCarId], references: [id])
-  orderShipmentItem orderShipmentItem[]
-  personnel         personnel           @relation(fields: [personnelId], references: [id])
-}
-
-model orderShipmentItem {
-  id                        Int                         @id @default(autoincrement())
-  orderShipmentId           Int
-  orderItemId               Int
-  personnelId               Int
-  orderedQuantity           Float
-  unit                      unit
-  // Relations
+  order                     order                       @relation(fields: [orderId], references: [id])
+  shippingCompany           shippingCompany?            @relation(fields: [shippingCompanyId], references: [id])
+  shippingCarrier           shippingCarrier?            @relation(fields: [shippingCarrierId], references: [id])
+  shippingCar               shippingCar?                @relation(fields: [shippingCarId], references: [id])
+  orderShipmentItem         orderShipmentItem[]
   personnel                 personnel                   @relation(fields: [personnelId], references: [id])
-  orderShipment             orderShipment               @relation(fields: [orderShipmentId], references: [id])
-  orderItem                 orderItem                   @relation(fields: [orderItemId], references: [id])
   orderShipmentConfirmation orderShipmentConfirmation[]
 }
 
+model orderShipmentItem {
+  id              Int           @id @default(autoincrement())
+  orderShipmentId Int
+  orderItemId     Int
+  personnelId     Int
+  meter           Float
+  kg              Float
+  // Relations
+  personnel       personnel     @relation(fields: [personnelId], references: [id])
+  orderShipment   orderShipment @relation(fields: [orderShipmentId], references: [id])
+  orderItem       orderItem     @relation(fields: [orderItemId], references: [id])
+}
+
 model orderShipmentConfirmation {
-  id                  Int    @id @default(autoincrement())
-  orderShipmentItemId Int
-  personnelId         Int
-  sentMeter           Float
-  sentKg              Float
-  lot                 String
-  barcode             String
+  id              Int    @id @default(autoincrement())
+  orderItemId     Int
+  orderShipmentId Int
+  personnelId     Int
+  // from stock
+  stockId         Int
+  sentMeter       Float
+  sentKg          Float
+  lot             String
+  barcode         String
 
   // Relations
-  personnel         personnel         @relation(fields: [personnelId], references: [id])
-  orderShipmentItem orderShipmentItem @relation(fields: [orderShipmentItemId], references: [id])
+  orderShipment orderShipment @relation(fields: [orderShipmentId], references: [id])
+  orderItem     orderItem     @relation(fields: [orderItemId], references: [id])
+  personnel     personnel     @relation(fields: [personnelId], references: [id])
+
+  stock stock @relation(fields: [stockId], references: [id])
 }
 
 model dofiRequest {

@@ -43,6 +43,7 @@ import {
   CustomChipSelectWithGroups,
 } from "@/components/table/utils";
 import { Delete } from "@mui/icons-material";
+import { itemTypes } from "@/contexts/itemTypes";
 
 interface orderItem {
   id: number;
@@ -107,7 +108,7 @@ interface SheetProps {
   subRows: any[];
   setSubRows: React.Dispatch<React.SetStateAction<any[]>>;
 }
-import { itemTypes } from "@/contexts/itemTypes";
+
 export default function Sheet(props: SheetProps) {
   const { refresh, subRows, setSubRows } = props;
   const [rows, setRows] = React.useState(initialRows);
@@ -557,7 +558,7 @@ export default function Sheet(props: SheetProps) {
               <Autocomplete
                 id="itemType"
                 options={itemTypes}
-                getOptionLabel={(option: any) => option.label}
+                getOptionLabel={(option) => option.label}
                 onChange={(event, newValue) =>
                   updateTempValues(newValue ? { itemType: newValue.value } : {})
                 }

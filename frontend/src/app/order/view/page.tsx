@@ -50,7 +50,7 @@ interface OrderItem {
   productId: number;
   dyeColorId?: number;
   laminationColorId?: number;
-  itemTypeId?: number;
+  itemType: string;
   description?: string;
   personnelId: number;
   meter: number;
@@ -58,7 +58,6 @@ interface OrderItem {
   product: { name: string };
   dyeColor?: { name: string };
   laminationColor?: { name: string };
-  itemType?: { name: string };
 }
 
 interface OrderShipment {
@@ -92,6 +91,8 @@ interface Personnel {
   firstName: string;
   lastName: string;
 }
+
+import { itemTypes } from "@/contexts/itemTypes";
 
 const OrderView = () => {
   const searchParams = useSearchParams();
@@ -169,7 +170,8 @@ const OrderView = () => {
       field: "itemType",
       headerName: "Ürün Tipi",
       width: 150,
-      valueGetter: (params, row) => row.itemType?.name,
+      valueGetter: (params, row) =>
+        itemTypes.find((type) => type.value === row.itemType)?.label,
     },
     {
       field: "orderItemSpecification",

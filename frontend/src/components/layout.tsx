@@ -18,6 +18,7 @@ import {
   Box,
   useMediaQuery,
   Paper,
+  CircularProgress,
 } from "@mui/material";
 import linkAuth from "../contexts/linkAuth.json";
 import SendIcon from "@mui/icons-material/Send";
@@ -48,7 +49,7 @@ interface LinkAuth {
 
 const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [darkMode, setDarkMode] = useState(false);
-  const [token, setToken] = useState<string | null>(null);
+  const [token, setToken] = useState<boolean | null>(null);
   const [open, setOpen] = useState(false);
 
   const userDepartment = getPersonnelInfo()?.department || "";
@@ -58,6 +59,8 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const handleTokenChange = () => {
       if (localStorage.token) {
         setToken(localStorage.token);
+      } else {
+        setToken(false);
       }
     };
     handleTokenChange();
@@ -159,15 +162,15 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     breakpoints: {
       values: {
         xs: 0,
-        sm: 600,
-        md: 960,
+        sm: 1200,
+        md: 1250,
         lg: 1280,
         xl: 1920,
       },
     },
   });
 
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const isMobile = window.innerWidth < theme.breakpoints.values.sm;
   useEffect(() => {
     setOpen(!isMobile);
   }, [isMobile]);
@@ -212,7 +215,6 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       .map((link) => link.link),
   ];
 
-  console.log(allowedLinks);
   return (
     <EmotionThemeProvider theme={theme}>
       <ThemeProvider theme={theme}>
@@ -255,12 +257,16 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                 open={open}
                 onClose={toggleDrawer}
                 anchor="left"
+                ModalProps={{
+                  keepMounted: true, // Better open performance on mobile.
+                }}
                 PaperProps={{
                   style: {
                     transition: "all 0.3s ease",
                     overflowY: "auto",
                     width: "inherit",
                     display: isMobile ? "block" : "contents",
+                    pointerEvents: open ? "auto" : "none",
                   },
                   sx: {
                     "&::-webkit-scrollbar": {
@@ -269,26 +275,46 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                   },
                 }}
               >
-                <Box display="flex" justifyContent="flex-end">
-                  <IconButton onClick={toggleDrawer}>
-                    <MenuIcon />
-                  </IconButton>
-                </Box>
                 <Box
-                  display="flex"
-                  alignItems="center"
-                  justifyContent="center"
-                  padding="1rem"
+                  display="block"
+                  justifyContent="flex-end"
+                  position="sticky"
+                  top={0}
+                  zIndex={1}
+                  paddingBottom="0"
+                  bgcolor={theme.palette.background.paper}
                 >
-                  <img
-                    src="/logo.png"
-                    alt="Logo"
-                    style={{
-                      width: "100%",
-                      maxWidth: "100%",
-                      height: "auto",
-                    }}
-                  />
+                  <Box
+                    display="flex"
+                    justifyContent="flex-end"
+                    position="sticky"
+                    top={0}
+                    zIndex={1}
+                    paddingBottom="0"
+                  >
+                    <IconButton onClick={toggleDrawer}>
+                      <MenuIcon />
+                    </IconButton>
+                  </Box>
+                  <Box
+                    display="flex"
+                    alignItems="center"
+                    justifyContent="center"
+                    padding="1rem"
+                    position="sticky"
+                    top={56} // Adjust this value based on the height of the AppBar
+                    zIndex={1}
+                  >
+                    <img
+                      src="/logo.png"
+                      alt="Logo"
+                      style={{
+                        width: "100%",
+                        maxWidth: "100%",
+                        height: "auto",
+                      }}
+                    />
+                  </Box>
                 </Box>
                 <Menu setOpen={setOpen} />
               </Drawer>
@@ -348,8 +374,43 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
               )}
             </Grid>
           </Grid>
-        ) : (
+        ) : token == false ? (
           <Login />
+        ) : (
+          <>
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "center",
+                alignItems: "center",
+                height: "100vh",
+                width: "100%",
+              }}
+            >
+              <Typography variant="h2" sx={{ marginTop: 2 }}>
+                Yükleniyor...
+              </Typography>
+              <img
+                src="/icon.png"
+                alt="Logo"
+                style={{
+                  width: "5rem",
+                  animation: "rotate 2s linear infinite",
+                }}
+              />
+            </Box>
+            <style jsx>{`
+              @keyframes rotate {
+                0% {
+                  transform: rotate(0deg);
+                }
+                100% {
+                  transform: rotate(360deg);
+                }
+              }
+            `}</style>{" "}
+          </>
         )}
       </ThemeProvider>
     </EmotionThemeProvider>

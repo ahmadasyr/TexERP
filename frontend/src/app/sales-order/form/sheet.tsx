@@ -23,6 +23,7 @@ import {
   GridRenderEditCellParams,
 } from "@mui/x-data-grid";
 import {
+  Alert,
   Autocomplete,
   FormControl,
   FormControlLabel,
@@ -30,6 +31,7 @@ import {
   InputLabel,
   MenuItem,
   Select,
+  Snackbar,
   Switch,
   TextField,
   Typography,
@@ -40,9 +42,10 @@ import { getPersonnelInfo, usePersonnelId } from "@/contexts/auth";
 import {
   CustomAutocomplete,
   CustomChipSelect,
-  CustomChipSelectWithGroups,
+  CustomChipSelectWithGroupsAutocomplete,
 } from "@/components/table/utils";
 import { Delete } from "@mui/icons-material";
+import MobileSheetEdit from "./mobileSheet";
 
 interface orderItem {
   id: number;
@@ -79,7 +82,7 @@ function EditToolbar(props: EditToolbarProps) {
         productId: 0,
         dyeColorId: 0,
         laminationColorId: 0,
-        itemType: "",
+        itemType: 0,
         description: "",
         personnelId: getPersonnelInfo().id,
         meter: 0,
@@ -107,7 +110,9 @@ interface SheetProps {
   subRows: any[];
   setSubRows: React.Dispatch<React.SetStateAction<any[]>>;
 }
+
 import { itemTypes } from "@/contexts/itemTypes";
+
 export default function Sheet(props: SheetProps) {
   const { refresh, subRows, setSubRows } = props;
   const [rows, setRows] = React.useState(initialRows);
@@ -179,7 +184,10 @@ export default function Sheet(props: SheetProps) {
       .then((response) => response.json())
       .then((data) => {
         setProducts(
-          data.map((value: any) => ({ value: value.id, label: value.name }))
+          data.map((value: any) => ({
+            value: value.id,
+            label: value.name,
+          }))
         );
       });
     fetch("/api/dye-color")
@@ -322,7 +330,7 @@ export default function Sheet(props: SheetProps) {
       minWidth: 250,
       editable: true,
       renderEditCell: (params: GridRenderEditCellParams) => (
-        <CustomChipSelectWithGroups
+        <CustomChipSelectWithGroupsAutocomplete
           values={outsourceTypes}
           valueKey="value"
           displayValueKey="label"
@@ -432,7 +440,13 @@ export default function Sheet(props: SheetProps) {
       document.getElementById(nextFieldId)?.focus();
     }
   };
+  const [productError, setProductError] = React.useState(false);
   const handleAddRow = () => {
+    if (!tempValues.productId) {
+      setProductError(true);
+      return;
+    }
+
     const id = Math.floor(Math.random() * 1200000) + 1;
     setRows((oldRows) => [
       ...oldRows,
@@ -468,12 +482,10 @@ export default function Sheet(props: SheetProps) {
   const handleTopCountChange = (value: string) => {
     const newTopCount = Number(value);
     setTopCount(newTopCount);
-    if (isPerTop) {
-      const newMeter = newTopCount * topQuantity;
-      setMeter(newMeter);
-      updateTempValues({ meter: newMeter });
-    } else {
-    }
+
+    const newMeter = newTopCount * topQuantity;
+    setMeter(newMeter);
+    updateTempValues({ meter: newMeter });
   };
 
   const handleIsPerTopChange = (value: string) => {
@@ -491,6 +503,41 @@ export default function Sheet(props: SheetProps) {
   const updateTempValues = (updatedValues: any) => {
     setTempValues((prevValues: any) => ({ ...prevValues, ...updatedValues }));
   };
+  const selectedProduct = React.useMemo(
+    () =>
+      products.find((product) => product.value === tempValues.productId) ||
+      null,
+    [tempValues, products]
+  );
+
+  const selectedDyeColor = React.useMemo(
+    () =>
+      dyeColors.find((dyeColor) => dyeColor.value === tempValues.dyeColorId) ||
+      null,
+    [tempValues, dyeColors]
+  );
+  const selectedItemType = React.useMemo(
+    () =>
+      itemTypes.find((itemType) => itemType.value === tempValues.itemType) ||
+      null,
+    [tempValues, itemTypes]
+  );
+  const selectedLaminationColor = React.useMemo(
+    () =>
+      laminationColors.find(
+        (laminationColor) =>
+          laminationColor.value === tempValues.laminationColorId
+      ) || null,
+    [tempValues, laminationColors]
+  );
+
+  const selectedSpecification = React.useMemo(
+    () =>
+      outsourceTypes.filter((type) =>
+        tempValues.orderItemSpecification?.includes(type.value)
+      ),
+    [tempValues, outsourceTypes]
+  );
 
   return (
     <>
@@ -516,213 +563,172 @@ export default function Sheet(props: SheetProps) {
           localeText={trTR.components.MuiDataGrid.defaultProps.localeText}
         />
       ) : (
-        <Grid container spacing={2}>
-          <Grid item xs={12} md={4}>
-            <FormControl
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                gap: "1rem",
-                padding: "1rem",
-              }}
-              fullWidth
-            >
-              <Typography variant="h5" gutterBottom>
-                Ürün Ekle
-              </Typography>
-              <Autocomplete
-                id="productId"
-                options={products}
-                getOptionLabel={(option) => option.label}
-                onChange={(event, newValue) =>
-                  updateTempValues(
-                    newValue ? { productId: newValue.value } : {}
-                  )
-                }
-                renderInput={(params) => <TextField {...params} label="Ürün" />}
-              />
-              <Autocomplete
-                id="dyeColorId"
-                options={dyeColors}
-                getOptionLabel={(option) => option.label}
-                onChange={(event, newValue) =>
-                  updateTempValues(
-                    newValue ? { dyeColorId: newValue.value } : {}
-                  )
-                }
-                renderInput={(params) => (
-                  <TextField {...params} label="Boya Rengi" />
-                )}
-              />
-              <Autocomplete
-                id="itemType"
-                options={itemTypes}
-                getOptionLabel={(option: any) => option.label}
-                onChange={(event, newValue) =>
-                  updateTempValues(newValue ? { itemType: newValue.value } : {})
-                }
-                renderInput={(params) => (
-                  <TextField {...params} label="Kumaş Türü" />
-                )}
-              />
-              <Autocomplete
-                id="laminationColorId"
-                options={laminationColors}
-                getOptionLabel={(option) => option.label}
-                onChange={(event, newValue) =>
-                  updateTempValues(
-                    newValue ? { laminationColorId: newValue.value } : {}
-                  )
-                }
-                renderInput={(params) => (
-                  <TextField {...params} label="Lamine Rengi" />
-                )}
-              />
-              <FormControlLabel
-                control={
-                  <Switch
-                    checked={isTop}
-                    id="isTop"
-                    onChange={() => setIsTop(!isTop)}
-                  />
-                }
-                label="Top Sayı Var"
-              />
-              {(isTop && (
-                <>
-                  <TextField
-                    id="topCount"
-                    label="Top Adedi"
-                    type="number"
-                    onChange={(e) => handleTopCountChange(e.target.value)}
-                  />
+        <>
+          <Grid container spacing={2}>
+            <Grid item xs={12} md={4}>
+              <FormControl
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "1rem",
+                  padding: "1rem",
+                }}
+                fullWidth
+              >
+                <Typography variant="h5" gutterBottom>
+                  Ürün Ekle
+                </Typography>
+                <Autocomplete
+                  id="productId"
+                  options={products}
+                  getOptionLabel={(option) => option.label}
+                  value={selectedProduct}
+                  onChange={(_, newValue) =>
+                    updateTempValues(
+                      newValue ? { productId: newValue.value } : {}
+                    )
+                  }
+                  renderInput={(params) => (
+                    <TextField {...params} label="Ürün" />
+                  )}
+                />
+                <Autocomplete
+                  id="dyeColorId"
+                  options={dyeColors}
+                  getOptionLabel={(option) => option.label}
+                  value={selectedDyeColor}
+                  onChange={(event, newValue) =>
+                    updateTempValues(
+                      newValue ? { dyeColorId: newValue.value } : {}
+                    )
+                  }
+                  renderInput={(params) => (
+                    <TextField {...params} label="Boya Rengi" />
+                  )}
+                />
+                <Autocomplete
+                  id="itemType"
+                  value={selectedItemType}
+                  options={itemTypes}
+                  getOptionLabel={(option) => option.label}
+                  onChange={(event, newValue) =>
+                    updateTempValues(
+                      newValue ? { itemType: newValue.value } : {}
+                    )
+                  }
+                  renderInput={(params) => (
+                    <TextField {...params} label="Kumaş Türü" />
+                  )}
+                />
+                <Autocomplete
+                  id="laminationColorId"
+                  value={selectedLaminationColor}
+                  options={laminationColors}
+                  getOptionLabel={(option) => option.label}
+                  onChange={(event, newValue) =>
+                    updateTempValues(
+                      newValue ? { laminationColorId: newValue.value } : {}
+                    )
+                  }
+                  renderInput={(params) => (
+                    <TextField {...params} label="Lamine Rengi" />
+                  )}
+                />
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={isTop}
+                      id="isTop"
+                      onChange={() => setIsTop(!isTop)}
+                    />
+                  }
+                  label="Top Sayı Var"
+                />
+                {(isTop && (
+                  <>
+                    <TextField
+                      id="topCount"
+                      label="Top Adedi"
+                      type="number"
+                      onChange={(e) => handleTopCountChange(e.target.value)}
+                    />
+                    <TextField
+                      id="meter"
+                      label="Metre"
+                      type="number"
+                      disabled={isTop}
+                      value={meter}
+                      onChange={(e) =>
+                        updateTempValues({ meter: Number(e.target.value) })
+                      }
+                    />
+                  </>
+                )) || (
                   <TextField
                     id="meter"
                     label="Metre"
                     type="number"
-                    disabled={isTop}
-                    value={calculateMeter()}
                     onChange={(e) =>
                       updateTempValues({ meter: Number(e.target.value) })
                     }
                   />
-                </>
-              )) || (
+                )}
+
                 <TextField
-                  id="meter"
-                  label="Metre"
+                  id="kg"
+                  label="Kg"
                   type="number"
                   onChange={(e) =>
-                    updateTempValues({ meter: Number(e.target.value) })
+                    updateTempValues({ kg: Number(e.target.value) })
                   }
                 />
-              )}
-
-              <TextField
-                id="kg"
-                label="Kg"
-                type="number"
-                onChange={(e) =>
-                  updateTempValues({ kg: Number(e.target.value) })
-                }
-              />
-              <Autocomplete
-                id="orderItemSpecification"
-                multiple
-                options={outsourceTypes}
-                getOptionLabel={(option) => option.label}
-                onChange={(event, newValue) =>
-                  updateTempValues({
-                    orderItemSpecification: newValue.map((v) => v.value),
-                  })
-                }
-                renderInput={(params) => (
-                  <TextField {...params} label="Özellikler" />
-                )}
-              />
-              <TextField
-                id="description"
-                label="Açıklama"
-                onChange={(e) =>
-                  updateTempValues({ description: e.target.value })
-                }
-              />
-              <Button variant="contained" onClick={handleAddRow}>
-                Ekle
-              </Button>
-            </FormControl>
-          </Grid>
-        </Grid>
-      )}
-      {rows.length > 0 && window.innerWidth < 600 && (
-        <Box sx={{ height: 500, width: "100%", mt: 2, position: "relative" }}>
-          {rows.map((row) => (
-            <Box
-              key={row.id}
-              sx={{
-                mb: 2,
-                p: 2,
-                border: "1px solid #ccc",
-                borderRadius: 2,
-                maxWidth: "100%",
-              }}
-            >
-              <Typography variant="h6">
-                Ürün:{" "}
-                {
-                  products.find((product) => product.value === row.productId)
-                    ?.label
-                }
-              </Typography>
-              <Typography variant="body1">
-                Boya Rengi:{" "}
-                {
-                  dyeColors.find((color) => color.value === row.dyeColorId)
-                    ?.label
-                }
-              </Typography>
-              <Typography variant="body1">
-                Kumaş Türü:{" "}
-                {itemTypes.find((type) => type.value === row.itemType)?.label}
-              </Typography>
-              <Typography variant="body1">
-                Lamine Rengi:{" "}
-                {
-                  laminationColors.find(
-                    (color) => color.value === row.laminationColorId
-                  )?.label
-                }
-              </Typography>
-              <Typography variant="body1">Metre: {row.meter}</Typography>
-              <Typography variant="body1">Kg: {row.kg}</Typography>
-              <Typography variant="body1">
-                Özellikler:{" "}
-                <b>
-                  {row.orderItemSpecification
-                    .map(
-                      (spec: any) =>
-                        outsourceTypes.find((type) => type.value === spec)
-                          ?.label
-                    )
-                    .join(", ")}
-                </b>
-              </Typography>
-              <Typography variant="body1">
-                Açıklama: {row.description}
-              </Typography>
-              <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 2 }}>
-                <Button
-                  variant="contained"
-                  color="error"
-                  startIcon={<DeleteIcon />}
-                  onClick={handleDeleteClick(row.id)}
-                >
-                  Sil
+                <Autocomplete
+                  id="orderItemSpecification"
+                  multiple
+                  options={outsourceTypes}
+                  value={selectedSpecification}
+                  getOptionLabel={(option) => option.label}
+                  onChange={(event, newValue) =>
+                    updateTempValues({
+                      orderItemSpecification: newValue.map((v) => v.value),
+                    })
+                  }
+                  renderInput={(params) => (
+                    <TextField {...params} label="Özellikler" />
+                  )}
+                />
+                <TextField
+                  id="description"
+                  label="Açıklama"
+                  onChange={(e) =>
+                    updateTempValues({ description: e.target.value })
+                  }
+                />
+                <Button variant="contained" onClick={handleAddRow}>
+                  Ekle
                 </Button>
-              </Box>
-            </Box>
-          ))}
-        </Box>
+              </FormControl>
+            </Grid>
+          </Grid>
+          <Snackbar
+            open={productError}
+            autoHideDuration={6000}
+            onClose={() => setProductError(false)}
+          >
+            <Alert severity="error" onClose={() => setProductError(false)}>
+              Ürün seçiniz
+            </Alert>
+          </Snackbar>
+          <MobileSheetEdit
+            rows={rows}
+            setRows={setRows}
+            products={products}
+            dyeColors={dyeColors}
+            itemTypes={itemTypes}
+            laminationColors={laminationColors}
+            outsourceTypes={outsourceTypes}
+          />
+        </>
       )}
     </>
   );

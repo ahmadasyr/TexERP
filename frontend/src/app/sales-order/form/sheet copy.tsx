@@ -36,6 +36,7 @@ import {
 import { trTR } from "@/components/trTrGrid";
 import { getPersonnelInfo, usePersonnelId } from "@/contexts/auth";
 import { CustomAutocomplete } from "@/components/table/utils";
+import { itemTypes } from "@/contexts/itemTypes";
 
 const initialRows: GridRowsProp = [
   {
@@ -106,7 +107,6 @@ interface SheetProps {
   setSubRows: React.Dispatch<React.SetStateAction<any[]>>;
 }
 
-import { itemTypes } from "@/contexts/itemTypes";
 export default function Sheet(props: SheetProps) {
   const { refresh, subRows, setSubRows } = props;
   const [rows, setRows] = React.useState(initialRows);

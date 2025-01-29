@@ -19,13 +19,10 @@ import competitorReportSubjectRoutes from "./routes/competitorReportSubjectRoute
 import competitorRoutes from "./routes/competitorRoutes";
 import accountRoutes from "./routes/accountRoutes";
 import accountTypeRoutes from "./routes/accountTypeRoutes";
-import cutStockRoutes from "./routes/cutStockRoutes";
 import machineRoutes from "./routes/machineRoutes";
 import machineTypeRoutes from "./routes/machineTypeRoutes";
 import productionOrderRoutes from "./routes/productionOrderRoutes";
 import productionOrderWrapRoutes from "./routes/productionOrderWrapRoutes";
-import rawQualityRoutes from "./routes/rawQualityRoutes";
-import rawStockRoutes from "./routes/rawStockRoutes";
 import wrapGroupRoutes from "./routes/wrapGroupRoutes";
 import wrapOrderRoutes from "./routes/wrapOrderRoutes";
 import wrapTypeRoutes from "./routes/wrapTypeRoutes";
@@ -58,6 +55,7 @@ import packagingTypeRoutes from "./routes/packagingTypeRoutes";
 import warehouseRoutes from "./routes/warehouseRoutes";
 import purchaseDeliveryRoutes from "./routes/purchaseDeliveryRoutes";
 import materialStockRoutes from "./routes/materialStockRoutes";
+import orderShipmentRoutes from "./routes/orderShipmentRoutes";
 const cors = require("cors");
 
 const app = express();
@@ -100,8 +98,7 @@ app.use("/competitor", competitorRoutes);
 app.use("/account", accountRoutes);
 // Use accountType routes
 app.use("/account-type", accountTypeRoutes);
-// Use cutStock routes
-app.use("/cut-stock", cutStockRoutes);
+
 // Use machine routes
 app.use("/machine", machineRoutes);
 // Use machineType routes
@@ -110,10 +107,7 @@ app.use("/machine-type", machineTypeRoutes);
 app.use("/production-order", productionOrderRoutes);
 // Use productionOrderWrap routes
 app.use("/production-order-wrap", productionOrderWrapRoutes);
-// Use rawQuality routes
-app.use("/raw-quality", rawQualityRoutes);
-// Use rawStock routes
-app.use("/raw-stock", rawStockRoutes);
+
 // Use wrapGroup routes
 app.use("/wrap-group", wrapGroupRoutes);
 // Use wrapOrder routes
@@ -178,4 +172,6 @@ app.use("/warehouse", warehouseRoutes);
 app.use("/purchase-delivery", purchaseDeliveryRoutes);
 // Use materialStock routes
 app.use("/material-stock", materialStockRoutes);
+// Use orderShipment routes
+app.use("/order-shipment", orderShipmentRoutes);
 export default app;

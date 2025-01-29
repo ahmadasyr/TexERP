@@ -1,4 +1,4 @@
-import { PrismaClient, unit } from "@prisma/client";
+import { PrismaClient, stockStatus, unit } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
@@ -9,7 +9,7 @@ export const createOrder = async (data: {
   orderItem: {
     productId: number;
     dyeColorId?: number;
-    itemTypeId?: number;
+    itemType: stockStatus;
     laminationColorId?: number;
     meter: number;
     kg: number;
@@ -47,7 +47,7 @@ export const createOrder = async (data: {
         create: data.orderItem.map((item) => ({
           productId: item.productId,
           dyeColorId: item.dyeColorId || null,
-          itemTypeId: item.itemTypeId || null,
+          itemType: item.itemType,
           laminationColorId: item.laminationColorId || null,
           meter: item.meter,
           kg: item.kg,
@@ -92,11 +92,6 @@ export const getOrder = async (id: number) => {
             },
           },
           dyeColor: {
-            select: {
-              name: true,
-            },
-          },
-          itemType: {
             select: {
               name: true,
             },
@@ -158,7 +153,7 @@ export const updateOrder = async (
       id?: number; // `id` is optional for new items
       productId: number;
       dyeColorId?: number;
-      itemTypeId?: number;
+      itemType: stockStatus;
       laminationColorId?: number;
       meter: number;
       kg: number;
@@ -198,7 +193,7 @@ export const updateOrder = async (
           update: {
             productId: item.productId,
             dyeColorId: item.dyeColorId || null,
-            itemTypeId: item.itemTypeId || null,
+            itemType: item.itemType,
             laminationColorId: item.laminationColorId || null,
             meter: item.meter,
             kg: item.kg,
@@ -219,7 +214,7 @@ export const updateOrder = async (
           create: {
             productId: item.productId,
             dyeColorId: item.dyeColorId || null,
-            itemTypeId: item.itemTypeId || null,
+            itemType: item.itemType,
             laminationColorId: item.laminationColorId || null,
             meter: item.meter,
             kg: item.kg,

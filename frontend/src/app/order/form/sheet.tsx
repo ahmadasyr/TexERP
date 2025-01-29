@@ -53,7 +53,7 @@ interface orderItem {
   productId: number;
   dyeColorId?: number | null;
   laminationColorId?: number | null;
-  itemTypeId?: number | null;
+  itemType: string;
   description?: string | null;
   personnelId: number;
   meter: number;
@@ -82,7 +82,7 @@ function EditToolbar(props: EditToolbarProps) {
         productId: 0,
         dyeColorId: 0,
         laminationColorId: 0,
-        itemTypeId: 0,
+        itemType: "",
         description: "",
         personnelId: getPersonnelInfo().id,
         meter: 0,
@@ -111,6 +111,8 @@ interface SheetProps {
   setSubRows: React.Dispatch<React.SetStateAction<any[]>>;
 }
 
+import { itemTypes } from "@/contexts/itemTypes";
+
 export default function Sheet(props: SheetProps) {
   const { refresh, subRows, setSubRows } = props;
   const [rows, setRows] = React.useState(initialRows);
@@ -119,7 +121,6 @@ export default function Sheet(props: SheetProps) {
   );
   const [products, setProducts] = React.useState<any[]>([]);
   const [dyeColors, setDyeColors] = React.useState<any[]>([]);
-  const [itemTypes, setItemTypes] = React.useState<any[]>([]);
   const [laminationColors, setLaminationColors] = React.useState<any[]>([]);
   const [personnels, setPersonnels] = React.useState<any[]>([]);
   const [outsourceTypes, setOutsourceTypes] = React.useState<any[]>([]);
@@ -193,13 +194,6 @@ export default function Sheet(props: SheetProps) {
       .then((response) => response.json())
       .then((data) => {
         setDyeColors(
-          data.map((value: any) => ({ value: value.id, label: value.name }))
-        );
-      });
-    fetch("/api/item-type")
-      .then((response) => response.json())
-      .then((data) => {
-        setItemTypes(
           data.map((value: any) => ({ value: value.id, label: value.name }))
         );
       });
@@ -285,28 +279,12 @@ export default function Sheet(props: SheetProps) {
       ),
     },
     {
-      field: "itemTypeId",
+      field: "itemType",
       headerName: "Kumaş Türü",
       type: "singleSelect",
       valueOptions: itemTypes,
       editable: true,
       width: 120,
-      renderEditCell: (params: GridRenderEditCellParams) => (
-        <CustomAutocomplete
-          values={itemTypes}
-          valueKey="value"
-          displayValueKey="label"
-          value={params.value}
-          onChange={(newValue: any) => {
-            params.api.setEditCellValue({
-              id: params.id,
-              field: "itemTypeId",
-              value: newValue,
-            });
-          }}
-          label="Kumaş Türü"
-        />
-      ),
     },
     {
       field: "laminationColorId",
@@ -478,7 +456,7 @@ export default function Sheet(props: SheetProps) {
         productId: tempValues.productId || 0,
         dyeColorId: tempValues.dyeColorId || null,
         laminationColorId: tempValues.laminationColorId || null,
-        itemTypeId: tempValues.itemTypeId || null,
+        itemType: tempValues.itemType,
         description: tempValues.description || "",
         personnelId: getPersonnelInfo().id,
         meter: tempValues.meter || 0,
@@ -540,7 +518,7 @@ export default function Sheet(props: SheetProps) {
   );
   const selectedItemType = React.useMemo(
     () =>
-      itemTypes.find((itemType) => itemType.value === tempValues.itemTypeId) ||
+      itemTypes.find((itemType) => itemType.value === tempValues.itemType) ||
       null,
     [tempValues, itemTypes]
   );
@@ -629,13 +607,13 @@ export default function Sheet(props: SheetProps) {
                   )}
                 />
                 <Autocomplete
-                  id="itemTypeId"
+                  id="itemType"
                   value={selectedItemType}
                   options={itemTypes}
                   getOptionLabel={(option) => option.label}
                   onChange={(event, newValue) =>
                     updateTempValues(
-                      newValue ? { itemTypeId: newValue.value } : {}
+                      newValue ? { itemType: newValue.value } : {}
                     )
                   }
                   renderInput={(params) => (

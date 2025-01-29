@@ -52,6 +52,7 @@ export interface HeadCell {
   uri?: string;
   boolean?: boolean;
   actionConditions?: any;
+  width?: number;
 }
 export interface conditions {
   action: string[];

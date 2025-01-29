@@ -16,7 +16,6 @@ export const getAllProductionOrders = async () => {
       },
       wraps: true,
       productionOrderWrap: true,
-      cutStock: true,
     },
   });
 };
@@ -36,7 +35,6 @@ export const getProductionOrderById = async (id: number) => {
       },
       wraps: true,
       productionOrderWrap: true,
-      cutStock: true,
     },
   });
 };

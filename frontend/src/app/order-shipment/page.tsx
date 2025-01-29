@@ -12,11 +12,11 @@ const Page: React.FC = () => {
   return (
     <div>
       <EnhancedTable
-        title="İplik Sevkiyatları"
+        title="Sevk Emirleri"
         headCells={headCells}
         tableName={tableName}
         viewable={true}
-        URI={"/yarn-order-shipment"}
+        URI={"/order-shipment"}
       />
     </div>
   );

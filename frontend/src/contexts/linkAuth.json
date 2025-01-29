@@ -132,14 +132,13 @@
     "allowedDepartments": ["urt", "admin"]
   },
   {
+    "link": "/order-shipment",
+    "allowedDepartments": ["pln", "sev", "urt", "admin", "sts"]
+  },
+  {
     "link": "/yarn-order-shipment",
     "allowedDepartments": ["sev", "urt", "pln", "admin", "sts"]
   },
-  {
-    "link": "/yarn-order-shipment-sent",
-    "allowedDepartments": ["sev", "urt", "pln", "admin", "sts"]
-  },
-
   {
     "link": "/supplier",
     "allowedDepartments": ["yon", "muh", "stn", "admin"]

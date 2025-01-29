@@ -66,6 +66,7 @@ type EnhancedTableProps = {
   editable?: boolean;
   deleteable?: boolean;
   disableColumnMenu?: boolean;
+  viewButtonLabel?: string;
 };
 
 export default function EnhancedTable({
@@ -81,6 +82,7 @@ export default function EnhancedTable({
   editable = true,
   deleteable = true,
   disableColumnMenu = false,
+  viewButtonLabel,
 }: EnhancedTableProps): JSX.Element {
   const router = useRouter();
   const [rows, setRows] = React.useState<Data[]>([]);
@@ -451,17 +453,15 @@ export default function EnhancedTable({
             <GridToolbarColumnsButton />
             <GridToolbarFilterButton />
             <GridToolbarDensitySelector />
-            {disableColumnMenu ? null : (
-              <GridToolbarExport
-                csvOptions={{
-                  fileName: `${title}-${new Date().toLocaleDateString()}`,
-                }}
-                printOptions={{
-                  hideFooter: true,
-                  hideToolbar: true,
-                }}
-              />
-            )}
+            <GridToolbarExport
+              csvOptions={{
+                fileName: `${title}-${new Date().toLocaleDateString()}`,
+              }}
+              printOptions={{
+                hideFooter: true,
+                hideToolbar: true,
+              }}
+            />
           </Grid>
           <GridToolbarQuickFilter />
           {createable && (
@@ -581,7 +581,6 @@ export default function EnhancedTable({
                     }
                   }}
                 >
-                  Görüntüle
                   <Visibility />
                 </Button>
               )}
@@ -703,58 +702,79 @@ export default function EnhancedTable({
           </Typography>
           <Divider />
           <br />
-          <DataGrid
-            ignoreDiacritics={true}
-            loading={skeleton}
-            {...rows}
-            rows={rows}
-            getRowClassName={(params) =>
-              params.indexRelativeToCurrentPage % 2 === 0 ? "even" : "odd"
-            }
-            // when rows are empty, no rows
-            pageSizeOptions={[25, 50, 100]}
-            disableColumnSorting={false}
-            columns={newHeadCells}
-            localeText={trTR.components.MuiDataGrid.defaultProps.localeText}
-            slots={{ toolbar: CustomToolbar }}
-            slotProps={{
-              toolbar: {
-                showQuickFilter: true,
-              },
-              loadingOverlay: {
-                variant: "skeleton",
-                noRowsVariant: "skeleton",
-              },
-            }}
-            initialState={{
-              pagination: {
-                paginationModel: {
-                  pageSize: 100,
-                },
-              },
-
-              sorting: {
-                sortModel: [
-                  {
-                    field: "id",
-                    sort: "desc",
-                  },
-                ],
-              },
-            }}
-            // add row selection and deletion
-            checkboxSelection
-            disableRowSelectionOnClick
-            onRowSelectionModelChange={(newSelection) => {
-              setSelected(newSelection);
-            }}
-            disableColumnMenu={disableColumnMenu}
-            // scroll overflow
-            style={{
-              height: "40rem",
-              width: "100%",
-            }}
-          />
+          <Grid container spacing={2}>
+            {rows.map((row) => (
+              <Grid item xs={12} sm={6} md={4} key={row.id}>
+                <Paper elevation={3} style={{ padding: "16px" }}>
+                  {headCells.map((cell: { id: keyof Data; label: string }) => (
+                    <div key={cell.id} style={{ marginBottom: "8px" }}>
+                      <Typography variant="subtitle2" color="textSecondary">
+                        {cell.label}
+                      </Typography>
+                      <Typography variant="body1">{row[cell.id]}</Typography>
+                    </div>
+                  ))}
+                  <div style={{ marginTop: "16px" }}>
+                    {viewable && (
+                      <Button
+                        variant="contained"
+                        onClick={() => {
+                          if (conditions) {
+                            if (checkConditions(row, "view")) {
+                              router.push(
+                                `${
+                                  useTableName ? tableName : currentURI
+                                }/view/?id=${row.id}`
+                              );
+                            } else {
+                              setResult({
+                                code: 401,
+                              });
+                            }
+                          } else {
+                            router.push(
+                              `${
+                                useTableName ? tableName : currentURI
+                              }/view/?id=${row.id}`
+                            );
+                          }
+                        }}
+                      >
+                        {viewButtonLabel ? viewButtonLabel : "Görüntüle"}
+                      </Button>
+                    )}
+                    {editable && (
+                      <IconButton
+                        onClick={() => {
+                          if (conditions) {
+                            if (checkConditions(row, "edit")) {
+                              router.push(
+                                `${
+                                  useTableName ? tableName : currentURI
+                                }/form/?id=${row.id}`
+                              );
+                            } else {
+                              setResult({
+                                code: 401,
+                              });
+                            }
+                          } else {
+                            router.push(
+                              `${
+                                useTableName ? tableName : currentURI
+                              }/form/?id=${row.id}`
+                            );
+                          }
+                        }}
+                      >
+                        <Edit />
+                      </IconButton>
+                    )}
+                  </div>
+                </Paper>
+              </Grid>
+            ))}
+          </Grid>
         </Paper>
       </Box>
     </>
