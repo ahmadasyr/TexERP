@@ -177,9 +177,10 @@ const OrderView = () => {
       orderItemId: itemToShip?.id,
       meter: data.meter,
       kg: data.kg,
+      lot: data.lot,
       personnelId: usePersonnelId(),
     };
-    const res = await fetch("/api/order-shipment/item", {
+    const res = await fetch("/api/order-shipment/shipmentItem", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -202,9 +203,25 @@ const OrderView = () => {
       headerName: "İşlemler",
       width: 130,
       renderCell: (params: GridRenderEditCellParams) =>
-        confirmedItems
-          .filter((item) => item.orderItemId === params.row.id)
-          .reduce((acc, item) => acc + item.sentMeter, 0) < params.row.meter ? (
+        params.row.itemType === "RAW_QUALITY" ? (
+          confirmedItems
+            .filter((item) => item.orderItemId === params.row.id)
+            .reduce((acc, item) => acc + item.sentKg, 0) < params.row.kg ? (
+            <Button
+              startIcon={<LocalShipping />}
+              variant="contained"
+              color="primary"
+              onClick={() => handleShip(params.row as OrderItem)}
+            >
+              Sevk Et
+            </Button>
+          ) : (
+            "Tamamlandı"
+          )
+        ) : confirmedItems
+            .filter((item) => item.orderItemId === params.row.id)
+            .reduce((acc, item) => acc + item.sentMeter, 0) <
+          params.row.meter ? (
           <Button
             startIcon={<LocalShipping />}
             variant="contained"
@@ -389,7 +406,8 @@ const OrderView = () => {
   const [formData, setFormData] = useState<{
     meter: number;
     kg: number;
-  }>({ kg: 0, meter: 0 });
+    lot: string;
+  }>({ kg: 0, meter: 0, lot: "" });
   return (
     <Paper
       style={{
@@ -454,48 +472,61 @@ const OrderView = () => {
                     Sipariş Durumu
                   </Typography>
                   <Grid container spacing={3}>
-                    {[
-                      {
-                        label: "Sevk edilmeyen Metre",
-                        value:
-                          itemToShip.meter -
-                          shipmentItems
-                            .filter(
-                              (item) => item.orderItemId === itemToShip.id
-                            )
-                            .reduce((acc, item) => acc + item.meter, 0),
-                      },
-                      {
-                        label: "Sevk edilmeyen Kg",
-                        value: itemToShip.kg,
-                      },
-                      {
-                        label: "Gönderilmemiş Metre",
-                        value:
-                          itemToShip.meter -
-                          confirmedItems
-                            .filter(
-                              (item) => item.orderItemId === itemToShip.id
-                            )
-                            .reduce((acc, item) => acc + item.sentMeter, 0),
-                      },
-                      {
-                        label: "Gönderilmemiş Kg",
-                        value:
-                          itemToShip.kg -
-                          confirmedItems
-                            .filter(
-                              (item) => item.orderItemId === itemToShip.id
-                            )
-                            .reduce((acc, item) => acc + item.sentKg, 0),
-                      },
-                    ].map(({ label, value }, index) => (
-                      <Grid item xs={12} sm={6} key={index}>
-                        <Typography variant="body1">
-                          <strong>{label}:</strong> {value}
-                        </Typography>
-                      </Grid>
-                    ))}
+                    {itemToShip.itemType === "RAW_QUALITY" ? (
+                      <>
+                        <Grid item xs={12} sm={6}>
+                          <Typography variant="body1">
+                            <strong>Sevk edilmeyen Kg:</strong> {itemToShip.kg}
+                          </Typography>
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                          <Typography variant="body1">
+                            <strong>Gönderilmemiş Kg:</strong>{" "}
+                            {itemToShip.kg -
+                              confirmedItems
+                                .filter(
+                                  (item) => item.orderItemId === itemToShip.id
+                                )
+                                .reduce((acc, item) => acc + item.sentKg, 0)}
+                          </Typography>
+                        </Grid>
+                      </>
+                    ) : (
+                      <>
+                        <Grid item xs={12} sm={6}>
+                          <Typography variant="body1">
+                            <strong>
+                              {itemToShip.itemType === "COVER_QUALITY"
+                                ? "Sevk edilmeyen Adet"
+                                : "Sevk edilmeyen Metre"}
+                              :
+                            </strong>{" "}
+                            {itemToShip.meter -
+                              shipmentItems
+                                .filter(
+                                  (item) => item.orderItemId === itemToShip.id
+                                )
+                                .reduce((acc, item) => acc + item.meter, 0)}
+                          </Typography>
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                          <Typography variant="body1">
+                            <strong>
+                              {itemToShip.itemType === "COVER_QUALITY"
+                                ? "Gönderilmemiş Adet"
+                                : "Gönderilmemiş Metre"}
+                              :
+                            </strong>{" "}
+                            {itemToShip.meter -
+                              confirmedItems
+                                .filter(
+                                  (item) => item.orderItemId === itemToShip.id
+                                )
+                                .reduce((acc, item) => acc + item.sentMeter, 0)}
+                          </Typography>
+                        </Grid>
+                      </>
+                    )}
                   </Grid>
                 </Paper>
 
@@ -505,38 +536,63 @@ const OrderView = () => {
                     Sevk Durumu
                   </Typography>
                   <Grid container spacing={3}>
-                    {[
-                      {
-                        label: "Sevk Emri Verilen Metre",
-                        value: shipmentItems
-                          .filter((item) => item.orderItemId === itemToShip.id)
-                          .reduce((acc, item) => acc + item.meter, 0),
-                      },
-                      {
-                        label: "Sevk Emri Verilen Kg",
-                        value: shipmentItems
-                          .filter((item) => item.orderItemId === itemToShip.id)
-                          .reduce((acc, item) => acc + item.kg, 0),
-                      },
-                      {
-                        label: "Onaylanan Metre",
-                        value: confirmedItems
-                          .filter((item) => item.orderItemId === itemToShip.id)
-                          .reduce((acc, item) => acc + item.sentMeter, 0),
-                      },
-                      {
-                        label: "Onaylanan Kg",
-                        value: confirmedItems
-                          .filter((item) => item.orderItemId === itemToShip.id)
-                          .reduce((acc, item) => acc + item.sentKg, 0),
-                      },
-                    ].map(({ label, value }, index) => (
-                      <Grid item xs={12} sm={6} key={index}>
-                        <Typography variant="body1">
-                          <strong>{label}:</strong> {value}
-                        </Typography>
-                      </Grid>
-                    ))}
+                    {itemToShip.itemType === "RAW_QUALITY" ? (
+                      <>
+                        <Grid item xs={12} sm={6}>
+                          <Typography variant="body1">
+                            <strong>Sevk Emri Verilen Kg:</strong>{" "}
+                            {shipmentItems
+                              .filter(
+                                (item) => item.orderItemId === itemToShip.id
+                              )
+                              .reduce((acc, item) => acc + item.kg, 0)}
+                          </Typography>
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                          <Typography variant="body1">
+                            <strong>Onaylanan Kg:</strong>{" "}
+                            {confirmedItems
+                              .filter(
+                                (item) => item.orderItemId === itemToShip.id
+                              )
+                              .reduce((acc, item) => acc + item.sentKg, 0)}
+                          </Typography>
+                        </Grid>
+                      </>
+                    ) : (
+                      <>
+                        <Grid item xs={12} sm={6}>
+                          <Typography variant="body1">
+                            <strong>
+                              {itemToShip.itemType === "COVER_QUALITY"
+                                ? "Sevk Emri Verilen Adet"
+                                : "Sevk Emri Verilen Metre"}
+                              :
+                            </strong>{" "}
+                            {shipmentItems
+                              .filter(
+                                (item) => item.orderItemId === itemToShip.id
+                              )
+                              .reduce((acc, item) => acc + item.meter, 0)}
+                          </Typography>
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                          <Typography variant="body1">
+                            <strong>
+                              {itemToShip.itemType === "COVER_QUALITY"
+                                ? "Onaylanan Adet"
+                                : "Onaylanan Metre"}
+                              :
+                            </strong>{" "}
+                            {confirmedItems
+                              .filter(
+                                (item) => item.orderItemId === itemToShip.id
+                              )
+                              .reduce((acc, item) => acc + item.sentMeter, 0)}
+                          </Typography>
+                        </Grid>
+                      </>
+                    )}
                   </Grid>
                 </Paper>
 
@@ -547,26 +603,50 @@ const OrderView = () => {
                   </Typography>
                   <Grid container spacing={3}>
                     <Grid item xs={12} sm={6}>
-                      <TextField
-                        label="Metre miktar"
-                        variant="outlined"
-                        fullWidth
-                        size="small"
-                        type="number"
-                        onChange={(e) =>
-                          setFormData({ ...formData, meter: +e.target.value })
-                        }
-                      />
+                      {itemToShip.itemType === "RAW_QUALITY" ? (
+                        <TextField
+                          label="Kg miktar"
+                          variant="outlined"
+                          fullWidth
+                          size="small"
+                          type="number"
+                          onChange={(e) =>
+                            setFormData({ ...formData, kg: +e.target.value })
+                          }
+                        />
+                      ) : itemToShip.itemType === "COVER_QUALITY" ? (
+                        <TextField
+                          label="Adet miktar"
+                          variant="outlined"
+                          fullWidth
+                          size="small"
+                          type="number"
+                          onChange={(e) =>
+                            setFormData({ ...formData, meter: +e.target.value })
+                          }
+                        />
+                      ) : (
+                        <TextField
+                          label="Metre miktar"
+                          variant="outlined"
+                          fullWidth
+                          size="small"
+                          type="number"
+                          onChange={(e) =>
+                            setFormData({ ...formData, meter: +e.target.value })
+                          }
+                        />
+                      )}
                     </Grid>
                     <Grid item xs={12} sm={6}>
                       <TextField
-                        label="Kg miktar"
+                        label="Lot"
                         variant="outlined"
                         fullWidth
                         size="small"
-                        type="number"
+                        type="text"
                         onChange={(e) =>
-                          setFormData({ ...formData, kg: +e.target.value })
+                          setFormData({ ...formData, lot: e.target.value })
                         }
                       />
                     </Grid>

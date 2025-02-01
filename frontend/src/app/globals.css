@@ -43,3 +43,11 @@
     top: 0;
   }
 }
+@font-face {
+  font-family: "Barcode";
+  src: url("/fonts/barcode.ttf");
+}
+
+.barcode-text {
+  font-family: "Barcode", sans-serif;
+}

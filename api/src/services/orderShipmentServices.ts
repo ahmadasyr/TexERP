@@ -44,6 +44,7 @@ export const updateOrderShipment = async (data: {
     id: number;
     meter: number;
     kg: number;
+    lot: string;
   }[];
 }) => {
   return await prisma.orderShipment.update({
@@ -59,7 +60,7 @@ export const updateOrderShipment = async (data: {
         },
         updateMany: data.orderShipmentItem.map((item) => ({
           where: { id: item.id },
-          data: { meter: item.meter, kg: item.kg },
+          data: { meter: item.meter, kg: item.kg, lot: item.lot },
         })),
       },
     },
@@ -156,6 +157,7 @@ export const createByItem = async (data: {
   meter: number;
   kg: number;
   personnelId: number;
+  lot: string;
 }) => {
   const findOrderItem = await prisma.orderItem.findUnique({
     where: { id: data.orderItemId },
@@ -170,6 +172,7 @@ export const createByItem = async (data: {
         orderItem: { connect: { id: data.orderItemId } },
         meter: data.meter,
         kg: data.kg,
+        lot: data.lot,
         personnel: { connect: { id: data.personnelId } },
       },
     });
@@ -183,6 +186,7 @@ export const createByItem = async (data: {
             orderItem: { connect: { id: data.orderItemId } },
             meter: data.meter,
             kg: data.kg,
+            lot: data.lot,
             personnel: { connect: { id: data.personnelId } },
           },
         },
@@ -260,6 +264,7 @@ export const getShipmentItems = async (id: number) => {
     id: item.id,
     meter: item.meter,
     kg: item.kg,
+    lot: item.lot,
     productName: item.orderItem.product.name,
     dyeColorName: item.orderItem.dyeColor?.name,
     laminationColorName: item.orderItem.laminationColor?.name,
@@ -272,7 +277,7 @@ export const getShipmentItems = async (id: number) => {
 export const findStockMatchingOrderItem = async (id: number) => {
   const getId = await prisma.orderShipmentItem.findUnique({
     where: { id },
-    select: { orderItemId: true },
+    select: { orderItemId: true, lot: true },
   });
   const orderItem = await prisma.orderItem.findUnique({
     where: { id: getId?.orderItemId },
@@ -308,6 +313,7 @@ export const findStockMatchingOrderItem = async (id: number) => {
           },
         },
       },
+      ...(getId?.lot ? { lot: getId.lot } : {}),
     },
     select: {
       id: true,
@@ -327,6 +333,7 @@ export const handleBarcodeRead = async (body: {
   orderShipmentId: number;
   orderItemId: number;
   personnelId: number;
+  lot: string;
 }) => {
   const stock = await prisma.stock.findUnique({
     where: { barcode: body.barcode },
@@ -367,7 +374,9 @@ export const handleBarcodeRead = async (body: {
       findOrderItem.dyeColorId !== stock.dyeColorId ||
       findOrderItem.laminationColorId !== stock.laminationColorId ||
       findOrderItem.itemType !== stock.status ||
-      stock.sold
+      body.lot
+        ? stock.lot !== body.lot
+        : false || stock.sold
     ) {
       throw new Error("Ürün ve stok uyumsuz.");
     } else {
@@ -438,7 +447,10 @@ export const getScannedItems = async (id: number) => {
       barcode: true,
     },
   });
-  return scannedItems;
+  return scannedItems.map((item, index) => ({
+    index: index + 1,
+    ...item,
+  }));
 };
 
 export const deleteConfirmation = async (id: number) => {

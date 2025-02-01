@@ -24,6 +24,7 @@ import {
 import { Alert } from "@mui/material";
 import { trTR } from "@/components/trTrGrid";
 import { usePersonnelId } from "@/contexts/auth";
+import { itemTypes } from "@/contexts/itemTypes";
 
 const initialRows: GridRowsProp = [
   {
@@ -33,6 +34,7 @@ const initialRows: GridRowsProp = [
     orderItemId: 0,
     meter: 0,
     kg: 0,
+    lot: "",
   },
 ];
 
@@ -149,7 +151,8 @@ export default function Sheet({ refresh, subRows, setSubRows }: SheetProps) {
       type: "string",
       editable: false,
       width: 120,
-      valueGetter: (params, row) => row.orderItem?.itemType?.name || "",
+      valueGetter: (params, row) =>
+        itemTypes.find((i) => i.value === row.orderItem.itemType)?.label || "",
     },
     {
       field: "outsourceType",
@@ -171,6 +174,13 @@ export default function Sheet({ refresh, subRows, setSubRows }: SheetProps) {
       field: "kg",
       headerName: "Emr Edilen Kg",
       type: "number",
+      editable: true,
+      width: 150,
+    },
+    {
+      field: "lot",
+      headerName: "Lot",
+      type: "string",
       editable: true,
       width: 150,
     },

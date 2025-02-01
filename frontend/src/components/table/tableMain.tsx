@@ -66,6 +66,8 @@ type EnhancedTableProps = {
   editable?: boolean;
   deleteable?: boolean;
   disableColumnMenu?: boolean;
+  noActions?: boolean;
+  specialButton?: any[];
 };
 
 export default function EnhancedTable({
@@ -81,6 +83,8 @@ export default function EnhancedTable({
   editable = true,
   deleteable = true,
   disableColumnMenu = false,
+  noActions = false,
+  specialButton,
 }: EnhancedTableProps): JSX.Element {
   const router = useRouter();
   const [rows, setRows] = React.useState<Data[]>([]);
@@ -362,77 +366,80 @@ export default function EnhancedTable({
         },
       };
     });
-    setNewHeadCells([
-      ...newHeadCell,
-      {
-        field: "actions",
-        headerName: "İşlemler",
-        width: 150,
-        hidable: false,
-        sortable: false,
+    !noActions
+      ? setNewHeadCells([
+          ...newHeadCell,
+          {
+            field: "actions",
+            headerName: "İşlemler",
+            width: 150,
+            hidable: false,
+            sortable: false,
 
-        renderCell: (params: any) => {
-          return (
-            <div>
-              {viewable && (
-                <IconButton
-                  onClick={() => {
-                    if (conditions) {
-                      if (checkConditions(params.row, "view")) {
-                        router.push(
-                          `${useTableName ? tableName : currentURI}/view/?id=${
-                            params.row.id
-                          }`
-                        );
-                      } else {
-                        setResult({
-                          code: 401,
-                        });
-                      }
-                    } else {
-                      router.push(
-                        `${useTableName ? tableName : currentURI}/view/?id=${
-                          params.row.id
-                        }`
-                      );
-                    }
-                  }}
-                >
-                  <Visibility />
-                </IconButton>
-              )}
-              {editable && (
-                <IconButton
-                  onClick={() => {
-                    if (conditions) {
-                      if (checkConditions(params.row, "edit")) {
-                        router.push(
-                          `${useTableName ? tableName : currentURI}/form/?id=${
-                            params.row.id
-                          }`
-                        );
-                      } else {
-                        setResult({
-                          code: 401,
-                        });
-                      }
-                    } else {
-                      router.push(
-                        `${useTableName ? tableName : currentURI}/form/?id=${
-                          params.row.id
-                        }`
-                      );
-                    }
-                  }}
-                >
-                  <Edit />
-                </IconButton>
-              )}
-            </div>
-          );
-        },
-      },
-    ]);
+            renderCell: (params: any) => {
+              return (
+                <div>
+                  {viewable && (
+                    <IconButton
+                      onClick={() => {
+                        if (conditions) {
+                          if (checkConditions(params.row, "view")) {
+                            router.push(
+                              `${
+                                useTableName ? tableName : currentURI
+                              }/view/?id=${params.row.id}`
+                            );
+                          } else {
+                            setResult({
+                              code: 401,
+                            });
+                          }
+                        } else {
+                          router.push(
+                            `${
+                              useTableName ? tableName : currentURI
+                            }/view/?id=${params.row.id}`
+                          );
+                        }
+                      }}
+                    >
+                      <Visibility />
+                    </IconButton>
+                  )}
+                  {editable && (
+                    <IconButton
+                      onClick={() => {
+                        if (conditions) {
+                          if (checkConditions(params.row, "edit")) {
+                            router.push(
+                              `${
+                                useTableName ? tableName : currentURI
+                              }/form/?id=${params.row.id}`
+                            );
+                          } else {
+                            setResult({
+                              code: 401,
+                            });
+                          }
+                        } else {
+                          router.push(
+                            `${
+                              useTableName ? tableName : currentURI
+                            }/form/?id=${params.row.id}`
+                          );
+                        }
+                      }}
+                    >
+                      <Edit />
+                    </IconButton>
+                  )}
+                </div>
+              );
+            },
+          },
+        ])
+      : setNewHeadCells(newHeadCell);
+
     setSkeleton(false);
   }, [URI, headCells, rows]);
   const currentURI = window.location.pathname;
@@ -621,6 +628,22 @@ export default function EnhancedTable({
               )}
             </>
           )}
+          {selected.length > 0 &&
+            specialButton &&
+            specialButton.map((button, index) => (
+              <Button
+                key={index}
+                variant="contained"
+                color={button.color}
+                onClick={() => {
+                  if (button.action) {
+                    button.action(selected);
+                  }
+                }}
+              >
+                {button.label}
+              </Button>
+            ))}
         </GridToolbarContainer>
       </>
     );

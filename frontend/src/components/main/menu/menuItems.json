@@ -136,6 +136,25 @@
             "link": "/yarn-sale",
             "desc": "İplik satış listesi",
             "icon": "attach_money"
+          },
+          {
+            "title": "İplik Sevkiyatları",
+            "desc": "İplik sevkiyatları menüsü",
+            "icon": "sports_volleyball",
+            "subItems": [
+              {
+                "title": "İplik Satış Sevk Emirleri",
+                "desc": "İplik satış sevkiyatları menüsü",
+                "icon": "sports_volleyball",
+                "link": "/yarn-order-shipment"
+              },
+              {
+                "title": "İplik Gönderimleri",
+                "desc": "İplik gönderimleri menüsü",
+                "icon": "sports_volleyball",
+                "link": "/yarn-order-shipment-sent"
+              }
+            ]
           }
         ]
       },
@@ -356,29 +375,10 @@
     "allowedDepartments": ["sev", "urt", "pln", "admin", "sts"],
     "subItems": [
       {
-        "title": "İplik Sevkiyatları",
-        "desc": "İplik sevkiyatları menüsü",
-        "icon": "sports_volleyball",
-        "subItems": [
-          {
-            "title": "İplik Satış Sevk Emirleri",
-            "desc": "İplik satış sevkiyatları menüsü",
-            "icon": "sports_volleyball",
-            "link": "/yarn-order-shipment"
-          },
-          {
-            "title": "İplik Gönderimleri",
-            "desc": "İplik gönderimleri menüsü",
-            "icon": "sports_volleyball",
-            "link": "/yarn-order-shipment-sent"
-          }
-        ]
-      },
-      {
-        "title": "Kumaş Satış Sevkiyatları",
+        "title": "Açık Sevk Emirleri",
         "desc": "Kumaş satış sevkiyatları menüsü",
         "icon": "format_list_bulleted",
-        "link": "#"
+        "link": "/worker-shipments"
       }
     ]
   },
@@ -457,55 +457,43 @@
             "title": "Kesim Depo",
             "desc": "Kesim depo işlemleri menüsü",
             "icon": "content_cut",
-            "link": "#"
+            "link": "/stock/?status=PRE_CUT"
           },
           {
             "title": "Kalite Ham Depo",
             "desc": "Kalite ham depo işlemleri menüsü",
             "icon": "check",
-            "link": "#"
+            "link": "/stock/?status=RAW_PRE_QUALITY"
           },
           {
             "title": "Ham Depo",
             "desc": "Ham depo işlemleri menüsü",
             "icon": "inventory_2",
-            "link": "#"
-          },
-          {
-            "title": "Boyaheden Gelen Kumaşlar",
-            "desc": "Boyaheden gelen kumaşlar depo işlemleri menüsü",
-            "icon": "inventory_2",
-            "link": "#"
+            "link": "/stock/?status=RAW_QUALITY"
           },
           {
             "title": "Kalite Boyali Depo",
             "desc": "Kalite boyalı depo işlemleri menüsü",
             "icon": "check",
-            "link": "#"
+            "link": "/stock/?status=RAW_PRE_QUALITY"
           },
           {
             "title": "Boyali Kumaş Depo",
             "desc": "Boyali kumaş depo işlemleri menüsü",
             "icon": "inventory_2",
-            "link": "#"
+            "link": "/stock/?status=DYE_QUALITY"
           },
           {
             "title": "Örtü Kumaş Depo",
             "desc": "Örtü kumaş depo işlemleri menüsü",
             "icon": "inventory_2",
-            "link": "#"
-          },
-          {
-            "title": "Fasondan Gelenler",
-            "desc": "Fasondan gelenler depo işlemleri menüsü",
-            "icon": "inventory_2",
-            "link": "#"
+            "link": "/stock/?status=COVER_QUALITY"
           },
           {
             "title": "Lamineli Kumaş Depo",
             "desc": "Lamineli kumaş depo işlemleri menüsü",
             "icon": "inventory_2",
-            "link": "#"
+            "link": "/stock/?status=LAMINATED_QUALITY"
           }
         ]
       },

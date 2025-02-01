@@ -16,7 +16,13 @@ export const headCells: HeadCell[] = [
     width: 120,
   },
   { id: "kg", numeric: true, disablePadding: false, label: "Kg", width: 120 },
-
+  {
+    id: "lot",
+    numeric: false,
+    disablePadding: false,
+    label: "Lot",
+    width: 120,
+  },
   {
     id: "dyeColorName",
     numeric: false,

@@ -826,6 +826,7 @@ enum stockStatus {
   OUTSOURCING
   LAMINATED_PRE_QUALITY
   LAMINATED_QUALITY
+  COVER_QUALITY
 }
 
 // Stock Section
@@ -1184,6 +1185,7 @@ model orderShipmentItem {
   personnelId     Int
   meter           Float
   kg              Float
+  lot             String?
   // Relations
   personnel       personnel     @relation(fields: [personnelId], references: [id])
   orderShipment   orderShipment @relation(fields: [orderShipmentId], references: [id])

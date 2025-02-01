@@ -205,9 +205,16 @@ export const updateOrder = async (
                   notIn: item.orderItemSpecification?.map((spec) => spec) || [],
                 },
               },
-              create:
+              upsert:
                 item.orderItemSpecification?.map((spec) => ({
-                  outsourceTypeId: spec,
+                  where: {
+                    orderItemId_outsourceTypeId: {
+                      orderItemId: item.id!,
+                      outsourceTypeId: spec,
+                    },
+                  },
+                  update: {},
+                  create: { outsourceTypeId: spec },
                 })) || [],
             },
           },
