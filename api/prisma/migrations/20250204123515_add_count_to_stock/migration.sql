@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE `stock` ADD COLUMN `count` INTEGER NULL DEFAULT 1;

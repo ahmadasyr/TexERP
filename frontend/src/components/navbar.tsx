@@ -30,7 +30,7 @@ import {
   ListItemIcon,
   Button,
 } from "@mui/material";
-import { handleLogout, getPersonnelInfo } from "@/contexts/auth";
+import { handleLogout, getPersonnelInfo, setDarkMode } from "@/contexts/auth";
 import { useRouter } from "next/navigation";
 import SearchIcon from "@mui/icons-material/Search";
 import menuItems from "./main/menu/menuItems.json";
@@ -464,7 +464,7 @@ export default function PrimaryAppBar({
     setTheme(newTheme);
     toggleTheme();
     if (localStorage) {
-      localStorage.setItem("darkMode", JSON.stringify(newTheme));
+      setDarkMode(newTheme);
     }
   };
 
@@ -519,6 +519,7 @@ export default function PrimaryAppBar({
                         .map((deepSubItem) => ({
                           ...deepSubItem,
                           group: `${item.title} > ${subItem.title}`, // Group by parent and subItem title
+                          link: deepSubItem.link || "", // Ensure link is always a string
                         }))
                     : []
                 )

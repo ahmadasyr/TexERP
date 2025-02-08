@@ -57,6 +57,10 @@ import purchaseDeliveryRoutes from "./routes/purchaseDeliveryRoutes";
 import materialStockRoutes from "./routes/materialStockRoutes";
 import orderShipmentRoutes from "./routes/orderShipmentRoutes";
 import stockRoutes from "./routes/stockRoutes";
+import reportIssue from "./routes/reportIssueRoutes";
+import dyeOrderRoutes from "./routes/dyeOrderRoutes";
+import dyeTypeRoutes from "./routes/dyeTypeRoutes";
+import dyeShipmentRoutes from "./routes/dyeShipmentRoutes";
 const cors = require("cors");
 
 const app = express();
@@ -177,4 +181,13 @@ app.use("/material-stock", materialStockRoutes);
 app.use("/order-shipment", orderShipmentRoutes);
 // Use stock routes
 app.use("/stock", stockRoutes);
+// Use reportIssue routes
+app.use("/report-issue", reportIssue);
+// Use dyeOrder routes
+app.use("/dye-order", dyeOrderRoutes);
+// Use dyeType routes
+app.use("/dye-type", dyeTypeRoutes);
+// Use dyeShipment routes
+app.use("/dye-shipment", dyeShipmentRoutes);
+
 export default app;

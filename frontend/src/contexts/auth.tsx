@@ -133,6 +133,13 @@ const getPersonnelInfo = (): any => {
   return personnel;
 };
 
+const getDarkMode = (): boolean => {
+  return getLocalStorageItem("darkMode") ?? false;
+};
+
+const setDarkMode = (value: boolean): void => {
+  setLocalStorageItem("darkMode", value);
+};
 export {
   handleLogin,
   handleLogout,
@@ -140,4 +147,6 @@ export {
   fetchProtectedData,
   getPersonnelInfo,
   handleReset,
+  getDarkMode,
+  setDarkMode,
 };

@@ -100,6 +100,8 @@ model personnel {
   supplierEvaluation       supplierEvaluation[]
   purchaseRequest          purchaseRequest[]
   stock                    stock[]
+  dyeConfirmation          dyeConfirmation[]
+  dyeShipment              dyeShipment[]
 }
 
 // GENERAL SECTION
@@ -181,7 +183,6 @@ model currency {
   exchangePercent   Float?
   customer          customer[]
   customerPrice     customerPrice[]
-  dyeOrderItem      dyeOrderItem[]
   yarnType          yarnType[]
   yarnOrderItem     yarnOrderItem[]
   productPrice      productPrice[]
@@ -482,7 +483,6 @@ model account {
   currency       currency?        @relation(fields: [currencyId], references: [id])
   accountType    accountType?     @relation(fields: [accountTypeId], references: [id])
   customer       customer[]
-  dyeOrder       dyeOrder[]
   outsourceOrder outsourceOrder[]
   yarnOrder      yarnOrder[]
   yarnStockEntry yarnStockEntry[]
@@ -522,6 +522,7 @@ model product {
   productWrap  productWrap[]
   productType  productType?   @relation(fields: [productTypeId], references: [id])
   stock        stock[]
+  dyeOrder     dyeOrder[]
 }
 
 enum ProductionSide {
@@ -839,6 +840,7 @@ model stock {
   lot               String
   meter             Float
   kg                Float
+  count             Int?        @default(1)
   yon               Boolean?
   status            stockStatus
   quality           Int?
@@ -847,14 +849,13 @@ model stock {
   dyeTypeId         Int?
   laminationColorId Int?
   productionOrderId Int?
-
   // warehouse data
-  counted   Boolean?
-  countDate DateTime?
-  shelf     String?
-  barcode   String?   @unique
-  sold      Boolean?  @default(false)
-  kazanNo   String?
+  counted           Boolean?
+  countDate         DateTime?
+  shelf             String?
+  barcode           String?     @unique
+  sold              Boolean?    @default(false)
+  kazanNo           String?
 
   // general data
   note        String?
@@ -869,6 +870,8 @@ model stock {
   productionOrder           productionOrder?            @relation(fields: [productionOrderId], references: [id])
   orderShipmentConfirmation orderShipmentConfirmation[]
   stockSpecifications       stockSpecifications[]
+  dyeShipmentItem           dyeShipmentItem[]
+  dyeConfirmation           dyeConfirmation[]
 }
 
 model stockSpecifications {
@@ -933,19 +936,22 @@ model laminationColor {
 }
 
 model dyeOrder {
-  id          Int      @id @default(autoincrement())
-  createdAt   DateTime @default(now())
-  accountId   Int
+  id          Int         @id @default(autoincrement())
+  createdAt   DateTime    @default(now())
+  supplierId  Int
   productId   Int
+  stockStatus stockStatus
+
   personnelId Int
-  description String
-  closed      Boolean  @default(false)
+  description String?
+  closed      Boolean @default(false)
 
   // Relations
-  account      account        @relation(fields: [accountId], references: [id])
+  supplier     supplier       @relation(fields: [supplierId], references: [id])
   personnel    personnel      @relation(fields: [personnelId], references: [id])
   dyeOrderItem dyeOrderItem[]
   dyeShipment  dyeShipment[]
+  product      product        @relation(fields: [productId], references: [id])
 }
 
 model dyeOrderItem {
@@ -955,47 +961,70 @@ model dyeOrderItem {
   dyeTypeId   Int
   lot         String
   yon         Boolean?
-  unitPrice   Float?
-  currencyId  Int?
   unit        unit
   quantity    Float
   kazanNo     String
-  sentCount   Int
-  sentMeter   Float
-  sentKg      Float
-  returnCount Int
-  returnMeter Float
-  returnKg    Float
-  note        String
+  note        String?
   personnelId Int
 
-  dyeOrder  dyeOrder  @relation(fields: [dyeOrderId], references: [id])
-  dyeColor  dyeColor  @relation(fields: [dyeColorId], references: [id])
-  dyeType   dyeType   @relation(fields: [dyeTypeId], references: [id])
-  currency  currency? @relation(fields: [currencyId], references: [id])
-  personnel personnel @relation(fields: [personnelId], references: [id])
+  dyeOrder        dyeOrder          @relation(fields: [dyeOrderId], references: [id])
+  dyeColor        dyeColor          @relation(fields: [dyeColorId], references: [id])
+  dyeType         dyeType           @relation(fields: [dyeTypeId], references: [id])
+  personnel       personnel         @relation(fields: [personnelId], references: [id])
+  dyeShipmentItem dyeShipmentItem[]
+  dyeConfirmation dyeConfirmation[]
 }
 
 model dyeShipment {
-  id         Int      @id @default(autoincrement())
-  dyeOrderId Int
-  createdAt  DateTime @default(now())
-  sentDate   DateTime
-  closed     Boolean  @default(false)
+  id                Int       @id @default(autoincrement())
+  createdAt         DateTime  @default(now())
+  personnelId       Int
+  sentDate          DateTime?
+  dyeOrderId        Int
+  closed            Boolean   @default(false)
+  shippingCompanyId Int?
+  shippingCarrierId Int?
+  shippingCarId     Int?
 
   // Relations
   dyeOrder        dyeOrder          @relation(fields: [dyeOrderId], references: [id])
+  personnel       personnel         @relation(fields: [personnelId], references: [id])
   dyeShipmentItem dyeShipmentItem[]
+  shippingCompany shippingCompany?  @relation(fields: [shippingCompanyId], references: [id])
+  shippingCarrier shippingCarrier?  @relation(fields: [shippingCarrierId], references: [id])
+  shippingCar     shippingCar?      @relation(fields: [shippingCarId], references: [id])
 }
 
 model dyeShipmentItem {
-  id            Int         @id @default(autoincrement())
-  dyeShipmentId Int
-  rawStockId    Int
-  personnelId   Int
+  id             Int          @id @default(autoincrement())
+  dyeShipmentId  Int
+  dyeOrderItemId Int
+  stockId        Int
+  personnelId    Int
+  meter          Float
+  kg             Float
+  count          Int
   // Relations
-  personnel     personnel   @relation(fields: [personnelId], references: [id])
-  dyeShipment   dyeShipment @relation(fields: [dyeShipmentId], references: [id])
+  personnel      personnel    @relation(fields: [personnelId], references: [id])
+  dyeShipment    dyeShipment  @relation(fields: [dyeShipmentId], references: [id])
+  dyeOrderItem   dyeOrderItem @relation(fields: [dyeOrderItemId], references: [id])
+  stock          stock        @relation(fields: [stockId], references: [id])
+}
+
+model dyeConfirmation {
+  id             Int      @id @default(autoincrement())
+  createdAt      DateTime @default(now())
+  dyeOrderItemId Int
+  stockId        Int
+  meter          Float
+  kg             Float
+  count          Int
+  personnelId    Int
+
+  // relations
+  dyeOrderItem dyeOrderItem @relation(fields: [dyeOrderItemId], references: [id])
+  stock        stock        @relation(fields: [stockId], references: [id])
+  personnel    personnel    @relation(fields: [personnelId], references: [id])
 }
 
 model outsourceOrder {
@@ -1126,6 +1155,7 @@ model shippingCompany {
   orderShipment     orderShipment[]
   yarnOrderShipment yarnOrderShipment[]
   purchaseDelivery  purchaseDelivery[]
+  dyeShipment       dyeShipment[]
 }
 
 model shippingCarrier {
@@ -1143,6 +1173,7 @@ model shippingCarrier {
   orderShipment     orderShipment[]
   yarnOrderShipment yarnOrderShipment[]
   purchaseDelivery  purchaseDelivery[]
+  dyeShipment       dyeShipment[]
 }
 
 model shippingCar {
@@ -1155,6 +1186,7 @@ model shippingCar {
   orderShipment     orderShipment[]
   yarnOrderShipment yarnOrderShipment[]
   purchaseDelivery  purchaseDelivery[]
+  dyeShipment       dyeShipment[]
 }
 
 model orderShipment {
@@ -1287,6 +1319,8 @@ model reportIssue {
   title       String
   description String
   status      issueStatus
+  response    String?
+  closedDate  DateTime?
   // Relations
   personnel   personnel   @relation(fields: [personnelId], references: [id])
 }
@@ -1327,6 +1361,7 @@ model supplier {
   materialPrice      materialPrice[]
   purchaseOrder      purchaseOrder[]
   supplierEvaluation supplierEvaluation[]
+  dyeOrder           dyeOrder[]
 }
 
 model supplierEvaluation {

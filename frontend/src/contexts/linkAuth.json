@@ -64,7 +64,7 @@
     "allowedDepartments": ["pln", "urt", "admin"]
   },
   {
-    "link": "/dyeing-order",
+    "link": "/dye-order",
     "allowedDepartments": ["pln", "urt", "admin"]
   },
   {

@@ -136,13 +136,22 @@ const OrderShipmentPage = () => {
     const printContent = document.getElementById("printable-section");
     if (printContent) {
       const printWindow = window.open("", "_blank");
-      printWindow?.document.write(
-        "<html><head><title>Yazdır</title></head><body>"
-      );
-      printWindow?.document.write(printContent.innerHTML);
-      printWindow?.document.write("</body></html>");
-      printWindow?.document.close();
-      printWindow?.print();
+      if (printWindow) {
+        printWindow.document.write(
+          "<html><head><title>Yazdır</title></head><body>"
+        );
+        printWindow.document.write(printContent.innerHTML);
+        printWindow.document.write("</body></html>");
+        printWindow.document.close();
+
+        // Add an event listener to close the print window after printing
+        printWindow.onload = () => {
+          printWindow.print();
+          printWindow.onafterprint = () => {
+            printWindow.close();
+          };
+        };
+      }
     }
   };
   const [exporting, setExporting] = useState<boolean>(false);
@@ -206,214 +215,223 @@ const OrderShipmentPage = () => {
           </Grid>
         </Grid>
       </Paper>
-      <div id="printable-section" style={{ margin: "20px" }}>
-        <h2>Sipariş Detayları</h2>
-        <div style={{ marginBottom: "20px" }}>
-          <p style={{ margin: "5px 0" }}>
-            <strong>Müşteri Adı:</strong> {order?.customer.name}
-          </p>
-          <p style={{ margin: "5px 0" }}>
-            <strong>Tarih:</strong>{" "}
-            {shipment?.sentDate
-              ? new Date(shipment.sentDate).toLocaleDateString()
-              : ""}
-          </p>
-          <p style={{ margin: "5px 0" }}>
-            <strong>Fiş No:</strong> {order?.id}
-          </p>
-        </div>
+      <Paper
+        sx={{
+          padding: "1rem",
+        }}
+      >
+        <div id="printable-section" style={{ margin: "20px" }}>
+          <h2>Sipariş Detayları</h2>
+          <div style={{ marginBottom: "20px" }}>
+            <p style={{ margin: "5px 0" }}>
+              <strong>Müşteri Adı:</strong> {order?.customer.name}
+            </p>
+            <p style={{ margin: "5px 0" }}>
+              <strong>Tarih:</strong>{" "}
+              {shipment?.sentDate
+                ? new Date(shipment.sentDate).toLocaleDateString()
+                : ""}
+            </p>
+            <p style={{ margin: "5px 0" }}>
+              <strong>Fiş No:</strong> {order?.id}
+            </p>
+          </div>
 
-        <h2>Gönderi Detayları</h2>
-        {flattenedShipments.map((entry, index) => (
-          <div key={index} style={{ marginBottom: "30px" }}>
-            <table style={{ width: "100%", borderCollapse: "collapse" }}>
-              <thead>
-                <tr>
-                  <th
-                    colSpan={6}
+          <h2>Gönderi Detayları</h2>
+          {flattenedShipments.map((entry, index) => (
+            <div key={index} style={{ marginBottom: "30px" }}>
+              <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                <thead>
+                  <tr>
+                    <th
+                      colSpan={6}
+                      style={{
+                        border: "1px solid #ddd",
+                        padding: "8px",
+                        textAlign: "left",
+                      }}
+                    >
+                      {`${entry.productName} ${entry.color} - Tür: ${entry.itemType} `}
+                    </th>
+                  </tr>
+                  <tr
                     style={{
-                      border: "1px solid #ddd",
-                      padding: "8px",
                       textAlign: "left",
                     }}
                   >
-                    {`${entry.productName} ${entry.color} - Tür: ${entry.itemType} `}
-                  </th>
-                </tr>
-                <tr
-                  style={{
-                    textAlign: "left",
-                  }}
-                >
-                  <th style={{ border: "1px solid #ddd", padding: "8px" }}>
-                    #
-                  </th>
-                  <th style={{ border: "1px solid #ddd", padding: "8px" }}>
-                    Barkod
-                  </th>
-                  <th style={{ border: "1px solid #ddd", padding: "8px" }}>
-                    Metre
-                  </th>
-                  {entry.itemType === "Ham Kumaş" || exporting ? (
                     <th style={{ border: "1px solid #ddd", padding: "8px" }}>
-                      KG {exporting && "(net)"}
+                      #
                     </th>
-                  ) : null}
-                  {exporting && (
                     <th style={{ border: "1px solid #ddd", padding: "8px" }}>
-                      KG (brüt)
+                      Barkod
                     </th>
-                  )}
-                  <th style={{ border: "1px solid #ddd", padding: "8px" }}>
-                    Lot
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {entry.shipments.map((shipment, i) => (
-                  <tr key={shipment.id}>
+                    <th style={{ border: "1px solid #ddd", padding: "8px" }}>
+                      Metre
+                    </th>
+                    {entry.itemType === "Ham Kumaş" || exporting ? (
+                      <th style={{ border: "1px solid #ddd", padding: "8px" }}>
+                        KG {exporting && "(net)"}
+                      </th>
+                    ) : null}
+                    {exporting && (
+                      <th style={{ border: "1px solid #ddd", padding: "8px" }}>
+                        KG (brüt)
+                      </th>
+                    )}
+                    <th style={{ border: "1px solid #ddd", padding: "8px" }}>
+                      Lot
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {entry.shipments.map((shipment, i) => (
+                    <tr key={shipment.id}>
+                      <td
+                        style={{
+                          border: "1px solid #ddd",
+                          padding: "8px",
+                        }}
+                      >
+                        {i + 1}
+                      </td>
+                      <td
+                        style={{
+                          border: "1px solid #ddd",
+                          padding: "8px",
+                        }}
+                      >
+                        {shipment.barcode || "N/A"}
+                      </td>
+                      <td
+                        style={{
+                          border: "1px solid #ddd",
+                          padding: "8px",
+                        }}
+                      >
+                        {shipment.sentMeter.toFixed(2)}
+                      </td>
+                      {entry.itemType === "Ham Kumaş" || exporting ? (
+                        <td
+                          style={{
+                            border: "1px solid #ddd",
+                            padding: "8px",
+                          }}
+                        >
+                          {shipment.sentKg.toFixed(2)}
+                        </td>
+                      ) : null}
+
+                      {exporting && (
+                        <td
+                          style={{
+                            border: "1px solid #ddd",
+                            padding: "8px",
+                          }}
+                        >
+                          {(shipment.sentKg + addedWeight).toFixed(2)}{" "}
+                        </td>
+                      )}
+
+                      <td
+                        style={{
+                          border: "1px solid #ddd",
+                          padding: "8px",
+                        }}
+                      >
+                        {shipment.lot || "N/A"}
+                      </td>
+                    </tr>
+                  ))}
+                  <tr>
+                    <td
+                      colSpan={1}
+                      style={{
+                        border: "1px solid #ddd",
+                        padding: "8px",
+                        fontWeight: "bold",
+                        textAlign: "left",
+                      }}
+                    >
+                      Toplam:
+                    </td>
+                    <td
+                      colSpan={1}
+                      style={{
+                        border: "1px solid #ddd",
+                        padding: "8px",
+                        fontWeight: "bold",
+                      }}
+                    ></td>
                     <td
                       style={{
                         border: "1px solid #ddd",
                         padding: "8px",
+                        fontWeight: "bold",
                       }}
                     >
-                      {i + 1}
+                      {entry.shipments
+                        .reduce((sum, s) => sum + s.sentMeter, 0)
+                        .toFixed(2)}{" "}
+                      m
                     </td>
-                    <td
-                      style={{
-                        border: "1px solid #ddd",
-                        padding: "8px",
-                      }}
-                    >
-                      {shipment.barcode || "N/A"}
-                    </td>
-                    <td
-                      style={{
-                        border: "1px solid #ddd",
-                        padding: "8px",
-                      }}
-                    >
-                      {shipment.sentMeter.toFixed(2)}
-                    </td>
+
                     {entry.itemType === "Ham Kumaş" || exporting ? (
                       <td
                         style={{
                           border: "1px solid #ddd",
                           padding: "8px",
+                          fontWeight: "bold",
                         }}
                       >
-                        {shipment.sentKg.toFixed(2)}
+                        {" "}
+                        {entry.shipments
+                          .reduce((sum, s) => sum + s.sentKg, 0)
+                          .toFixed(2)}
                       </td>
                     ) : null}
-
                     {exporting && (
                       <td
                         style={{
                           border: "1px solid #ddd",
                           padding: "8px",
+                          fontWeight: "bold",
                         }}
                       >
-                        {(shipment.sentKg + addedWeight).toFixed(2)}{" "}
+                        {(
+                          entry.shipments.reduce(
+                            (sum, s) => sum + s.sentKg,
+                            0
+                          ) +
+                          addedWeight * entry.shipments.length
+                        ).toFixed(2)}{" "}
+                        kg
                       </td>
                     )}
-
                     <td
                       style={{
                         border: "1px solid #ddd",
                         padding: "8px",
+                        fontWeight: "bold",
                       }}
                     >
-                      {shipment.lot || "N/A"}
+                      {entry.shipments.length} Top
                     </td>
                   </tr>
-                ))}
-                <tr>
-                  <td
-                    colSpan={1}
-                    style={{
-                      border: "1px solid #ddd",
-                      padding: "8px",
-                      fontWeight: "bold",
-                      textAlign: "left",
-                    }}
-                  >
-                    Toplam:
-                  </td>
-                  <td
-                    colSpan={1}
-                    style={{
-                      border: "1px solid #ddd",
-                      padding: "8px",
-                      fontWeight: "bold",
-                    }}
-                  ></td>
-                  <td
-                    style={{
-                      border: "1px solid #ddd",
-                      padding: "8px",
-                      fontWeight: "bold",
-                    }}
-                  >
-                    {entry.shipments
-                      .reduce((sum, s) => sum + s.sentMeter, 0)
-                      .toFixed(2)}{" "}
-                    m
-                  </td>
-
-                  {entry.itemType === "Ham Kumaş" || exporting ? (
-                    <td
-                      style={{
-                        border: "1px solid #ddd",
-                        padding: "8px",
-                        fontWeight: "bold",
-                      }}
-                    >
-                      {" "}
-                      {entry.shipments
-                        .reduce((sum, s) => sum + s.sentKg, 0)
-                        .toFixed(2)}
-                    </td>
-                  ) : null}
-                  {exporting && (
-                    <td
-                      style={{
-                        border: "1px solid #ddd",
-                        padding: "8px",
-                        fontWeight: "bold",
-                      }}
-                    >
-                      {(
-                        entry.shipments.reduce((sum, s) => sum + s.sentKg, 0) +
-                        addedWeight * entry.shipments.length
-                      ).toFixed(2)}{" "}
-                      kg
-                    </td>
-                  )}
-                  <td
-                    style={{
-                      border: "1px solid #ddd",
-                      padding: "8px",
-                      fontWeight: "bold",
-                    }}
-                  >
-                    {entry.shipments.length} Top
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+                </tbody>
+              </table>
+            </div>
+          ))}
+          <div style={{ marginTop: "40px", marginBottom: "20px" }}>
+            <p style={{ margin: "5px 0" }}>
+              <strong>Tarih:</strong> {new Date().toLocaleDateString()}
+            </p>
+            <br />
+            <p style={{ margin: "5px 0" }}>
+              <strong>Alıcı Ad Soyad / İmza:</strong>
+            </p>
           </div>
-        ))}
-        <div style={{ marginTop: "40px", marginBottom: "20px" }}>
-          <p style={{ margin: "5px 0" }}>
-            <strong>Tarih:</strong> {new Date().toLocaleDateString()}
-          </p>
-          <br />
-          <p style={{ margin: "5px 0" }}>
-            <strong>Alıcı Ad Soyad / İmza:</strong>
-          </p>
         </div>
-      </div>
+      </Paper>
     </div>
   );
 };

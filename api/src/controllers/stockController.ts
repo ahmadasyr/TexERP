@@ -7,6 +7,7 @@ import {
   deleteStock,
   updateStock,
   getStocksByIds,
+  getGroupedByProductAndStatus,
 } from "../services/stockServices";
 
 import { Request, Response } from "express";
@@ -71,6 +72,21 @@ export const updateStockController = async (req: Request, res: Response) => {
 export const getStocksByIdsController = async (req: Request, res: Response) => {
   try {
     const stocks = await getStocksByIds(req.body.ids);
+    res.json(stocks);
+  } catch (error) {
+    res.status(500).json({ message: error });
+  }
+};
+
+export const getGroupedByProductAndStatusController = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const stocks = await getGroupedByProductAndStatus(
+      Number(req.params.productId),
+      req.params.status as stockStatus
+    );
     res.json(stocks);
   } catch (error) {
     res.status(500).json({ message: error });

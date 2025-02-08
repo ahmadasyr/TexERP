@@ -16,6 +16,7 @@ import {
 } from "../../components/table/utils";
 import {
   Button,
+  Chip,
   Dialog,
   DialogActions,
   DialogContent,
@@ -32,7 +33,14 @@ import {
 import Checkbox from "@mui/material/Checkbox";
 import "./table.scss";
 import { styled } from "@mui/material/styles";
-import { Add, Delete, Edit, Refresh, Visibility } from "@mui/icons-material";
+import {
+  Add,
+  Delete,
+  Edit,
+  Refresh,
+  TouchApp,
+  Visibility,
+} from "@mui/icons-material";
 import { useRouter } from "next/navigation";
 import { fetchData } from "../../components/utils";
 import {
@@ -67,6 +75,7 @@ type EnhancedTableProps = {
   deleteable?: boolean;
   disableColumnMenu?: boolean;
   viewButtonLabel?: string;
+  parseParams?: any[];
 };
 
 export default function EnhancedTable({
@@ -83,6 +92,7 @@ export default function EnhancedTable({
   deleteable = true,
   disableColumnMenu = false,
   viewButtonLabel,
+  parseParams,
 }: EnhancedTableProps): JSX.Element {
   const router = useRouter();
   const [rows, setRows] = React.useState<Data[]>([]);
@@ -131,40 +141,6 @@ export default function EnhancedTable({
       setRows(processedRows);
     }, URI);
   }, [URI, refresh]);
-
-  // condition example:
-  // conditions = [
-  //   {
-  //     action: ["edit"],
-  //     checks: [
-  //       {
-  //         key: "fromPersonnelId",
-  //         type: "equal",
-  //         value: getPersonnelInfo().id,
-  //       },
-  //       {
-  //         key: "toPersonnelId",
-  //         type: "equal",
-  //         value: getPersonnelInfo().id,
-  //       },
-  //       {
-  //         key: "followedPersonnelId",
-  //         type: "equal",
-  //         value: getPersonnelInfo().id,
-  //       },
-  //     ],
-  //   },
-  //   {
-  //     action: ["delete"],
-  //     checks: [
-  //       {
-  //         key: "fromPersonnelId",
-  //         type: "equal",
-  //         value: getPersonnelInfo().id,
-  //       },
-  //     ],
-  //   },
-  // ];
 
   const checkConditions = (row: any, action: string) => {
     let result = true;
@@ -218,6 +194,7 @@ export default function EnhancedTable({
           width: 205,
           hide: !cell.visible,
           type: cell.numeric ? "number" : "string",
+          align: cell.align || cell.numeric ? "right" : "left",
           valueGetter: (params: any, row: any) => {
             if (typeof row === "object" && cell.displayValue) {
               return `${row[cell.id]?.id} - ${cell.displayValue
@@ -234,6 +211,7 @@ export default function EnhancedTable({
             const render = cell.actionConditions.find(
               (condition: any) => condition.value === params.value
             );
+            console.log(render);
 
             if (!render) {
               return <span>No Action</span>;
@@ -260,32 +238,48 @@ export default function EnhancedTable({
                 <>
                   {render.label?.map((label: string, index: number) => (
                     <React.Fragment key={index}>
-                      <Button
-                        onClick={() =>
-                          handleFetch(
-                            `${render.action[index]}/${params.row.id}`
-                          )
-                        }
-                        style={{ marginRight: "0.5rem" }}
-                        variant="contained"
-                        color={render?.color[index] || "primary"}
-                      >
-                        {label}
-                      </Button>
+                      {render.action && render.action[index] !== null ? (
+                        <Button
+                          disabled={
+                            !checkConditions(params.row, "edit") ||
+                            render.action[index] === null
+                          }
+                          onClick={() => {
+                            render.action[index] &&
+                              handleFetch(
+                                `${render.action[index]}/${params.row.id}`
+                              );
+                          }}
+                          style={{ marginRight: "0.5rem" }}
+                          variant="contained"
+                          color={render?.color[index] || "primary"}
+                        >
+                          {label}
+                        </Button>
+                      ) : (
+                        <span style={{ marginRight: "0.5rem" }}>{label}</span>
+                      )}
                     </React.Fragment>
                   ))}
                 </>
               );
             }
 
-            return (
+            return render.action ? (
               <Button
+                startIcon={<TouchApp />}
                 onClick={() => handleFetch(`${render.action}/${params.row.id}`)}
                 variant="contained"
                 color={render?.color || "primary"}
               >
-                {render?.label || "İşlem Bulunamadı"}
+                {render?.label || render?.value}
               </Button>
+            ) : (
+              <Chip
+                sx={{ fontSize: "0.875rem" }}
+                color={render?.color || "primary"}
+                label={render?.label || render?.value}
+              />
             );
           },
         };
@@ -384,7 +378,17 @@ export default function EnhancedTable({
                         router.push(
                           `${useTableName ? tableName : currentURI}/view/?id=${
                             params.row.id
-                          }`
+                          }
+                          ${
+                            parseParams
+                              ? parseParams
+                                  .map(
+                                    (param) => `&${param.param}=${param.value}`
+                                  )
+                                  .join("")
+                              : ""
+                          }
+                          `
                         );
                       } else {
                         setResult({
@@ -395,7 +399,17 @@ export default function EnhancedTable({
                       router.push(
                         `${useTableName ? tableName : currentURI}/view/?id=${
                           params.row.id
-                        }`
+                        }
+                        ${
+                          parseParams
+                            ? parseParams
+                                .map(
+                                  (param) => `&${param.param}=${param.value}`
+                                )
+                                .join("")
+                            : ""
+                        }
+                        `
                       );
                     }
                   }}
@@ -706,14 +720,120 @@ export default function EnhancedTable({
             {rows.map((row) => (
               <Grid item xs={12} sm={6} md={4} key={row.id}>
                 <Paper elevation={3} style={{ padding: "16px" }}>
-                  {headCells.map((cell: { id: keyof Data; label: string }) => (
-                    <div key={cell.id} style={{ marginBottom: "8px" }}>
-                      <Typography variant="subtitle2" color="textSecondary">
-                        {cell.label}
-                      </Typography>
-                      <Typography variant="body1">{row[cell.id]}</Typography>
-                    </div>
-                  ))}
+                  {headCells.map(
+                    (cell: {
+                      actionConditions: any;
+                      id: keyof Data;
+                      label: string;
+                    }) => (
+                      <div key={cell.id} style={{ marginBottom: "8px" }}>
+                        <Typography variant="subtitle2" color="textSecondary">
+                          {cell.label}
+                        </Typography>
+                        {cell?.actionConditions ? (
+                          <>
+                            {(() => {
+                              const render = cell.actionConditions.find(
+                                (condition: any) =>
+                                  condition.value === row[cell.id]
+                              );
+                              console.log(render);
+
+                              if (!render) {
+                                return <span>No Action</span>;
+                              }
+
+                              const handleFetch = async (url: string) => {
+                                try {
+                                  const response = await fetch(url, {
+                                    method: "PUT",
+                                    headers: {
+                                      "Content-Type": "application/json",
+                                    },
+                                  });
+                                  if (!response.ok)
+                                    throw new Error(
+                                      "Network response was not ok"
+                                    );
+                                  setRefresh(!refresh);
+                                } catch (error) {
+                                  console.error(
+                                    "Error performing action:",
+                                    error
+                                  );
+                                }
+                              };
+
+                              if (row[cell.id] === null) {
+                                return (
+                                  <>
+                                    {render.label?.map(
+                                      (label: string, index: number) => (
+                                        <React.Fragment key={index}>
+                                          {render.action &&
+                                          render.action[index] !== null ? (
+                                            <Button
+                                              disabled={
+                                                !checkConditions(row, "edit") ||
+                                                render.action[index] === null
+                                              }
+                                              onClick={() => {
+                                                render.action[index] &&
+                                                  handleFetch(
+                                                    `${render.action[index]}/${row.id}`
+                                                  );
+                                              }}
+                                              style={{ marginRight: "0.5rem" }}
+                                              variant="contained"
+                                              color={
+                                                render?.color[index] ||
+                                                "primary"
+                                              }
+                                            >
+                                              {label}
+                                            </Button>
+                                          ) : (
+                                            <span
+                                              style={{ marginRight: "0.5rem" }}
+                                            >
+                                              {label}
+                                            </span>
+                                          )}
+                                        </React.Fragment>
+                                      )
+                                    )}
+                                  </>
+                                );
+                              }
+
+                              return render.action ? (
+                                <Button
+                                  startIcon={<TouchApp />}
+                                  onClick={() =>
+                                    handleFetch(`${render.action}/${row.id}`)
+                                  }
+                                  variant="contained"
+                                  color={render?.color || "primary"}
+                                >
+                                  {render?.label || render?.value}
+                                </Button>
+                              ) : (
+                                <Chip
+                                  sx={{ fontSize: "0.875rem" }}
+                                  color={render?.color || "primary"}
+                                  label={render?.label || render?.value}
+                                />
+                              );
+                            })()}
+                          </>
+                        ) : (
+                          <Typography variant="body2">
+                            {row[cell.id]}
+                          </Typography>
+                        )}
+                      </div>
+                    )
+                  )}
                   <div style={{ marginTop: "16px" }}>
                     {viewable && (
                       <Button
@@ -724,7 +844,16 @@ export default function EnhancedTable({
                               router.push(
                                 `${
                                   useTableName ? tableName : currentURI
-                                }/view/?id=${row.id}`
+                                }/view/?id=${row.id}${
+                                  parseParams
+                                    ? parseParams
+                                        .map(
+                                          (param) =>
+                                            `&${param.param}=${param.value}`
+                                        )
+                                        .join("")
+                                    : ""
+                                }`
                               );
                             } else {
                               setResult({
@@ -735,7 +864,16 @@ export default function EnhancedTable({
                             router.push(
                               `${
                                 useTableName ? tableName : currentURI
-                              }/view/?id=${row.id}`
+                              }/view/?id=${row.id}${
+                                parseParams
+                                  ? parseParams
+                                      .map(
+                                        (param) =>
+                                          `&${param.param}=${param.value}`
+                                      )
+                                      .join("")
+                                  : ""
+                              }`
                             );
                           }
                         }}

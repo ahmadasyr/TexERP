@@ -111,7 +111,7 @@ interface SheetProps {
   setSubRows: React.Dispatch<React.SetStateAction<any[]>>;
 }
 
-import { itemTypes } from "@/contexts/itemTypes";
+import { saleItemTypes as itemTypes } from "@/contexts/itemTypes";
 
 export default function Sheet(props: SheetProps) {
   const { refresh, subRows, setSubRows } = props;

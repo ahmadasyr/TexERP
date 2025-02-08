@@ -16,6 +16,7 @@ import {
 } from "../../components/table/utils";
 import {
   Button,
+  Chip,
   Dialog,
   DialogActions,
   DialogContent,
@@ -32,7 +33,14 @@ import {
 import Checkbox from "@mui/material/Checkbox";
 import "./table.scss";
 import { styled } from "@mui/material/styles";
-import { Add, Delete, Edit, Refresh, Visibility } from "@mui/icons-material";
+import {
+  Add,
+  Delete,
+  Edit,
+  Refresh,
+  TouchApp,
+  Visibility,
+} from "@mui/icons-material";
 import { useRouter } from "next/navigation";
 import { fetchData } from "../../components/utils";
 import {
@@ -68,6 +76,8 @@ type EnhancedTableProps = {
   disableColumnMenu?: boolean;
   noActions?: boolean;
   specialButton?: any[];
+  outerRefresh?: boolean;
+  setOuterRefresh?: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 export default function EnhancedTable({
@@ -85,6 +95,8 @@ export default function EnhancedTable({
   disableColumnMenu = false,
   noActions = false,
   specialButton,
+  outerRefresh,
+  setOuterRefresh,
 }: EnhancedTableProps): JSX.Element {
   const router = useRouter();
   const [rows, setRows] = React.useState<Data[]>([]);
@@ -132,42 +144,13 @@ export default function EnhancedTable({
 
       setRows(processedRows);
     }, URI);
-  }, [URI, refresh]);
+  }, [URI, refresh, outerRefresh]);
 
-  // condition example:
-  // conditions = [
-  //   {
-  //     action: ["edit"],
-  //     checks: [
-  //       {
-  //         key: "fromPersonnelId",
-  //         type: "equal",
-  //         value: getPersonnelInfo().id,
-  //       },
-  //       {
-  //         key: "toPersonnelId",
-  //         type: "equal",
-  //         value: getPersonnelInfo().id,
-  //       },
-  //       {
-  //         key: "followedPersonnelId",
-  //         type: "equal",
-  //         value: getPersonnelInfo().id,
-  //       },
-  //     ],
-  //   },
-  //   {
-  //     action: ["delete"],
-  //     checks: [
-  //       {
-  //         key: "fromPersonnelId",
-  //         type: "equal",
-  //         value: getPersonnelInfo().id,
-  //       },
-  //     ],
-  //   },
-  // ];
-
+  useEffect(() => {
+    if (setOuterRefresh) {
+      setOuterRefresh(!outerRefresh);
+    }
+  }, [refresh]);
   const checkConditions = (row: any, action: string) => {
     let result = true;
     conditions?.forEach((condition: any) => {
@@ -220,6 +203,7 @@ export default function EnhancedTable({
           width: 205,
           hide: !cell.visible,
           type: cell.numeric ? "number" : "string",
+          align: cell.align || cell.numeric ? "right" : "left",
           valueGetter: (params: any, row: any) => {
             if (typeof row === "object" && cell.displayValue) {
               return `${row[cell.id]?.id} - ${cell.displayValue
@@ -236,6 +220,7 @@ export default function EnhancedTable({
             const render = cell.actionConditions.find(
               (condition: any) => condition.value === params.value
             );
+            console.log(render);
 
             if (!render) {
               return <span>No Action</span>;
@@ -262,32 +247,48 @@ export default function EnhancedTable({
                 <>
                   {render.label?.map((label: string, index: number) => (
                     <React.Fragment key={index}>
-                      <Button
-                        onClick={() =>
-                          handleFetch(
-                            `${render.action[index]}/${params.row.id}`
-                          )
-                        }
-                        style={{ marginRight: "0.5rem" }}
-                        variant="contained"
-                        color={render?.color[index] || "primary"}
-                      >
-                        {label}
-                      </Button>
+                      {render.action && render.action[index] !== null ? (
+                        <Button
+                          disabled={
+                            !checkConditions(params.row, "edit") ||
+                            render.action[index] === null
+                          }
+                          onClick={() => {
+                            render.action[index] &&
+                              handleFetch(
+                                `${render.action[index]}/${params.row.id}`
+                              );
+                          }}
+                          style={{ marginRight: "0.5rem" }}
+                          variant="contained"
+                          color={render?.color[index] || "primary"}
+                        >
+                          {label}
+                        </Button>
+                      ) : (
+                        <span style={{ marginRight: "0.5rem" }}>{label}</span>
+                      )}
                     </React.Fragment>
                   ))}
                 </>
               );
             }
 
-            return (
+            return render.action ? (
               <Button
+                startIcon={<TouchApp />}
                 onClick={() => handleFetch(`${render.action}/${params.row.id}`)}
                 variant="contained"
                 color={render?.color || "primary"}
               >
-                {render?.label || "İşlem Bulunamadı"}
+                {render?.label || render?.value}
               </Button>
+            ) : (
+              <Chip
+                sx={{ fontSize: "0.875rem" }}
+                color={render?.color || "primary"}
+                label={render?.label || render?.value}
+              />
             );
           },
         };
@@ -298,6 +299,7 @@ export default function EnhancedTable({
         width: cell.width || 130,
         hide: !cell.visible,
         type: cell.numeric ? "number" : "string",
+        align: cell.align || cell.numeric ? "right" : "left",
         valueGetter: (params: any, row: any) => {
           if (typeof row === "object" && cell.displayValue) {
             return `${row[cell.id]?.id} - ${cell.displayValue
@@ -472,42 +474,38 @@ export default function EnhancedTable({
           </Grid>
           <GridToolbarQuickFilter />
           {createable && (
-            <Button
-              style={{ marginLeft: "auto" }}
-              variant="contained"
-              onClick={() => {
-                if (conditions) {
-                  if (checkConditions({}, "create")) {
-                    if (customPath) {
-                      router.push(customPath);
-                    } else {
-                      router.push(
-                        `${useTableName ? tableName : currentURI}/form`
-                      );
-                    }
-                  } else {
-                    setResult({
-                      code: 401,
-                    });
-                  }
-                } else {
-                  if (customPath) {
-                    router.push(customPath);
-                  } else {
-                    router.push(
-                      `${useTableName ? tableName : currentURI}/form`
-                    );
-                  }
-                }
-              }}
+            <Link
+              href={
+                conditions && !checkConditions({}, "create")
+                  ? undefined
+                  : customPath
+                  ? customPath
+                  : `${useTableName ? tableName : currentURI}/form`
+              }
+              style={{ textDecoration: "none", marginLeft: "auto" }}
             >
-              Yeni Oluştur
-              <Add />
-            </Button>
+              <Button
+                startIcon={<Add />}
+                variant="contained"
+                onClick={(e) => {
+                  if (conditions) {
+                    if (!checkConditions({}, "create")) {
+                      e.preventDefault();
+                      setResult({
+                        code: 401,
+                      });
+                    }
+                  }
+                }}
+              >
+                Yeni Oluştur
+              </Button>
+            </Link>
           )}
 
           {selected.length === 0 && (
             <Button
+              startIcon={<Refresh />}
               style={!createable ? { marginLeft: "auto" } : {}}
               variant="outlined"
               color="secondary"
@@ -516,11 +514,11 @@ export default function EnhancedTable({
               }}
             >
               Yenile
-              <Refresh />
             </Button>
           )}
           {selected.length > 0 && deleteable && (
             <Button
+              startIcon={<Delete />}
               variant="outlined"
               color="error"
               onClick={() => {
@@ -553,78 +551,41 @@ export default function EnhancedTable({
                 }
               }}
             >
-              <Delete />
+              Sil
             </Button>
           )}
           {selected.length === 1 && (
             <>
               {viewable && (
-                <Button
-                  style={
-                    !createable && !deleteable ? { marginLeft: "auto" } : {}
-                  }
-                  variant="contained"
-                  color="info"
-                  onClick={() => {
-                    if (conditions) {
-                      if (
-                        checkConditions(
-                          rows.find((row) => row.id === selected[0]),
-                          "view"
-                        )
-                      ) {
-                        router.push(
-                          `${useTableName ? tableName : currentURI}/view/?id=${
-                            selected[0]
-                          }`
-                        );
-                      }
-                    } else {
-                      router.push(
-                        `${useTableName ? tableName : currentURI}/view/?id=${
-                          selected[0]
-                        }`
-                      );
-                    }
-                  }}
+                <Link
+                  href={`${useTableName ? tableName : currentURI}/view/?id=${
+                    selected[0]
+                  }`}
+                  style={{ textDecoration: "none" }}
                 >
-                  Görüntüle
-                  <Visibility />
-                </Button>
+                  <Button
+                    startIcon={<Visibility />}
+                    style={
+                      !createable && !deleteable ? { marginLeft: "auto" } : {}
+                    }
+                    variant="contained"
+                    color="info"
+                  >
+                    Görüntüle
+                  </Button>
+                </Link>
               )}
               {editable && (
-                <Button
-                  variant="contained"
-                  color="info"
-                  onClick={() => {
-                    if (conditions) {
-                      if (
-                        checkConditions(
-                          rows.find((row) => row.id === selected[0]),
-                          "edit"
-                        )
-                      ) {
-                        router.push(
-                          `${useTableName ? tableName : currentURI}/form/?id=${
-                            selected[0]
-                          }`
-                        );
-                      } else {
-                        setResult({
-                          code: 401,
-                        });
-                      }
-                    } else {
-                      router.push(
-                        `${useTableName ? tableName : currentURI}/form/?id=${
-                          selected[0]
-                        }`
-                      );
-                    }
-                  }}
+                <Link
+                  href={`${useTableName ? tableName : currentURI}/form/?id=${
+                    selected[0]
+                  }`}
+                  style={{ textDecoration: "none" }}
                 >
-                  <Edit />
-                </Button>
+                  <Button startIcon={<Edit />} variant="contained" color="info">
+                    Düzenle
+                  </Button>
+                </Link>
               )}
             </>
           )}
@@ -764,6 +725,11 @@ export default function EnhancedTable({
                   },
                 ],
               },
+            }}
+            autosizeOptions={{
+              columns: newHeadCells,
+              includeOutliers: true,
+              includeHeaders: true,
             }}
             // add row selection and deletion
             checkboxSelection

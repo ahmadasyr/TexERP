@@ -13,6 +13,7 @@ import menuItems from "./menuItems.json";
 import { usePathname, useRouter } from "next/navigation";
 import { getPersonnelInfo } from "@/contexts/auth";
 import { set } from "date-fns";
+import Link from "next/link";
 
 interface MenuItem {
   title: string;
@@ -115,21 +116,26 @@ export default function Menu(props: MenuProps) {
               </Collapse>
             </>
           ) : (
-            <ListItemButton
-              title={item.desc}
-              onClick={() => {
-                item.link !== window.location.pathname &&
-                  handleNavigation(item.link);
+            <Link
+              style={{
+                textDecoration: "none",
+                color: "inherit",
               }}
-              selected={pathname === item.link}
-              disabled={item.link === "/" || item.link === "#"}
-              sx={{ pl: level * 2 + 2 }}
+              href={item.link || "#"}
+              passHref
             >
-              <ListItemIcon sx={{ minWidth: 36 }}>
-                <Icon fontSize="small">{item.icon}</Icon>
-              </ListItemIcon>
-              <ListItemText primary={item.title} />
-            </ListItemButton>
+              <ListItemButton
+                title={item.desc}
+                selected={pathname === item.link}
+                disabled={item.link === "/" || item.link === "#"}
+                sx={{ pl: level * 2 + 2 }}
+              >
+                <ListItemIcon sx={{ minWidth: 36 }}>
+                  <Icon fontSize="small">{item.icon}</Icon>
+                </ListItemIcon>
+                <ListItemText primary={item.title} />
+              </ListItemButton>
+            </Link>
           )}
         </React.Fragment>
       );
@@ -152,28 +158,44 @@ export default function Menu(props: MenuProps) {
         </ListItemButton>
         <Collapse in={openItems["user-settings"]} timeout="auto" unmountOnExit>
           <List component="div" disablePadding>
-            <ListItemButton
-              title="Profil"
-              onClick={() => handleNavigation("/profile")}
-              selected={pathname === "/profile"}
-              sx={{ pl: 4 }}
+            <Link
+              style={{
+                textDecoration: "none",
+                color: "inherit",
+              }}
+              href="/profile"
+              passHref
             >
-              <ListItemIcon sx={{ minWidth: 36 }}>
-                <Icon fontSize="small">person</Icon>
-              </ListItemIcon>
-              <ListItemText primary="Profil" />
-            </ListItemButton>
-            <ListItemButton
-              title="Çıkış Yap"
-              onClick={() => handleNavigation("/logout")}
-              selected={pathname === "/logout"}
-              sx={{ pl: 4 }}
+              <ListItemButton
+                title="Profil"
+                selected={pathname === "/profile"}
+                sx={{ pl: 4 }}
+              >
+                <ListItemIcon sx={{ minWidth: 36 }}>
+                  <Icon fontSize="small">person</Icon>
+                </ListItemIcon>
+                <ListItemText primary="Profil" />
+              </ListItemButton>
+            </Link>
+            <Link
+              style={{
+                textDecoration: "none",
+                color: "inherit",
+              }}
+              href="/logout"
+              passHref
             >
-              <ListItemIcon sx={{ minWidth: 36 }}>
-                <Icon fontSize="small">logout</Icon>
-              </ListItemIcon>
-              <ListItemText primary="Çıkış Yap" />
-            </ListItemButton>
+              <ListItemButton
+                title="Çıkış Yap"
+                selected={pathname === "/logout"}
+                sx={{ pl: 4 }}
+              >
+                <ListItemIcon sx={{ minWidth: 36 }}>
+                  <Icon fontSize="small">logout</Icon>
+                </ListItemIcon>
+                <ListItemText primary="Çıkış Yap" />
+              </ListItemButton>
+            </Link>
           </List>
         </Collapse>
       </>
@@ -200,28 +222,38 @@ export default function Menu(props: MenuProps) {
           unmountOnExit
         >
           <List component="div" disablePadding>
-            <ListItemButton
-              title="Alt Çalışanlarım"
-              onClick={() => handleNavigation("/my-subordinates")}
-              selected={pathname === "/my-subordinates"}
-              sx={{ pl: 4 }}
+            <Link
+              style={{ textDecoration: "none", color: "inherit" }}
+              href={"/my-subordinates"}
+              passHref
             >
-              <ListItemIcon sx={{ minWidth: 36 }}>
-                <Icon fontSize="small">group</Icon>
-              </ListItemIcon>
-              <ListItemText primary="Alt Çalışanlarım" />
-            </ListItemButton>
-            <ListItemButton
-              title="Satın Alma Talepleri"
-              onClick={() => handleNavigation("/subordinate-requests")}
-              selected={pathname === "/subordinate-requests"}
-              sx={{ pl: 4 }}
+              <ListItemButton
+                title="Alt Çalışanlarım"
+                selected={pathname === "/my-subordinates"}
+                sx={{ pl: 4 }}
+              >
+                <ListItemIcon sx={{ minWidth: 36 }}>
+                  <Icon fontSize="small">group</Icon>
+                </ListItemIcon>
+                <ListItemText primary="Alt Çalışanlarım" />
+              </ListItemButton>
+            </Link>
+            <Link
+              style={{ textDecoration: "none", color: "inherit" }}
+              href={"/subordinate-requests"}
+              passHref
             >
-              <ListItemIcon sx={{ minWidth: 36 }}>
-                <Icon fontSize="small">shopping_cart</Icon>
-              </ListItemIcon>
-              <ListItemText primary="Satın Alma Talepleri" />
-            </ListItemButton>
+              <ListItemButton
+                title="Satın Alma Talepleri"
+                selected={pathname === "/subordinate-requests"}
+                sx={{ pl: 4 }}
+              >
+                <ListItemIcon sx={{ minWidth: 36 }}>
+                  <Icon fontSize="small">shopping_cart</Icon>
+                </ListItemIcon>
+                <ListItemText primary="Satın Alma Talepleri" />
+              </ListItemButton>{" "}
+            </Link>
           </List>
         </Collapse>
       </>

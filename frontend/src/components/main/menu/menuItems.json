@@ -165,20 +165,20 @@
         "subItems": [
           {
             "title": "Boyahane Siparişleri",
-            "link": "/dyeing-order",
+            "link": "/dye-order",
             "desc": "Boyahane sipariş listesi",
             "icon": "shopping_cart"
           },
           {
             "title": "Boyahane Çeki Listeleri",
-            "link": "/dyeing-draw-list",
+            "link": "/dye-shipment",
             "desc": "Boyahane çeki listesi",
             "icon": "list"
           },
           {
-            "title": "Gelen ْİrsaliyeler",
-            "link": "/dyeing-receipt",
-            "desc": "Boyahane gelen irsaliye listesi",
+            "title": "Boyahane İrsaliyeler",
+            "link": "/worker-dye-shipments",
+            "desc": "Boyahane irsaliye listesi",
             "icon": "list"
           }
         ]
@@ -221,25 +221,19 @@
           },
           {
             "title": "Satış Sipariş Raporları",
-            "link": "/sales-order-report",
+            "link": "#",
             "desc": "Satış sipariş rapor listesi",
             "icon": "list"
           },
           {
             "title": "Sevk Emirleri",
-            "link": "/shipment-order",
+            "link": "/order-shipment",
             "desc": "Sevk emir listesi",
             "icon": "list"
           },
           {
-            "title": "Satış Çeki Listeleri",
-            "link": "/sales-draw-list",
-            "desc": "Satış çeki listesi",
-            "icon": "list"
-          },
-          {
             "title": "Satış İade İrsaliyeleri",
-            "link": "/sales-return-receipt",
+            "link": "#",
             "desc": "Satış iade irsaliye listesi",
             "icon": "list"
           }
@@ -375,10 +369,16 @@
     "allowedDepartments": ["sev", "urt", "pln", "admin", "sts"],
     "subItems": [
       {
-        "title": "Açık Sevk Emirleri",
+        "title": "Açık Satış Sevk Emirleri",
         "desc": "Kumaş satış sevkiyatları menüsü",
         "icon": "format_list_bulleted",
         "link": "/worker-shipments"
+      },
+      {
+        "title": "Açık Boyahane Sevk Emirleri",
+        "desc": "Boyahane sevkiyatları menüsü",
+        "icon": "format_list_bulleted",
+        "link": "/worker-dye-shipments"
       }
     ]
   },

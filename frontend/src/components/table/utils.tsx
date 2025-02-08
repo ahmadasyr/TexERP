@@ -51,7 +51,19 @@ export interface HeadCell {
   clickable?: boolean;
   uri?: string;
   boolean?: boolean;
-  actionConditions?: any;
+  actionConditions?: {
+    value: any;
+    label: string;
+    color:
+      | "primary"
+      | "success"
+      | "error"
+      | "warning"
+      | "info"
+      | "secondary"
+      | "none";
+    action?: string | null;
+  }[];
   width?: number;
 }
 export interface conditions {
@@ -295,7 +307,7 @@ export function CustomAutocomplete(props: any) {
       onChange={handleOnChange}
       renderInput={(params) => (
         <TextField
-          label={label} // Add a label if required
+          label={label}
           style={{ border: "none !important", borderRadius: "0" }}
           {...params}
         />

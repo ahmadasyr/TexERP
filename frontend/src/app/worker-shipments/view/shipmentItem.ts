@@ -38,6 +38,38 @@ export const headCells: HeadCell[] = [
     width: 120,
   },
   {
+    id: "itemType",
+    numeric: false,
+    disablePadding: false,
+    label: "Kumaş Tipi",
+    actionConditions: [
+      {
+        value: "RAW_QUALITY",
+        label: "Ham Kumaş",
+        color: "primary",
+        action: null,
+      },
+      {
+        value: "DYE_PRE_QUALITY",
+        label: "Kalitesiz Boyalı Kumaş",
+        color: "secondary",
+        action: null,
+      },
+      {
+        value: "DYE_QUALITY",
+        label: "Kalite Boyalı Kumaş",
+        color: "info",
+        action: null,
+      },
+      {
+        value: "LAMINATED_QUALITY",
+        label: "Lamineli Kumaş",
+        color: "warning",
+        action: null,
+      },
+    ],
+  },
+  {
     id: "outsourceTypeNames",
     numeric: false,
     disablePadding: false,

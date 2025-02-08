@@ -23,4 +23,4 @@ LEFT JOIN
 LEFT JOIN
     tblhesaplar T ON T.id = F.hesapno
 WHERE
-    F.tarih BETWEEN '2024-07-01' AND '2024-07-31';
+    F.tarih BETWEEN '2025-01-01' AND '2025-01-31';

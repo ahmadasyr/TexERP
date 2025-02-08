@@ -2,7 +2,9 @@ import React, { useEffect } from "react";
 import { Box, Typography, Link, Button } from "@mui/material";
 import { Announcement, Campaign } from "@mui/icons-material";
 import Clock from "react-live-clock";
+import { useRouter } from "next/navigation";
 const Footer = ({ darkMode }: { darkMode: boolean }) => {
+  const router = useRouter();
   return (
     <Box
       sx={{
@@ -58,6 +60,9 @@ const Footer = ({ darkMode }: { darkMode: boolean }) => {
           },
         }}
         aria-label="Report an issue"
+        onClick={() => {
+          router.push("/report-issue");
+        }}
       >
         Sorun Bildir
         <Campaign sx={{ marginLeft: "8px", fontSize: "1.2rem" }} />

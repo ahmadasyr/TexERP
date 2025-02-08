@@ -265,6 +265,7 @@ export const getShipmentItems = async (id: number) => {
     meter: item.meter,
     kg: item.kg,
     lot: item.lot,
+    itemType: item.orderItem.itemType,
     productName: item.orderItem.product.name,
     dyeColorName: item.orderItem.dyeColor?.name,
     laminationColorName: item.orderItem.laminationColor?.name,
@@ -415,9 +416,45 @@ export const getShipmentItemDetails = async (id: number) => {
       kg: true,
       orderItemId: true,
       orderShipmentId: true,
+      lot: true,
+      orderItem: {
+        select: {
+          product: { select: { name: true } },
+          dyeColor: { select: { name: true } },
+          laminationColor: { select: { name: true } },
+          itemType: true,
+          orderItemSpecification: {
+            select: { outsourceType: { select: { name: true } } },
+          },
+        },
+      },
     },
   });
-  return item;
+  const sentItems = await prisma.orderShipmentConfirmation.findMany({
+    where: {
+      orderShipmentId: item?.orderShipmentId,
+      orderItemId: item?.orderItemId,
+    },
+    select: {
+      sentKg: true,
+      sentMeter: true,
+    },
+  });
+  return {
+    ...item,
+    productName: item?.orderItem.product.name,
+    dyeColorName: item?.orderItem.dyeColor?.name,
+    laminationColorName: item?.orderItem.laminationColor?.name,
+    outsourceTypeNames: item?.orderItem.orderItemSpecification
+      .map((spec) => spec.outsourceType.name)
+      .join(", "),
+    remainingMeter:
+      item?.meter &&
+      item?.meter - sentItems.reduce((acc, item) => acc + item.sentMeter, 0),
+    remainingKg:
+      item?.kg &&
+      item?.kg - sentItems.reduce((acc, item) => acc + item.sentKg, 0),
+  };
 };
 
 export const getScannedItems = async (id: number) => {

@@ -22,6 +22,7 @@ interface FormFieldProps {
   togglePopup?: (table: string, column: string, on: boolean) => void;
   multiline?: boolean;
   multiSelect?: boolean;
+  disabled?: boolean;
 }
 
 const gridSize = 12;
@@ -86,6 +87,7 @@ export const NewSelect = ({
   formFields,
   formData,
   handleChange,
+  disabled,
 }: FormFieldProps) => {
   const field = formFields.find((field) => field.name === keyProp);
   if (!field || !field.options) {
@@ -113,7 +115,8 @@ export const NewSelect = ({
         disabled={
           (field.dependant &&
             !formData[field.dependency as keyof typeof formData]) ||
-          field.disabled
+          field.disabled ||
+          disabled
         }
       >
         <MenuItem value={""}>
@@ -316,6 +319,7 @@ export const NewRelation = ({
   handleChange,
   tableData,
   togglePopup,
+  disabled,
 }: FormFieldProps & { tableData: any[] }) => {
   const field = formFields.find((f) => f.name === keyProp);
   if (!field) return null; // Return null for clarity
@@ -364,7 +368,7 @@ export const NewRelation = ({
     <>
       <FormControl fullWidth>
         <Autocomplete
-          disabled={field?.disabled}
+          disabled={field?.disabled || disabled}
           options={
             field.groupBy
               ? filteredOptions.sort(

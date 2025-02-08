@@ -80,6 +80,7 @@ export const getStocksByStatus = async (status: stockStatus) => {
   return (await stock).map((s: any) => {
     return {
       ...s,
+      productName: s.product.name,
       dyeColor: s.dyeColor?.name ?? null,
       dyeType: s.dyeType?.name ?? null,
       laminationColor: s.laminationColor?.name ?? null,
@@ -248,4 +249,33 @@ export const getStocksByIds = async (ids: number[]) => {
         .join(", "),
     };
   });
+};
+
+export const getGroupedByProductAndStatus = async (
+  productId: number,
+  status: stockStatus
+) => {
+  const groupedStocks = await prisma.stock.groupBy({
+    by: ["lot", "yon"],
+    _sum: {
+      meter: true,
+      kg: true,
+      count: true,
+    },
+    _count: {
+      _all: true,
+    },
+    where: {
+      productId,
+      status,
+    },
+  });
+
+  return groupedStocks.map((group: any) => ({
+    lot: group.lot,
+    yon: group.yon,
+    totalMeter: group._sum.meter,
+    totalKg: group._sum.kg,
+    count: group._count._all,
+  }));
 };

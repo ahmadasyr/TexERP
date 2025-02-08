@@ -40,3 +40,41 @@ export const itemTypes: { value: string; label: string }[] = [
     label: "Örtü Kumaş",
   },
 ];
+
+export const saleItemTypes: { value: string; label: string }[] = [
+  {
+    value: "RAW_QUALITY",
+    label: "Ham Kumaş",
+  },
+  {
+    value: "DYE_QUALITY",
+    label: "Boyalı Kumaş",
+  },
+  {
+    value: "LAMINATED_QUALITY",
+    label: "Lamineli Kumaş",
+  },
+  {
+    value: "COVER_QUALITY",
+    label: "Örtü Kumaş",
+  },
+];
+
+export const dyeItemTypes: { value: string; label: string }[] = [
+  {
+    value: "RAW_QUALITY",
+    label: "Ham Kumaş",
+  },
+  {
+    value: "DYE_PRE_QUALITY",
+    label: "Kalitesiz Boyalı Kumaş",
+  },
+  {
+    value: "DYE_QUALITY",
+    label: "Kalite Boyalı Kumaş",
+  },
+  {
+    value: "LAMINATED_QUALITY",
+    label: "Lamineli Kumaş",
+  },
+];

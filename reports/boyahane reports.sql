@@ -25,4 +25,4 @@ JOIN
 JOIN 
     tblhesaplar ON tblhesaplar.id = boyahanefis.hesapno
 WHERE 
-    DATE(boyahaneirsaliye.tarih) BETWEEN '2024-07-01' AND '2024-07-31';
+    DATE(boyahaneirsaliye.tarih) BETWEEN '2025-01-01' AND '2025-01-31';

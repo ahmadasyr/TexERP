@@ -31,7 +31,7 @@ const Page: React.FC = () => {
         value={status || ""}
       >
         <MenuItem value="" disabled>
-          Select stock status
+          Stok Tipi Seçiniz
         </MenuItem>
         {itemTypes.map((item) => (
           <MenuItem key={item.value} value={item.value}>

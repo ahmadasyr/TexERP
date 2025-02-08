@@ -24,6 +24,13 @@ const Page: React.FC = () => {
   const [shipmentItem, setShipmentItem] = React.useState<{
     meter?: number;
     kg?: number;
+    productName?: string;
+    dyeColorName?: string;
+    lot?: string;
+    laminationColorName?: string;
+    outSourceTypeNames?: string;
+    remainingMeter?: number;
+    remainingKg?: number;
     orderItemId?: number;
     orderShipmentId?: number;
   }>({});
@@ -35,7 +42,7 @@ const Page: React.FC = () => {
         .then((res) => res.json())
         .then((data) => {
           setShipmentItem(data);
-          console.log(data);
+          setDone(data.remainingMeter === 0);
         });
     }
   }, [id, refresh]);
@@ -62,7 +69,9 @@ const Page: React.FC = () => {
       });
   };
   const [popup, setPopup] = React.useState(false);
+  const [done, setDone] = React.useState(false);
   const [readType, setReadType] = React.useState<number>(0);
+  const router = useRouter();
   return (
     <>
       <Dialog fullWidth open={popup} onClose={() => setPopup(false)}>
@@ -89,45 +98,94 @@ const Page: React.FC = () => {
           marginBottom: "1rem",
         }}
       >
-        <Tabs
-          value={readType}
-          onChange={(_, newValue) => setReadType(newValue)}
-        >
-          <Tab value={0} label="Barkod Okut" />
-          <Tab value={1} label="Manuel Giriş" />
-        </Tabs>
-        {readType === 0 ? (
-          <Box width="100%" height="30rem">
-            <BarcodeScannerComponent
-              width={"100%"}
-              height={"100%"}
-              onUpdate={(err, result) => {
-                if (result && result.getText()) {
-                  setBarcode(result.getText());
-                  setPopup(true);
-                }
-              }}
-            />
-          </Box>
-        ) : readType === 1 ? (
-          <Paper style={{ padding: "1rem", display: "grid", gap: "1rem" }}>
-            <TextField
-              type="text"
-              variant="outlined"
-              label="Barkod"
-              value={barcode}
-              onChange={(e) => setBarcode(e.target.value)}
-              fullWidth
-            />
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={() => setPopup(true)}
+        {shipmentItem.remainingMeter === 0 ? (
+          <>
+            <Dialog open={done} fullWidth>
+              <Box style={{ padding: "1rem", display: "grid", gap: "1rem" }}>
+                <Typography variant="h6">Sevk Emri Tamamlandı</Typography>
+                <Button
+                  color="success"
+                  variant="contained"
+                  onClick={() => setDone(false)}
+                >
+                  Tamam
+                </Button>
+                <Button
+                  color="error"
+                  variant="contained"
+                  onClick={() => router.back()}
+                >
+                  Geri Dön
+                </Button>
+              </Box>
+            </Dialog>
+          </>
+        ) : (
+          <>
+            <Tabs
+              value={readType}
+              onChange={(_, newValue) => setReadType(newValue)}
             >
-              Okut
-            </Button>
-          </Paper>
-        ) : null}
+              <Tab value={0} label="Barkod Okut" />
+              <Tab value={1} label="Manuel Giriş" />
+            </Tabs>
+            {readType === 0 ? (
+              <Box width="100%" height="30rem" maxHeight={"25vh"}>
+                <BarcodeScannerComponent
+                  width={"100%"}
+                  height={"100%"}
+                  onUpdate={(err, result) => {
+                    if (result && result.getText()) {
+                      setBarcode(result.getText());
+                      setPopup(true);
+                    }
+                  }}
+                />
+              </Box>
+            ) : readType === 1 ? (
+              <Paper style={{ padding: "1rem", display: "grid", gap: "1rem" }}>
+                <TextField
+                  type="text"
+                  variant="outlined"
+                  label="Barkod"
+                  value={barcode}
+                  onChange={(e) => setBarcode(e.target.value)}
+                  fullWidth
+                />
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={() => setPopup(true)}
+                >
+                  Okut
+                </Button>
+              </Paper>
+            ) : null}
+          </>
+        )}
+        <Paper elevation={3} style={{ padding: "16px", margin: "1rem" }}>
+          <Typography variant="h6" gutterBottom>
+            Ürün: {shipmentItem?.productName || "Yok"}
+          </Typography>
+          <Typography variant="h6" gutterBottom>
+            Renk: {shipmentItem?.dyeColorName || "Yok"}
+          </Typography>
+          <Typography variant="h6" gutterBottom>
+            Lamine Rengi: {shipmentItem?.laminationColorName || "Yok"}
+          </Typography>
+          <Typography variant="h6" gutterBottom>
+            Özellikler: {shipmentItem?.outSourceTypeNames || "Yok"}
+          </Typography>
+          <Typography variant="h6" gutterBottom>
+            Lot: {shipmentItem?.lot || "Yok"}
+          </Typography>
+          <Typography variant="h6" gutterBottom>
+            Kalan Metre: {shipmentItem?.remainingMeter || 0}
+          </Typography>
+          <Typography variant="h6" gutterBottom>
+            Kalan Kg: {shipmentItem?.remainingKg || 0}
+          </Typography>
+        </Paper>
         <Tabs value={tab} onChange={(_, newValue) => setTab(newValue)}>
           <Tab value={0} label="Okutulan Ürünler" />
           <Tab value={1} label="Stoktaki Uyumlu Ürünler" />
@@ -144,6 +202,8 @@ const Page: React.FC = () => {
             URI={"/order-shipment/scanned/" + id}
             disableColumnMenu={true}
             noActions
+            outerRefresh={refresh}
+            setOuterRefresh={setRefresh}
           />
         ) : tab === 1 ? (
           <EnhancedTable
@@ -157,6 +217,8 @@ const Page: React.FC = () => {
             URI={"/order-shipment/stock/" + id}
             disableColumnMenu={true}
             noActions
+            outerRefresh={refresh}
+            setOuterRefresh={setRefresh}
           />
         ) : null}
       </Box>
