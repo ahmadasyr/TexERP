@@ -837,7 +837,7 @@ model stock {
 
   // product data
   productId         Int
-  lot               String
+  lot               String?
   meter             Float
   kg                Float
   count             Int?        @default(1)

@@ -7,6 +7,9 @@ import {
   deleteDyeOrder,
   changeDyeOrderStatus,
   getOrderByShipment,
+  getDyeItemSpecs,
+  acceptDye,
+  deleteConfirmation,
 } from "../services/dyeOrderServices";
 
 import { Request, Response } from "express";
@@ -101,6 +104,41 @@ export const getOrderByShipmentController = async (
     const shipment = await getOrderByShipment(Number(req.params.id));
     res.status(200).json(shipment);
   } catch (error) {
+    res.status(400).json({ error: error });
+  }
+};
+
+export const getDyeItemSpecsController = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const dyeItemSpecs = await getDyeItemSpecs(Number(req.params.id));
+    res.status(200).json(dyeItemSpecs);
+  } catch (error) {
+    res.status(400).json({ error: error });
+  }
+};
+
+export const acceptDyeController = async (req: Request, res: Response) => {
+  try {
+    const dyeItemSpecs = await acceptDye(Number(req.params.id), req.body);
+    res.status(200).json(dyeItemSpecs);
+  } catch (error) {
+    console.log(error);
+    res.status(400).json({ error: error });
+  }
+};
+
+export const deleteConfirmationController = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const dyeOrder = await deleteConfirmation(Number(req.params.id));
+    res.status(200).json(dyeOrder);
+  } catch (error) {
+    console.log(error);
     res.status(400).json({ error: error });
   }
 };

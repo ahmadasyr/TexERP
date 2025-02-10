@@ -105,14 +105,18 @@ const OrderView = () => {
       headerName: "Detaylar",
       width: 150,
       renderCell: (params) => (
-        <Link href={`/dye-order-item/view/?id=${params.row.id}`}>
+        <Link href={`/dye-order/view/view/?id=${params.row.id}`}>
           <Button variant="contained" color="primary">
             Detaylar
           </Button>
         </Link>
       ),
     },
-    { field: "id", headerName: "ID", width: 70 },
+    {
+      field: "kazanNo",
+      headerName: "Kazan No",
+      width: 150,
+    },
     {
       field: "lot",
       headerName: "Lot",
@@ -275,6 +279,7 @@ const OrderView = () => {
                               startIcon={<EditNote />}
                               variant="contained"
                               color="primary"
+                              size="small"
                             >
                               İrsaliye Detaylarını Güncelle
                             </Button>
@@ -287,6 +292,7 @@ const OrderView = () => {
                               startIcon={<LocalOffer />}
                               variant="contained"
                               color="info"
+                              size="small"
                             >
                               Çeki Listesi Oluştur
                             </Button>
@@ -296,6 +302,7 @@ const OrderView = () => {
                               startIcon={<OpenInNew />}
                               variant="contained"
                               color="success"
+                              size="small"
                               onClick={() => {
                                 fetch(
                                   `/api/dye-shipment/open/${shipments[0].id}`,
@@ -320,6 +327,7 @@ const OrderView = () => {
                               startIcon={<Close />}
                               variant="contained"
                               color="error"
+                              size="small"
                               onClick={() => {
                                 fetch(
                                   `/api/dye-shipment/close/${shipments[0].id}`,

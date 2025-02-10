@@ -473,7 +473,7 @@ export default function EnhancedTable({
             )}
           </Grid>
           <GridToolbarQuickFilter />
-          {createable && (
+          {createable && selected.length === 0 && (
             <Link
               href={
                 conditions && !checkConditions({}, "create")
@@ -521,6 +521,7 @@ export default function EnhancedTable({
               startIcon={<Delete />}
               variant="outlined"
               color="error"
+              style={{ marginLeft: "auto" }}
               onClick={() => {
                 const newSelections: number[] = [];
                 if (conditions) {

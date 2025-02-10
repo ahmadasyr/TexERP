@@ -1,6 +1,6 @@
 import { HeadCell } from "../../components/table/utils";
 import { createField } from "../../components/form/utils";
-export const tableName = "material";
+export const tableName = "stock";
 // model stock {
 //   id        Int      @id @default(autoincrement())
 //   createdAt DateTime @default(now())
@@ -130,7 +130,7 @@ export const headCells: HeadCell[] = [
     id: "productionOrder",
     numeric: false,
     disablePadding: false,
-    label: "Üretim Siparişi",
+    label: "İş Emri",
     displayValue: ["id"],
   },
   {
@@ -184,4 +184,4 @@ export const headCells: HeadCell[] = [
   },
 ];
 
-export const title = "Malzemeler";
+export const title = "Stoklar";

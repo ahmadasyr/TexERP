@@ -390,7 +390,7 @@ export const handleBarcodeRead = async (body: {
             stock: { connect: { id: stock.id } },
             sentMeter: stock.meter,
             sentKg: stock.kg,
-            lot: stock.lot,
+            lot: stock.lot ? stock.lot : "",
             barcode: body.barcode,
           },
         })

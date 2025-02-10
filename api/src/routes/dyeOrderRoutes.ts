@@ -8,6 +8,9 @@ import {
   openDyeOrderController,
   closeDyeOrderController,
   getOrderByShipmentController,
+  getDyeItemSpecsController,
+  acceptDyeController,
+  deleteConfirmationController,
 } from "../controllers/dyeOrderController";
 
 import { Router } from "express";
@@ -15,6 +18,9 @@ import { Router } from "express";
 const router = Router();
 
 router.post("/", createDyeOrderController);
+router.post("/accept/:id", acceptDyeController);
+router.delete("/accept/:id", deleteConfirmationController);
+router.get("/specs/:id", getDyeItemSpecsController);
 router.get("/kazanNo", fetchHighestKazanNoController);
 router.put("/:id", updateDyeOrderController);
 router.get("/:id", fetchDyeOrderController);
