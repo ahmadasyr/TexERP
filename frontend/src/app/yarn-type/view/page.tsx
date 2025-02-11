@@ -10,7 +10,7 @@ import {
   GridCellParams,
   GridRenderEditCellParams,
 } from "@mui/x-data-grid";
-import { Box, Typography, Button, Grid } from "@mui/material";
+import { Box, Typography, Button, Grid, Paper } from "@mui/material";
 import SaveIcon from "@mui/icons-material/Save";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
@@ -427,7 +427,7 @@ const YarnTypeView = () => {
 
   const handleDeleteRow = async (rowId: number) => {
     const deleteId = yarnStockEntries.find((entry) => entry.no === rowId)?.id;
-    const confirmed = confirm("Are you sure you want to delete this row?");
+    const confirmed = confirm("Silmek istediğinize emin misiniz?");
     if (!confirmed) return;
     if (deleteId) {
       try {
@@ -479,7 +479,7 @@ const YarnTypeView = () => {
   const sales = yarnType?.yarnOrderItem.filter((item) => item.yarnOrder.sale);
   const totalSaleKg = sales?.reduce((total, item) => total + item.kg, 0);
   return (
-    <Box sx={{ p: 3 }}>
+    <Paper sx={{ p: 2, pb: 10, m: "auto", maxWidth: "98%", mt: 2 }}>
       {loading ? (
         <Typography>Loading...</Typography>
       ) : (
@@ -601,7 +601,7 @@ const YarnTypeView = () => {
           </Box>
         </>
       )}
-    </Box>
+    </Paper>
   );
 };
 export default YarnTypeView;

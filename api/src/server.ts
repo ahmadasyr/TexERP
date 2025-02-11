@@ -61,6 +61,9 @@ import reportIssue from "./routes/reportIssueRoutes";
 import dyeOrderRoutes from "./routes/dyeOrderRoutes";
 import dyeTypeRoutes from "./routes/dyeTypeRoutes";
 import dyeShipmentRoutes from "./routes/dyeShipmentRoutes";
+import outsourceOrderRoutes from "./routes/outsourceOrderRoutes";
+import outsourceShipmentRoutes from "./routes/outsourceShipmentRoutes";
+import yarnStockRoutes from "./routes/yarnStockRoutes";
 const cors = require("cors");
 
 const app = express();
@@ -189,5 +192,11 @@ app.use("/dye-order", dyeOrderRoutes);
 app.use("/dye-type", dyeTypeRoutes);
 // Use dyeShipment routes
 app.use("/dye-shipment", dyeShipmentRoutes);
+// Use outsourceOrder routes
+app.use("/outsource-order", outsourceOrderRoutes);
+// Use outsourceShipment routes
+app.use("/outsource-shipment", outsourceShipmentRoutes);
+// Use yarnStock routes
+app.use("/yarn-stock", yarnStockRoutes);
 
 export default app;

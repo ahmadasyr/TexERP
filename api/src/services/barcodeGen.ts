@@ -5,7 +5,7 @@ export function barcodeGenerator(stockStatus: stockStatus) {
     case "RAW_QUALITY":
       return "HK";
     case "COVER_QUALITY":
-      return "DK";
+      return "ÖK";
     case "DYE_QUALITY":
       return "BK";
     case "DYE_PRE_QUALITY":

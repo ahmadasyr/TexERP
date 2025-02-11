@@ -52,29 +52,11 @@ interface SheetProps {
 }
 
 export default function Sheet(props: SheetProps) {
-  const genNewKazan = () => {
-    // split kazan by letters and numbers
-    // add row.length + 2 to the number
-    // join kazan back together
-    if (highestKazan) {
-      const kazan = highestKazan.match(/(\D+)?(\d+)/);
-      if (kazan) {
-        const prefix = kazan[1] || "";
-        const number = String(parseInt(kazan[2]) + rows.length + 1).padStart(
-          kazan[2].length,
-          "0"
-        );
-        return prefix + number;
-      }
-    }
-    return highestKazan;
-  };
   function EditToolbar(props: EditToolbarProps) {
     const { setRows, setRowModesModel } = props;
 
     const handleClick = () => {
       const id = Math.random();
-      const kazan = genNewKazan();
       setRows((oldRows) => [
         ...oldRows,
         {
@@ -87,7 +69,6 @@ export default function Sheet(props: SheetProps) {
           quantity: 0,
           unit: "kg",
           note: "",
-          kazanNo: highestKazan ? kazan : "",
           personnelId: getPersonnelInfo().id,
         },
       ]);
@@ -229,13 +210,7 @@ export default function Sheet(props: SheetProps) {
           data.map((value: any) => ({ value: value.id, label: value.name }))
         );
       });
-    fetch("/api/dye-order/kazanNo")
-      .then((response) => response.json())
-      .then((data) => {
-        setHighestKazan(data);
-      });
   }, []);
-  const [highestKazan, setHighestKazan] = React.useState<string | null>("0");
   React.useEffect(() => {
     if (!formData.id) {
       setRows([]);
@@ -364,33 +339,27 @@ export default function Sheet(props: SheetProps) {
 
   const columns: GridColDef[] = [
     {
-      field: "groups",
-      headerName: "Lot ve Yön Seçimi",
-      width: 150,
+      field: "productId",
+      headerName: "Ürün",
+      type: "singleSelect",
       editable: true,
-      resizable: false,
-      sortable: false,
-      hideable: false,
-      filterable: false,
-
-      renderEditCell: (params) => <GroupsEditCell {...params} />,
-      renderCell: (params) => <GroupsEditCell {...params} />,
-    },
-    {
-      field: "lot",
-      headerName: "Lot",
-      type: "string",
-      editable: false,
       width: 150,
-    },
-    {
-      field: "yon",
-      headerName: "Yön",
-      type: "string",
-      editable: false,
-      width: 20,
-      valueFormatter: (params, row) =>
-        row.yon ? "B" : row.yon == false && row.yon !== null ? "A" : "",
+      valueOptions: products,
+      renderEditCell: (params: GridRenderEditCellParams) => (
+        <CustomAutocomplete
+          values={products}
+          valueKey="value"
+          displayValueKey="label"
+          value={params.value}
+          onChange={(newValue: any) => {
+            params.api.setEditCellValue({
+              id: params.id,
+              field: "productId",
+              value: newValue,
+            });
+          }}
+        />
+      ),
     },
     {
       field: "dyeColorId",
@@ -418,23 +387,23 @@ export default function Sheet(props: SheetProps) {
       ),
     },
     {
-      field: "dyeTypeId",
-      headerName: "Boya Tipi",
+      field: "laminationColorId",
+      headerName: "Lamine Rengi",
       type: "singleSelect",
-      valueOptions: dyeTypes,
+      valueOptions: laminationColors,
       editable: true,
       width: 200,
 
       renderEditCell: (params: GridRenderEditCellParams) => (
         <CustomAutocomplete
-          values={dyeTypes}
+          values={laminationColors}
           valueKey="value"
           displayValueKey="label"
           value={params.value}
           onChange={(newValue: any) => {
             params.api.setEditCellValue({
               id: params.id,
-              field: "dyeTypeId",
+              field: "laminationColorId",
               value: newValue,
             });
           }}
@@ -464,13 +433,6 @@ export default function Sheet(props: SheetProps) {
         },
       ],
       editable: true,
-    },
-    {
-      field: "kazanNo",
-      headerName: "Kazan No",
-      type: "string",
-      editable: true,
-      width: 120,
     },
     {
       field: "note",

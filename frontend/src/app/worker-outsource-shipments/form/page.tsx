@@ -1,20 +1,23 @@
 "use client";
-import { Data, formFields, tableName, title } from "../order";
+import { Data, formFields, tableName, title } from "../orderShipment";
 import React, { useEffect } from "react";
-import { Box, Button, Divider, Grid, Typography } from "@mui/material";
+import { Alert, Box, Button, Grid, Modal, Typography } from "@mui/material";
 import {
   NewTextField,
   NewSelect,
   NewCheckBox,
   NewRelation,
   NewDate,
+  NewNumber,
+  NewEmail,
+  NewPhone,
 } from "@/components/form/FormFields";
 import { useFormData } from "@/components/form/utils";
 import { FormModal } from "@/components/form/modal";
 import Popup from "@/components/form/Popup";
 import { useSearchParams } from "next/navigation";
 import Sheet from "./sheet";
-import { getPersonnelInfo } from "@/contexts/auth";
+import { usePersonnelId } from "@/contexts/auth";
 interface Page {
   popupHandler?: (data: any) => void;
   popupSetter?: (data: any) => void;
@@ -24,7 +27,6 @@ interface Page {
 const Page: React.FC = ({ popupHandler, popupSetter }: Page) => {
   const searchParams = useSearchParams();
   const id = searchParams.get("id");
-  const supplierId = searchParams.get("supplierId");
   const { formData, handleChange, tableData, runFetchData } =
     useFormData<Data>(formFields);
   const [alertValue, setAlertValue] = React.useState<number>(0);
@@ -40,35 +42,21 @@ const Page: React.FC = ({ popupHandler, popupSetter }: Page) => {
         .then((response) => response.json())
         .then((data) => {
           Object.keys(data).forEach((key) => {
-            if (key !== "dyeOrderItem") {
+            if (key !== "orderShipmentItem") {
               handleChange({
                 target: { name: key, value: data[key] },
               } as React.ChangeEvent<{ name: string; value: any }>);
             }
           });
-          setSubRows(data.dyeOrderItem);
+          setSubRows(data.orderShipmentItem || []);
           setRefresh(!refresh);
         });
     }
-    if (supplierId) {
-      handleChange({
-        target: { name: "supplierId", value: Number(supplierId) },
-      } as React.ChangeEvent<{ name: string; value: any }>);
-    }
-    if (!id) {
-      handleChange({
-        target: { name: "createdAt", value: new Date().toISOString() },
-      } as React.ChangeEvent<{ name: string; value: any }>);
-      handleChange({
-        target: { name: "personnelId", value: getPersonnelInfo().id },
-      } as React.ChangeEvent<{ name: string; value: any }>);
-    }
-  }, [id, supplierId]);
-
+  }, [id]);
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const rows = subRows.map((row) => {
-      const { isNew, dyeOrderId, ...rest } = row;
+      const { isNew, yarnOrderId, ...rest } = row;
       return rest;
     });
     if (id) {
@@ -80,7 +68,7 @@ const Page: React.FC = ({ popupHandler, popupSetter }: Page) => {
           },
           body: JSON.stringify({
             ...formData,
-            dyeOrderItem: rows,
+            orderShipmentItem: rows,
           }),
         });
 
@@ -99,8 +87,7 @@ const Page: React.FC = ({ popupHandler, popupSetter }: Page) => {
     } else {
       try {
         // add personnelId to formData
-        formData["personnelId"] = getPersonnelInfo().id;
-
+        formData["personnelId"] = usePersonnelId();
         const response = await fetch(`/api/${tableName}`, {
           method: "POST",
           headers: {
@@ -108,7 +95,7 @@ const Page: React.FC = ({ popupHandler, popupSetter }: Page) => {
           },
           body: JSON.stringify({
             ...formData,
-            dyeOrderItem: rows,
+            orderShipmentItem: rows,
           }),
         });
 
@@ -173,19 +160,7 @@ const Page: React.FC = ({ popupHandler, popupSetter }: Page) => {
       }
     });
     setOldFormData(formData);
-    if (formData.supplierId) {
-      // get customer info
-      tableData.find((row) => {
-        row.name === "customer" &&
-          row.values.find((value: any) => {
-            if (value.id === formData.supplierId) {
-              setSelectedCustomer(value);
-            }
-          });
-      });
-    }
   }, [formData]);
-  const [selectedCustomer, setSelectedCustomer] = React.useState<any>(null);
   const [subRows, setSubRows] = React.useState<any[]>([]);
   return (
     <>
@@ -203,7 +178,6 @@ const Page: React.FC = ({ popupHandler, popupSetter }: Page) => {
         handleChange={handleChange}
         formData={formData}
       />
-
       <form
         style={
           popupHandler
@@ -222,52 +196,44 @@ const Page: React.FC = ({ popupHandler, popupSetter }: Page) => {
         onSubmit={handleSubmit}
       >
         <Box width={"100%"}>
-          <Typography mb={4} variant="h4" gutterBottom>
+          <Typography variant="h4" gutterBottom>
             {title}
           </Typography>
           <Grid container spacing={1}>
+            <Grid item xs={12} md={4}>
+              <NewCheckBox {...allProps} keyProp="closed" />
+            </Grid>
             <Grid container spacing={1}>
-              {id && (
-                <Grid item xs={12} md={12}>
-                  <NewCheckBox {...allProps} keyProp="closed" />
-                </Grid>
-              )}
               <Grid item xs={12} md={4}>
-                <NewRelation {...allProps} keyProp="supplierId" />
+                <NewRelation {...allProps} keyProp="orderId" />
               </Grid>
               <Grid item xs={12} md={4}>
                 <NewDate {...allProps} keyProp="createdAt" />
               </Grid>
               <Grid item xs={12} md={4}>
-                <NewRelation
-                  {...allProps}
-                  keyProp="productId"
-                  disabled={id ? true : false}
-                />
+                <NewDate {...allProps} keyProp="sentDate" />
+              </Grid>
+
+              <Grid item xs={12} md={4}>
+                <NewRelation {...allProps} keyProp="shippingCompanyId" />
               </Grid>
               <Grid item xs={12} md={4}>
-                <NewSelect
-                  {...allProps}
-                  keyProp="stockStatus"
-                  disabled={id ? true : false}
-                />
+                <NewRelation {...allProps} keyProp="shippingCarrierId" />
               </Grid>
-              <Grid item xs={12} md={8}>
-                <NewTextField {...allProps} keyProp="description" />
+              <Grid item xs={12} md={4}>
+                <NewRelation {...allProps} keyProp="shippingCarId" />
+              </Grid>
+              <Grid item xs={12} md={4}>
+                <NewRelation {...allProps} keyProp="personnelId" />
               </Grid>
             </Grid>
-
-            <Divider sx={{ marginY: 2, width: "100%" }} />
             <Grid container spacing={1}>
-              <Grid item xs={12} md={12} style={{ overflow: "auto" }}>
-                {formData.productId && formData.stockStatus && (
-                  <Sheet
-                    refresh={refresh}
-                    subRows={subRows}
-                    setSubRows={setSubRows}
-                    formData={formData as any}
-                  />
-                )}
+              <Grid item xs={12} md={12}>
+                <Sheet
+                  refresh={refresh}
+                  subRows={subRows}
+                  setSubRows={setSubRows}
+                />
               </Grid>
             </Grid>
             <Button

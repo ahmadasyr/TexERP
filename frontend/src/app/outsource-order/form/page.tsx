@@ -40,13 +40,13 @@ const Page: React.FC = ({ popupHandler, popupSetter }: Page) => {
         .then((response) => response.json())
         .then((data) => {
           Object.keys(data).forEach((key) => {
-            if (key !== "dyeOrderItem") {
+            if (key !== "outsourceOrderItem") {
               handleChange({
                 target: { name: key, value: data[key] },
               } as React.ChangeEvent<{ name: string; value: any }>);
             }
           });
-          setSubRows(data.dyeOrderItem);
+          setSubRows(data.outsourceOrderItem);
           setRefresh(!refresh);
         });
     }
@@ -68,7 +68,7 @@ const Page: React.FC = ({ popupHandler, popupSetter }: Page) => {
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const rows = subRows.map((row) => {
-      const { isNew, dyeOrderId, ...rest } = row;
+      const { isNew, outsourceOrderId, ...rest } = row;
       return rest;
     });
     if (id) {
@@ -80,7 +80,7 @@ const Page: React.FC = ({ popupHandler, popupSetter }: Page) => {
           },
           body: JSON.stringify({
             ...formData,
-            dyeOrderItem: rows,
+            outsourceOrderItem: rows,
           }),
         });
 
@@ -108,7 +108,7 @@ const Page: React.FC = ({ popupHandler, popupSetter }: Page) => {
           },
           body: JSON.stringify({
             ...formData,
-            dyeOrderItem: rows,
+            outsourceOrderItem: rows,
           }),
         });
 
@@ -241,7 +241,7 @@ const Page: React.FC = ({ popupHandler, popupSetter }: Page) => {
               <Grid item xs={12} md={4}>
                 <NewRelation
                   {...allProps}
-                  keyProp="productId"
+                  keyProp="outsourceTypeId"
                   disabled={id ? true : false}
                 />
               </Grid>
@@ -260,7 +260,7 @@ const Page: React.FC = ({ popupHandler, popupSetter }: Page) => {
             <Divider sx={{ marginY: 2, width: "100%" }} />
             <Grid container spacing={1}>
               <Grid item xs={12} md={12} style={{ overflow: "auto" }}>
-                {formData.productId && formData.stockStatus && (
+                {formData.outsourceTypeId && formData.stockStatus && (
                   <Sheet
                     refresh={refresh}
                     subRows={subRows}

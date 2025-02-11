@@ -3,33 +3,32 @@ import { barcodeGenerator } from "./barcodeGen";
 
 const prisma = new PrismaClient();
 
-export const createDyeOrder = async (data: {
+export const createOutsourceOrder = async (data: {
   supplierId: number;
-  productId: number;
+  outsourceTypeId: number;
   stockStatus: stockStatus;
   personnelId: number;
-  dyeOrderItem: {
+  description?: string;
+  outsourceOrderItem: {
+    productId: number;
     dyeColorId: number;
-    dyeTypeId: number;
-    lot: string;
-    yon?: boolean;
+    laminationColorId: number;
     unit: unit;
     quantity: number;
-    kazanNo: string;
     note?: string;
     personnelId: number;
   }[];
 }) => {
-  const dyeOrder = await prisma.dyeOrder.create({
+  const outsourceOrder = await prisma.outsourceOrder.create({
     data: {
       supplier: {
         connect: {
           id: data.supplierId,
         },
       },
-      product: {
+      outsourceType: {
         connect: {
-          id: data.productId,
+          id: data.outsourceTypeId,
         },
       },
       stockStatus: data.stockStatus,
@@ -38,24 +37,27 @@ export const createDyeOrder = async (data: {
           id: data.personnelId,
         },
       },
-      dyeOrderItem: {
-        create: data.dyeOrderItem.map((item) => ({
+      description: data.description,
+      outsourceOrderItem: {
+        create: data.outsourceOrderItem.map((item) => ({
+          product: {
+            connect: {
+              id: item.productId,
+            },
+          },
           dyeColor: {
             connect: {
               id: item.dyeColorId,
             },
           },
-          dyeType: {
+          laminationColor: {
             connect: {
-              id: item.dyeTypeId,
+              id: item.laminationColorId,
             },
           },
-          lot: item.lot,
-          yon: item.yon,
           unit: item.unit,
           quantity: item.quantity,
-          kazanNo: item.kazanNo,
-          note: item.note,
+          note: item.note ?? "",
           personnel: {
             connect: {
               id: item.personnelId,
@@ -65,41 +67,30 @@ export const createDyeOrder = async (data: {
       },
     },
   });
-  return dyeOrder;
+  return outsourceOrder;
 };
 
-export const fetchHighestKazanNo = async () => {
-  const dyeOrderItem = await prisma.dyeOrderItem.findFirst({
-    orderBy: {
-      kazanNo: "desc",
-    },
-  });
-
-  return dyeOrderItem ? dyeOrderItem.kazanNo : null;
-};
-
-export const updateDyeOrder = async (
+export const updateOutsourceOrder = async (
   id: number,
   data: {
     supplierId: number;
-    productId: number;
+    outsourceTypeId: number;
     stockStatus: stockStatus;
     personnelId: number;
-    dyeOrderItem: {
+    description?: string;
+    outsourceOrderItem: {
       id?: number;
+      productId: number;
       dyeColorId: number;
-      dyeTypeId: number;
-      lot: string;
-      yon?: boolean;
+      laminationColorId: number;
       unit: unit;
       quantity: number;
-      kazanNo: string;
       note?: string;
       personnelId: number;
     }[];
   }
 ) => {
-  const dyeOrder = await prisma.dyeOrder.update({
+  const outsourceOrder = await prisma.outsourceOrder.update({
     where: {
       id,
     },
@@ -109,9 +100,9 @@ export const updateDyeOrder = async (
           id: data.supplierId,
         },
       },
-      product: {
+      outsourceType: {
         connect: {
-          id: data.productId,
+          id: data.outsourceTypeId,
         },
       },
       stockStatus: data.stockStatus,
@@ -120,34 +111,37 @@ export const updateDyeOrder = async (
           id: data.personnelId,
         },
       },
-      dyeOrderItem: {
+      description: data.description,
+      outsourceOrderItem: {
         deleteMany: {
           id: {
-            notIn: data.dyeOrderItem
+            notIn: data.outsourceOrderItem
               .map((item) => item.id)
               .filter((id): id is number => id !== undefined),
           },
         },
-        upsert: data.dyeOrderItem.map((item) => ({
+        upsert: data.outsourceOrderItem.map((item) => ({
           where: {
             id: item.id,
           },
           update: {
+            product: {
+              connect: {
+                id: item.productId,
+              },
+            },
             dyeColor: {
               connect: {
                 id: item.dyeColorId,
               },
             },
-            dyeType: {
+            laminationColor: {
               connect: {
-                id: item.dyeTypeId,
+                id: item.laminationColorId,
               },
             },
-            lot: item.lot,
-            yon: item.yon,
             unit: item.unit,
             quantity: item.quantity,
-            kazanNo: item.kazanNo,
             note: item.note,
             personnel: {
               connect: {
@@ -156,21 +150,23 @@ export const updateDyeOrder = async (
             },
           },
           create: {
+            product: {
+              connect: {
+                id: item.productId,
+              },
+            },
             dyeColor: {
               connect: {
                 id: item.dyeColorId,
               },
             },
-            dyeType: {
+            laminationColor: {
               connect: {
-                id: item.dyeTypeId,
+                id: item.laminationColorId,
               },
             },
-            lot: item.lot,
-            yon: item.yon,
             unit: item.unit,
             quantity: item.quantity,
-            kazanNo: item.kazanNo,
             note: item.note,
             personnel: {
               connect: {
@@ -182,11 +178,11 @@ export const updateDyeOrder = async (
       },
     },
   });
-  return dyeOrder;
+  return outsourceOrder;
 };
 
-export const deleteDyeOrder = async (id: number) => {
-  const dyeOrder = await prisma.dyeOrder.delete({
+export const deleteOutsourceOrder = async (id: number) => {
+  const dyeOrder = await prisma.outsourceOrder.delete({
     where: {
       id,
     },
@@ -194,95 +190,85 @@ export const deleteDyeOrder = async (id: number) => {
   return dyeOrder;
 };
 
-export const fetchDyeOrder = async (id: number) => {
-  const dyeOrder = await prisma.dyeOrder.findUnique({
+export const fetchOutsourceOrder = async (id: number) => {
+  const outsourceOrder = await prisma.outsourceOrder.findUnique({
     where: {
       id,
     },
     include: {
       supplier: true,
-      product: true,
+      outsourceType: true,
       personnel: true,
-      dyeOrderItem: {
+      outsourceOrderItem: {
         include: {
+          product: true,
           dyeColor: true,
-          dyeType: true,
+          laminationColor: true,
           personnel: true,
-          dyeShipmentItem: true,
-          dyeConfirmation: true,
+          outsourceShipmentItem: true,
+          outsourceConfirmation: true,
         },
       },
     },
   });
   return {
-    ...dyeOrder,
-    dyeOrderItem:
-      dyeOrder?.dyeOrderItem &&
-      dyeOrder.dyeOrderItem.map((item) => ({
+    ...outsourceOrder,
+    outsourceOrderItem:
+      outsourceOrder?.outsourceOrderItem &&
+      outsourceOrder.outsourceOrderItem.map((item) => ({
         ...item,
-        sentKg: item.dyeShipmentItem.reduce(
-          (acc, shipmentItem) => acc + shipmentItem.kg,
-          0
-        ),
-        sentMeter: item.dyeShipmentItem.reduce(
+        sentMeter: item.outsourceShipmentItem.reduce(
           (acc, shipmentItem) => acc + shipmentItem.meter,
           0
         ),
-        sentCount: item.dyeShipmentItem.reduce(
+        sentKg: item.outsourceShipmentItem.reduce(
+          (acc, shipmentItem) => acc + shipmentItem.kg,
+          0
+        ),
+        sentCount: item.outsourceShipmentItem.reduce(
           (acc, shipmentItem) => acc + shipmentItem.count,
           0
         ),
-        remainingKg:
-          item.dyeShipmentItem.reduce(
-            (acc, shipmentItem) => acc + shipmentItem.kg,
-            0
-          ) -
-          item.dyeConfirmation.reduce(
-            (acc, confirmation) => acc + confirmation.kg,
-            0
-          ),
-        remainingMeter:
-          item.dyeShipmentItem.reduce(
-            (acc, shipmentItem) => acc + shipmentItem.meter,
-            0
-          ) -
-          item.dyeConfirmation.reduce(
-            (acc, confirmation) => acc + confirmation.meter,
-            0
-          ),
-        remainingCount:
-          item.dyeShipmentItem.reduce(
-            (acc, shipmentItem) => acc + shipmentItem.count,
-            0
-          ) -
-          item.dyeConfirmation.reduce(
-            (acc, confirmation) => acc + confirmation.count,
-            0
-          ),
+        confirmedMeter: item.outsourceConfirmation.reduce(
+          (acc, confirmation) => acc + confirmation.meter,
+          0
+        ),
+        confirmedKg: item.outsourceConfirmation.reduce(
+          (acc, confirmation) => acc + confirmation.kg,
+          0
+        ),
+        confirmedCount: item.outsourceConfirmation.reduce(
+          (acc, confirmation) => acc + confirmation.count,
+          0
+        ),
       })),
   };
 };
 
-export const fetchDyeOrders = async () => {
-  const dyeOrders = await prisma.dyeOrder.findMany({
+export const fetchOutsourceOrders = async () => {
+  const outsourceOrders = await prisma.outsourceOrder.findMany({
     include: {
       supplier: true,
-      product: true,
+      outsourceType: true,
       personnel: true,
-      dyeOrderItem: {
+      outsourceOrderItem: {
         include: {
+          product: true,
           dyeColor: true,
-          dyeType: true,
+          laminationColor: true,
           personnel: true,
         },
       },
     },
   });
-  return dyeOrders;
+  return outsourceOrders;
 };
 
-export const changeDyeOrderStatus = async (id: number, closed: boolean) => {
-  const dyeOrder = await prisma.dyeOrder.update({
+export const changeOutsourceOrderStatus = async (
+  id: number,
+  closed: boolean
+) => {
+  const outsourceOrder = await prisma.outsourceOrder.update({
     where: {
       id,
     },
@@ -290,12 +276,12 @@ export const changeDyeOrderStatus = async (id: number, closed: boolean) => {
       closed,
     },
   });
-  return dyeOrder;
+  return outsourceOrder;
 };
 export const getOrderByShipment = async (id: number) => {
-  const order = await prisma.dyeOrder.findFirst({
+  const order = await prisma.outsourceOrder.findFirst({
     where: {
-      dyeShipment: {
+      outsourceShipment: {
         some: {
           id,
         },
@@ -304,14 +290,20 @@ export const getOrderByShipment = async (id: number) => {
     select: {
       id: true,
       createdAt: true,
-      product: {
+      supplier: {
         select: {
           name: true,
         },
       },
-      supplier: {
+      outsourceType: {
         select: {
           name: true,
+        },
+      },
+      personnel: {
+        select: {
+          firstName: true,
+          lastName: true,
         },
       },
     },
@@ -319,13 +311,13 @@ export const getOrderByShipment = async (id: number) => {
   return order;
 };
 
-export const getDyeItemSpecs = async (id: number) => {
-  const dyeOrderItem = await prisma.dyeOrderItem.findUnique({
+export const getOutsourceOrderItemSpecs = async (id: number) => {
+  const outsourceOrderItem = await prisma.outsourceOrderItem.findUnique({
     where: {
       id,
     },
     include: {
-      dyeConfirmation: {
+      outsourceConfirmation: {
         include: {
           personnel: {
             select: {
@@ -340,50 +332,47 @@ export const getDyeItemSpecs = async (id: number) => {
           },
         },
       },
-      dyeShipmentItem: true,
-      dyeOrder: {
-        include: {
-          product: {
-            select: {
-              name: true,
-            },
-          },
+      outsourceShipmentItem: true,
+      outsourceOrder: true,
+      product: {
+        select: {
+          name: true,
         },
       },
       dyeColor: true,
-      dyeType: true,
+      laminationColor: true,
     },
   });
   return {
-    ...dyeOrderItem,
-    confirmedKg: dyeOrderItem?.dyeConfirmation.reduce(
+    ...outsourceOrderItem,
+    confirmedKg: outsourceOrderItem?.outsourceConfirmation.reduce(
+      (acc, confirmation) => acc + confirmation.kg,
+      0
+    ),
+    confirmedMeter: outsourceOrderItem?.outsourceConfirmation.reduce(
+      (acc, confirmation) => acc + confirmation.meter,
+      0
+    ),
+    confirmedCount: outsourceOrderItem?.outsourceConfirmation.reduce(
+      (acc, confirmation) => acc + confirmation.count,
+      0
+    ),
+    shippedKg: outsourceOrderItem?.outsourceShipmentItem.reduce(
       (acc, shipmentItem) => acc + shipmentItem.kg,
       0
     ),
-    confirmedMeter: dyeOrderItem?.dyeConfirmation.reduce(
-      (acc, shipmentItem) => acc + shipmentItem.meter,
-      0
-    ),
-    confirmedCount: dyeOrderItem?.dyeConfirmation.reduce(
+    shippedCount: outsourceOrderItem?.outsourceShipmentItem.reduce(
       (acc, shipmentItem) => acc + shipmentItem.count,
       0
     ),
-    shippedKg: dyeOrderItem?.dyeShipmentItem.reduce(
-      (acc, shipmentItem) => acc + shipmentItem.kg,
-      0
-    ),
-    shippedCount: dyeOrderItem?.dyeShipmentItem.reduce(
-      (acc, shipmentItem) => acc + shipmentItem.count,
-      0
-    ),
-    shippedMeter: dyeOrderItem?.dyeShipmentItem.reduce(
+    shippedMeter: outsourceOrderItem?.outsourceShipmentItem.reduce(
       (acc, shipmentItem) => acc + shipmentItem.meter,
       0
     ),
   };
 };
 
-export const acceptDye = async (
+export const acceptOutsourceOrder = async (
   id: number,
   data: {
     oneBarcode: boolean;
@@ -411,34 +400,37 @@ export const acceptDye = async (
     throw new Error("topCount must be greater than zero.");
   }
 
-  const dyeOrderItem = await prisma.dyeOrderItem.findUnique({ where: { id } });
-  if (!dyeOrderItem) {
-    throw new Error(`DyeOrderItem with id ${id} not found.`);
+  const outsourceOrderItem = await prisma.outsourceOrderItem.findUnique({
+    where: { id },
+  });
+  if (!outsourceOrderItem) {
+    throw new Error(`OutsourceOrderItem with id ${id} not found.`);
   }
 
   if (data.perTop && !data.oneBarcode) {
     await Promise.all(
       Array.from({ length: data.topCount }).map(async () => {
-        const confirmation = await prisma.dyeConfirmation.create({
+        const confirmation = await prisma.outsourceConfirmation.create({
           data: {
-            dyeOrderItem: { connect: { id } },
+            outsourceOrderItem: { connect: { id } },
             meter: data.topMeter,
             kg: data.topKg,
             count: 1,
             personnel: { connect: { id: data.personnelId } },
             stock: {
               create: {
-                kazanNo: dyeOrderItem.kazanNo,
-                lot: dyeOrderItem.lot || "",
                 meter: data.topMeter,
                 kg: data.topKg,
                 count: 1,
-                yon: dyeOrderItem.yon,
                 product: { connect: { id: data.productId } },
-                status: "DYE_PRE_QUALITY",
+                status: data.stockStatus,
                 personnel: { connect: { id: data.personnelId } },
-                dyeColor: { connect: { id: dyeOrderItem.dyeColorId } },
-                dyeType: { connect: { id: dyeOrderItem.dyeTypeId } },
+                dyeColor: outsourceOrderItem.dyeColorId
+                  ? { connect: { id: outsourceOrderItem.dyeColorId } }
+                  : undefined,
+                laminationColor: outsourceOrderItem.laminationColorId
+                  ? { connect: { id: outsourceOrderItem.laminationColorId } }
+                  : undefined,
               },
             },
           },
@@ -447,7 +439,7 @@ export const acceptDye = async (
         await prisma.stock.update({
           where: { id: confirmation.stockId },
           data: {
-            barcode: barcodeGenerator("DYE_PRE_QUALITY") + confirmation.stockId,
+            barcode: barcodeGenerator(data.stockStatus) + confirmation.stockId,
           },
         });
       })
@@ -462,26 +454,27 @@ export const acceptDye = async (
 
     await Promise.all(
       Array.from({ length: data.topCount }).map(async () => {
-        const confirmation = await prisma.dyeConfirmation.create({
+        const confirmation = await prisma.outsourceConfirmation.create({
           data: {
-            dyeOrderItem: { connect: { id } },
+            outsourceOrderItem: { connect: { id } },
             meter: splitMeter,
             kg: splitKg,
             count: 1,
             personnel: { connect: { id: data.personnelId } },
             stock: {
               create: {
-                kazanNo: dyeOrderItem.kazanNo,
-                lot: dyeOrderItem.lot || "",
                 meter: splitMeter,
                 kg: splitKg,
                 count: 1,
-                yon: dyeOrderItem.yon,
                 product: { connect: { id: data.productId } },
-                status: "DYE_PRE_QUALITY",
+                status: data.stockStatus,
                 personnel: { connect: { id: data.personnelId } },
-                dyeColor: { connect: { id: dyeOrderItem.dyeColorId } },
-                dyeType: { connect: { id: dyeOrderItem.dyeTypeId } },
+                dyeColor: outsourceOrderItem.dyeColorId
+                  ? { connect: { id: outsourceOrderItem.dyeColorId } }
+                  : undefined,
+                laminationColor: outsourceOrderItem.laminationColorId
+                  ? { connect: { id: outsourceOrderItem.laminationColorId } }
+                  : undefined,
               },
             },
           },
@@ -490,32 +483,33 @@ export const acceptDye = async (
         await prisma.stock.update({
           where: { id: confirmation.stockId },
           data: {
-            barcode: barcodeGenerator("DYE_PRE_QUALITY") + confirmation.stockId,
+            barcode: barcodeGenerator(data.stockStatus) + confirmation.stockId,
           },
         });
       })
     );
   } else if (data.oneBarcode) {
-    const confirmation = await prisma.dyeConfirmation.create({
+    const confirmation = await prisma.outsourceConfirmation.create({
       data: {
-        dyeOrderItem: { connect: { id } },
+        outsourceOrderItem: { connect: { id } },
         meter: data.topMeter,
         kg: data.topKg,
         count: data.topCount,
         personnel: { connect: { id: data.personnelId } },
         stock: {
           create: {
-            kazanNo: dyeOrderItem.kazanNo,
-            lot: dyeOrderItem.lot || "",
             meter: data.topMeter,
             kg: data.topKg,
             count: data.topCount,
-            yon: dyeOrderItem.yon,
             product: { connect: { id: data.productId } },
-            status: "DYE_PRE_QUALITY",
+            status: data.stockStatus,
             personnel: { connect: { id: data.personnelId } },
-            dyeColor: { connect: { id: dyeOrderItem.dyeColorId } },
-            dyeType: { connect: { id: dyeOrderItem.dyeTypeId } },
+            dyeColor: outsourceOrderItem.dyeColorId
+              ? { connect: { id: outsourceOrderItem.dyeColorId } }
+              : undefined,
+            laminationColor: outsourceOrderItem.laminationColorId
+              ? { connect: { id: outsourceOrderItem.laminationColorId } }
+              : undefined,
           },
         },
       },
@@ -524,14 +518,14 @@ export const acceptDye = async (
     await prisma.stock.update({
       where: { id: confirmation.stockId },
       data: {
-        barcode: barcodeGenerator("DYE_PRE_QUALITY") + confirmation.stockId,
+        barcode: barcodeGenerator(data.stockStatus) + confirmation.stockId,
       },
     });
   }
 };
 
 export const deleteConfirmation = async (id: number) => {
-  const confirmation = await prisma.dyeConfirmation
+  const confirmation = await prisma.outsourceConfirmation
     .delete({
       where: {
         id,

@@ -1,30 +1,41 @@
 "use client";
-import { Data, formFields, tableName, title } from "../order";
+import { Data, formFields, tableName, title } from "../stock";
 import React, { useEffect } from "react";
-import { Box, Button, Divider, Grid, Typography } from "@mui/material";
+import {
+  Alert,
+  Box,
+  Button,
+  Grid,
+  Modal,
+  Typography,
+  ButtonGroup,
+  Tooltip,
+} from "@mui/material";
 import {
   NewTextField,
   NewSelect,
   NewCheckBox,
   NewRelation,
   NewDate,
+  NewNumber,
+  NewEmail,
+  NewPhone,
 } from "@/components/form/FormFields";
 import { useFormData } from "@/components/form/utils";
 import { FormModal } from "@/components/form/modal";
 import Popup from "@/components/form/Popup";
 import { useSearchParams } from "next/navigation";
-import Sheet from "./sheet";
 import { getPersonnelInfo } from "@/contexts/auth";
-interface Page {
+interface MaterialProps {
   popupHandler?: (data: any) => void;
   popupSetter?: (data: any) => void;
   render?: any[];
 }
 
-const Page: React.FC = ({ popupHandler, popupSetter }: Page) => {
+const Material: any = ({ popupHandler, popupSetter }: MaterialProps) => {
   const searchParams = useSearchParams();
   const id = searchParams.get("id");
-  const supplierId = searchParams.get("supplierId");
+  const purchaseOrderItemId = Number(searchParams.get("purchaseOrderItemId"));
   const { formData, handleChange, tableData, runFetchData } =
     useFormData<Data>(formFields);
   const [alertValue, setAlertValue] = React.useState<number>(0);
@@ -33,44 +44,33 @@ const Page: React.FC = ({ popupHandler, popupSetter }: Page) => {
     table: "",
     column: "",
   });
-  const [refresh, setRefresh] = React.useState<boolean>(false);
+
   useEffect(() => {
     if (id && !popupHandler) {
       fetch(`/api/${tableName}/${id}`)
         .then((response) => response.json())
         .then((data) => {
           Object.keys(data).forEach((key) => {
-            if (key !== "dyeOrderItem") {
-              handleChange({
-                target: { name: key, value: data[key] },
-              } as React.ChangeEvent<{ name: string; value: any }>);
-            }
+            handleChange({
+              target: { name: key, value: data[key] },
+            } as React.ChangeEvent<{ name: string; value: any }>);
           });
-          setSubRows(data.dyeOrderItem);
-          setRefresh(!refresh);
         });
     }
-    if (supplierId) {
+  }, [id]);
+  const [purchaseOrderItemDetails, setPurchaseOrderItemDetails] =
+    React.useState<any>(null);
+  useEffect(() => {
+    !id &&
       handleChange({
-        target: { name: "supplierId", value: Number(supplierId) },
+        target: {
+          name: "personnelId",
+          value: getPersonnelInfo().id,
+        },
       } as React.ChangeEvent<{ name: string; value: any }>);
-    }
-    if (!id) {
-      handleChange({
-        target: { name: "createdAt", value: new Date().toISOString() },
-      } as React.ChangeEvent<{ name: string; value: any }>);
-      handleChange({
-        target: { name: "personnelId", value: getPersonnelInfo().id },
-      } as React.ChangeEvent<{ name: string; value: any }>);
-    }
-  }, [id, supplierId]);
-
+  }, []);
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const rows = subRows.map((row) => {
-      const { isNew, dyeOrderId, ...rest } = row;
-      return rest;
-    });
     if (id) {
       try {
         const response = await fetch(`/api/${tableName}/${id}`, {
@@ -78,10 +78,7 @@ const Page: React.FC = ({ popupHandler, popupSetter }: Page) => {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({
-            ...formData,
-            dyeOrderItem: rows,
-          }),
+          body: JSON.stringify(formData),
         });
 
         if (!response.ok) {
@@ -98,18 +95,13 @@ const Page: React.FC = ({ popupHandler, popupSetter }: Page) => {
       }
     } else {
       try {
-        // add personnelId to formData
-        formData["personnelId"] = getPersonnelInfo().id;
-
+        formData.personnelId = getPersonnelInfo().id;
         const response = await fetch(`/api/${tableName}`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({
-            ...formData,
-            dyeOrderItem: rows,
-          }),
+          body: JSON.stringify(formData),
         });
 
         if (!response.ok) {
@@ -160,33 +152,6 @@ const Page: React.FC = ({ popupHandler, popupSetter }: Page) => {
     });
   }
 
-  const [oldFormData, setOldFormData] = React.useState<any>({});
-
-  useEffect(() => {
-    formFields.forEach((field) => {
-      if (
-        field.relation &&
-        oldFormData[field.name as keyof Data] !==
-          formData[field.name as keyof Data]
-      ) {
-        runFetchData();
-      }
-    });
-    setOldFormData(formData);
-    if (formData.supplierId) {
-      // get customer info
-      tableData.find((row) => {
-        row.name === "customer" &&
-          row.values.find((value: any) => {
-            if (value.id === formData.supplierId) {
-              setSelectedCustomer(value);
-            }
-          });
-      });
-    }
-  }, [formData]);
-  const [selectedCustomer, setSelectedCustomer] = React.useState<any>(null);
-  const [subRows, setSubRows] = React.useState<any[]>([]);
   return (
     <>
       <Popup
@@ -203,7 +168,6 @@ const Page: React.FC = ({ popupHandler, popupSetter }: Page) => {
         handleChange={handleChange}
         formData={formData}
       />
-
       <form
         style={
           popupHandler
@@ -222,67 +186,85 @@ const Page: React.FC = ({ popupHandler, popupSetter }: Page) => {
         onSubmit={handleSubmit}
       >
         <Box width={"100%"}>
-          <Typography mb={4} variant="h4" gutterBottom>
+          <Typography variant="h4" gutterBottom>
             {title}
           </Typography>
           <Grid container spacing={1}>
-            <Grid container spacing={1}>
-              {id && (
-                <Grid item xs={12} md={12}>
-                  <NewCheckBox {...allProps} keyProp="closed" />
+            <Grid item xs={6} md={4}>
+              <NewRelation {...allProps} keyProp="yarnTypeId" />
+            </Grid>
+            <Grid item xs={6} md={4}>
+              <NewRelation {...allProps} keyProp="warehouseId" />
+            </Grid>
+            <Grid item xs={6} md={4}>
+              <NewTextField {...allProps} keyProp="lot" />
+            </Grid>
+            <Grid item xs={6} md={4}>
+              <NewNumber {...allProps} keyProp="entryKg" />
+            </Grid>
+            <Grid item xs={6} md={4}>
+              <NewNumber {...allProps} keyProp="entryCount" />
+            </Grid>
+            {id && (
+              <>
+                <Grid item xs={6} md={4}>
+                  <NewNumber {...allProps} keyProp="netKg" />
                 </Grid>
-              )}
-              <Grid item xs={12} md={4}>
-                <NewRelation {...allProps} keyProp="supplierId" />
-              </Grid>
-              <Grid item xs={12} md={4}>
-                <NewDate {...allProps} keyProp="createdAt" />
-              </Grid>
-              <Grid item xs={12} md={4}>
-                <NewRelation
-                  {...allProps}
-                  keyProp="productId"
-                  disabled={id ? true : false}
-                />
-              </Grid>
-              <Grid item xs={12} md={4}>
-                <NewSelect
-                  {...allProps}
-                  keyProp="stockStatus"
-                  disabled={id ? true : false}
-                />
-              </Grid>
-              <Grid item xs={12} md={8}>
-                <NewTextField {...allProps} keyProp="description" />
-              </Grid>
-            </Grid>
-
-            <Divider sx={{ marginY: 2, width: "100%" }} />
-            <Grid container spacing={1}>
-              <Grid item xs={12} md={12} style={{ overflow: "auto" }}>
-                {formData.productId && formData.stockStatus && (
-                  <Sheet
-                    refresh={refresh}
-                    subRows={subRows}
-                    setSubRows={setSubRows}
-                    formData={formData as any}
-                  />
-                )}
-              </Grid>
-            </Grid>
-            <Button
-              style={{ marginTop: "1rem" }}
-              type="submit"
-              variant="contained"
-              color="primary"
-            >
-              Kaydet
-            </Button>
+                <Grid item xs={6} md={4}>
+                  <NewNumber {...allProps} keyProp="count" />
+                </Grid>
+              </>
+            )}
           </Grid>
+          <ButtonGroup
+            variant="outlined"
+            aria-label="Loading button group"
+            style={{ display: "flex", justifyContent: "right" }}
+          >
+            {/* Save Button */}
+            <Tooltip title="Kaydetmek için tıklayın">
+              <Button
+                type="submit"
+                variant="contained"
+                color="primary"
+                size="large"
+              >
+                Kaydet
+              </Button>
+            </Tooltip>
+
+            {/* Restore Button */}
+            <Tooltip title="Formu yerel verilerle geri yükle">
+              <Button
+                onClick={() => {
+                  setAlertValue(-2);
+                }}
+                variant="contained"
+                color="secondary"
+                size="large"
+              >
+                Geri Yükle
+              </Button>
+            </Tooltip>
+
+            {/* Reset Button */}
+            <Tooltip title="Formu sıfırla">
+              <Button
+                onClick={() => {
+                  setAlertValue(-1);
+                }}
+                variant="text"
+                color="error"
+                size="large"
+              >
+                Sıfırla
+              </Button>
+            </Tooltip>
+          </ButtonGroup>
         </Box>
       </form>
     </>
   );
 };
 
-export default Page;
+export default Material;

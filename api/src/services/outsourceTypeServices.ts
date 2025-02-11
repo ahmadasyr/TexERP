@@ -29,9 +29,13 @@ export const getOutsourceTypeById = async (id: number) => {
 };
 
 export const getAllOutsourceTypes = async () => {
-  return await prisma.outsourceType.findMany({
+  const types = await prisma.outsourceType.findMany({
     include: { outsourceGroup: true, parentOutsourceType: true },
   });
+  return types.map((type) => ({
+    ...type,
+    group: type?.outsourceGroup?.name,
+  }));
 };
 
 export const updateOutsourceType = async (

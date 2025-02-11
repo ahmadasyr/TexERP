@@ -170,41 +170,29 @@
             "icon": "shopping_cart"
           },
           {
-            "title": "Boyahane Çeki Listeleri",
+            "title": "Boyahane Sevkiyatları",
             "link": "/dye-shipment",
-            "desc": "Boyahane çeki listesi",
-            "icon": "list"
-          },
-          {
-            "title": "Boyahane İrsaliyeler",
-            "link": "/worker-dye-shipments",
-            "desc": "Boyahane irsaliye listesi",
-            "icon": "list"
+            "desc": "Boyahane sevk listesi",
+            "icon": "local_shipping"
           }
         ]
       },
       {
         "title": "Fason İşlemleri",
         "desc ": "Fason işlemleri menüsü",
-        "icon": "local_shipping",
+        "icon": "domain_add",
         "subItems": [
           {
             "title": "Fason Siparişleri",
-            "link": "/outsourcing-order",
+            "link": "/outsource-order",
             "desc": "Fason sipariş listesi",
             "icon": "shopping_cart"
           },
           {
-            "title": "Fason Çeki Listeleri",
-            "link": "/outsourcing-draw-list",
-            "desc": "Fason çeki listesi",
-            "icon": "list"
-          },
-          {
-            "title": "Fason Gelen İrsaliyeler",
-            "link": "/outsourcing-receipt",
-            "desc": "Fason gelen irsaliye listesi",
-            "icon": "list"
+            "title": "Fason Sevkiyatları",
+            "link": "/outsource-shipment",
+            "desc": "Fason sevkiyat listesi",
+            "icon": "local_shipping"
           }
         ]
       },
@@ -371,14 +359,20 @@
       {
         "title": "Açık Satış Sevk Emirleri",
         "desc": "Kumaş satış sevkiyatları menüsü",
-        "icon": "format_list_bulleted",
+        "icon": "shopping_cart",
         "link": "/worker-shipments"
       },
       {
         "title": "Açık Boyahane Sevk Emirleri",
         "desc": "Boyahane sevkiyatları menüsü",
-        "icon": "format_list_bulleted",
+        "icon": "color_lens",
         "link": "/worker-dye-shipments"
+      },
+      {
+        "title": "Açık Fason Sevk Emirleri",
+        "link": "/worker-outsource-shipments",
+        "desc": "Fason Sevk Emirleri listesi",
+        "icon": "domain"
       }
     ]
   },
@@ -440,7 +434,7 @@
         "title": "İplik Depo",
         "desc": "İplik depo işlemleri menüsü",
         "icon": "sports_volleyball",
-        "link": "#"
+        "link": "/yarn-stock"
       },
       {
         "title": "Çözgü Depo",

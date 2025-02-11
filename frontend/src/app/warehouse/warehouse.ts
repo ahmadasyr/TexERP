@@ -37,7 +37,7 @@ export const formFields = [
 export const headCells: HeadCell[] = [
   { id: "id", numeric: true, disablePadding: true, label: "No" },
   { id: "name", numeric: false, disablePadding: false, label: "İsim" },
-  { id: "address", numeric: false, disablePadding: false, label: "Şehir" },
+  { id: "address", numeric: false, disablePadding: false, label: "Adres" },
   {
     id: "personnel",
     numeric: false,
